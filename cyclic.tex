@@ -9,6 +9,7 @@
 \newenvironment{tikzc}[1][]{\begin{center}\begin{tikzpicture}[#1]}{\end{tikzpicture}\end{center}}
 \tikzset{>=stealth}
 \tikzset{ed/.style={auto,inner sep=0pt,font=\scriptsize}} %edges
+\tikzset{arr/.style={draw,isosceles triangle,inner sep=2pt}} %arrows
 
 \newcommand{\C}{\cC}
 \newcommand{\V}{\cV}
@@ -18,6 +19,7 @@
 \autodefs{\cMod}
 
 \newcommand{\blank}{\mathord{\hspace{1pt}\text{--}\hspace{1pt}}}
+\newcommand{\uniq}{\mathord{!}}
 
 \title{Cyclic virtual equipments}
 \author{Michael Shulman}
@@ -71,13 +73,16 @@ For instance, an element of $H_\C((A,B\op,A\op,C),(C,B\op)$ could be drawn like 
 The actions of $S\C$ are given by rearranging the pairs and composing isomorphisms; we need $\C$ to be a groupoid since we end up having to compose in both directions.
 
 In what follows we will be interested in a particular restriction of the pairing profunctor.
-Let $R$ denote the free strict monoidal category monad.
-We have a obvious map of monads $R\to S$, and composing it with the multiplication of $S$ we have a functor $\theta : RSX \to SSX \to SX$.
-On the other hand, for a set $X$ (regarded as a discrete category) taking the set of objects of $SX$ gives a monad $S_0$ on $\mathbf{Set}$ whose algebras are monoids with an involution.
-We again have an obvious map of monads $S_0 \to S$, and an induced composite $\psi : SS_0X \to SSX \to SX$.
-Let $H'_X = H_X(\theta,\psi)$, a profunctor from $SS_0X$ to $RSX$; thus we have just decomposed the domain and codomain of $H$ in a particular way.
+Let $\mu:SS\to S$ denote the multiplication of the monad $S$.
+Let $R$ denote the free strict monoidal category monad, which comes with an obvious map of monads $\theta : R\to S$.
+Define
+\begin{align*}
+  H'_X &= H_X(\mu \circ \theta S,\mu)\\
+  &\cong \mu_* \odot H_X \odot \mu^* \odot \theta S^*
+\end{align*}
+This is a profunctor from $SSX$ to $RSX$; thus we have just decomposed the domain and codomain of $H$ in a particular way.
 
-Now we define a \textbf{node family} to consist of a set $X$, regarded as a discrete category, together with a diagram $Y:SX\to\mathbf{Set}$.
+Now we define a \textbf{node family} to consist of a groupoid $X$ together with a diagram $Y:SX\to\mathbf{Set}$, which we will often regard as a profunctor from $SX$ to $1$.
 We picture the elements of $Y$ as labels for nodes in directed graphs, equipped with an (ordered) labeling on their edges: the objects labeled with $(\blank)\op$ correspond to edges going out, while those without $(\blank)\op$ are edges going in.
 For instance, $M\in Y(A,B\op,B,C\op,A)$ might be drawn like this:
 \begin{tikzc}
@@ -88,15 +93,20 @@ For instance, $M\in Y(A,B\op,B,C\op,A)$ might be drawn like this:
   \draw[->] (M) -- node[ed] {$C$} (-1,0) node[ed,anchor=east] {4};
   \draw[<-] (M) -- node[ed] {$A$} (-.3,1) node[ed,anchor=south east] {5};
 \end{tikzc}
-Since $X$ is discrete, the only morphisms in $SX$ are permutations respecting the opposites.
-This essentially means we have operations allowing us to renumber the edges of any node.
-Note that these actions are not in general free: if for instance $M \in Y(A,A)$ it might, or might not, be the case that $M$ is fixed by switching the two $A$'s.
+The morphisms in $SX$ are permutations labeled by isomorphisms in $X$ that respect the opposites.
+This essentially means that the morphisms of $X$ act on nodes, and moreover we have operations allowing us to renumber the edges of any node.
+Note that these actions are not in general free: if for instance $M \in Y(A,A)$ it might, or might not, be the case that $M$ is fixed by switching the two $A$s.
 
 Given a node family $(X,Y)$, we define a new node family $T(X,Y)$ as follows.
-Its underlying set is $S_0X$.
-To define the nodes of $T(X,Y)$, first note that the free strict monoidal category monad $R$ can be extended to act on diagrams, giving a diagram $RY : RSX \to \mathbf{Set}$.
-Now we tensor this diagram with $H'_X$ over $RSX$, obtaining a diagram $SS_0X \to \mathbf{Set}$; this is the diagram of nodes in $T(X,Y)$.
-More concretely, these nodes are obtained as follows:
+Its underlying groupoid is $S X$.
+To define the nodes of $T(X,Y)$, first note that the free strict monoidal category monad $R$ can be extended to act on profunctors, giving a profunctor $RY : RSX \to R1$.
+The elements of $RY(n,\omega)$, where $\omega$ is a list of elements of $SX$ of length $n$, are permutations of $n$ labeled by elements of $Y$.
+In other words, $RY(n,\omega)$ is a copower by $\Sigma_n$ of the set of length-$n$ lists of elements of $Y$.
+Thus, if we left Kan extend $RY$ along the unique functor $\uniq:R1\to 1$ (which is the same as composing it with the representable profunctor ``$\uniq_*$'' from $R1$ to $1$), we get a profunctor whose elements are precisely finite lists of elements of $Y$.
+Now we also compose this profunctor on the left with $H'_X$, obtaining a profunctor
+\[ H'_X \odot RY \odot \uniq_* : SSX \hto 1.\]
+This is the diagram of nodes in $T(X,Y)$.
+More concretely, they are obtained as follows.
 \begin{enumerate}
 \item Consider a finite list of nodes in $Y$
 \item Renumber their combined edges arbitrarily (compatibly with how we already know how to renumber the edges of each node individually)
@@ -110,84 +120,59 @@ The operation $T$ is almost a monad on the category of node families.
 We have a map $(X,Y) \to T(X,Y)$ arising from the units of the monads $S$ and $R$: on nodes it does no renumbering, pairing, or antipairing, and decomposes $(A,B\op,C)$ as $((A),(B)\op,(C))$.
 And we have a \emph{partial} map $TT(X,Y)\rightharpoonup T(X,Y)$ defined as follows.
 
-On objects it is simply the multiplication of the monad $S_0$ (and hence is total).
+On objects it is simply the multiplication of the monad $S$ (and hence is total).
 On nodes, what we need is a map
-\[H'_{S_0 X} \otimes_{RSS_0X} R(H'_X \otimes_{RSX} RY) \rightharpoonup H'_X \otimes_{RSX} RY\]
-lying over the map $SS_0S_0 X \to SS_0 X$ ($S$ of the multiplication of the monad $S_0$).
-Now it is a fact that $R$ extended to profunctors is a strong functor, so our desired domain can be identified with
-\[ H'_{S_0 X} \otimes_{RSS_0X} RH'_X \otimes_{RRSX} RRY \]
-or, looking at the definition of $H'$ in terms of $H$,
-\[ {SS_0X}(1,\phi S_0) \odot % \otimes_{S S_0 X}
-  H_{S_0 X} \odot %\otimes_{S S_0 X}
-  SS_0X(\theta S_0,1) \odot %\otimes_{RSS_0 X}
-  RSX(1,R\phi)\odot % \otimes_{RSX}
-  R H_X \odot % \otimes_{RSX}
-  RSX(R\theta,1) \odot %\otimes_{RRSX}
-  RRY \]
-Now the following diagram commutes, by naturality:
-\begin{equation*}
-  \vcenter{\xymatrix{
-      RSS_0 \ar[r]^{R\phi}\ar[d]_{\theta S_0} &
-      RS\ar[d]^{\theta}\\
-      SS_0\ar[r]_{\phi} &
-      S.
-    }}
-\end{equation*}
-Therefore, we have a map
-\[SS_0X(\theta S_0,1) \odot RSX(1,R\phi) \too SX(1,\phi) \odot SX(\theta,1)
-\]
-Applying this in the middle of the above long composite, we get
-\[ {SS_0X}(1,\phi S_0) \odot
-  H_{S_0 X} \odot
-  SX(1,\phi) \odot
-  SX(\theta,1) \odot
-  RH_x \odot
-  RSX(R\theta,1) \odot 
-  RRY \]
-Now we have two cells of profunctors
-\begin{equation*}
-  \vcenter{\xymatrix{
-      RSX\ar[r]|{|}^{R H_X}\ar[d]_{\theta} \ar@{}[dr]|{\Downarrow} &
-      RSX \ar[d]^{\theta}\\
-      SX\ar[r]|{|}_R &
-      SX
-    }}\qquad\text{and}\qquad
-  \vcenter{\xymatrix{
-      SS_0X\ar[r]|{|}^{H_{S_0 X}}\ar[d]_{\phi} \ar@{}[dr]|{\Downarrow} &
-      SS_0X \ar[d]^{\phi}\\
-      SX\ar[r]|{|}_R &
-      SX
-    }}
-\end{equation*}
-The first is obtained by discarding the brackets in a list of pairings, and the second by ``distributing'' a pairing between words to a pairing between their elements.
-This gives us maps
-\[SX(\theta,1) \odot RH_x \to H_x \odot SX(\theta,1) \]
-\[ H_{S_0 X} \odot SX(1,\phi) \to SX(1,\phi) \odot H_X. \]
-Applying these in the middle of the long composite, we get
-\[ {SS_0X}(1,\phi S_0) \odot
-  SX(1,\phi) \odot
-  H_{X} \odot
-  H_X \odot SX(\theta,1) \odot
-  RSX(R\theta,1) \odot 
-  RRY. \]
-Next we note that $\phi \circ \phi S_0 = \phi \circ S \mu$ and $\theta \circ R\theta = \theta \circ \nu S$, where $\mu$ and $\nu$ are the multiplications of the monads $S_0$ and $R$ respectively.
-Thus, this is isomorphic to
-\[ {SS_0X}(1,S\mu) \odot
-  SX(1,\phi) \odot
-  H_{X} \odot
-  H_X \odot SX(\theta,1) \odot
-  RSX(\nu S,1) \odot 
-  RRY. \]
-Since we want our map to be over $S\mu$, we can drop the ${SS_0X}(1,S\mu)$ on the left.
-On the right, the multiplication $RRY \to RY$ lies over $\nu S$, hence induces a map $RSX(\nu S,1) \odot RRY \to RY$.
-Thus, we have gotten to
-\[ SX(1,\phi) \odot
-  H_{X} \odot
-  H_X \odot SX(\theta,1) \odot
-  RY. \]
-This is almost the diagram of nodes of $T(X,Y)$; it remains only to collapse the two copies of $H_X$.
-Here is where the partiality enters.
-We define a partial composition law $H\otimes H \rightharpoonup H$ by ``following the paths of pairings'' until they end up on the outside, as below:
+\[H'_{S X} \odot R(H'_X \odot RY \odot \uniq_*) \odot \uniq_* \rightharpoonup H'_X \odot RY \odot \uniq_*\]
+lying over the map $S\mu : SSS X \to SS X$ on the left.
+Using the fact that $R$ extended to profunctors is strong, the desired domain can be identified with
+\[ H'_{S X} \odot RH'_X \odot RRY \odot R(\uniq_*) \odot \uniq_* \]
+Expanding out the definition of $H'$ in terms of $H$, the desired map is shown in \cref{fig:Tmult}.
+\begin{figure}
+  \centering
+  \newcounter{reg}
+  \def\labreg#1{\stepcounter{reg}(\Alph{reg})%
+    \ea\global\ea\edef\csname refreg#1\endcsname{(\Alph{reg})}}
+  \begin{equation*}
+    \vcenter{\xymatrix{
+        \ar[r]^{\mu S_*}\ar[ddd]_{S\mu } &
+        \ar[r]^{H_{SX}}\ar[dd]_\mu \ar@{}[ddr]|{\Downarrow\labreg{HSX}} &
+        \ar[r]^{\mu S^*}\ar[dd]^\mu &
+        \ar[r]^{\theta SS^*} &
+        \ar[r]^{R\mu_*} &
+        \ar[r]^{RH_X}\ar[d]_{\theta S} \ar@{}[dr]|{\Downarrow\theta} &
+        \ar[r]^{R\mu^*}\ar[d]^{\theta S} &
+        \ar[r]^{R\theta S^*} &
+        \ar[r]^{RRY}\ar[ddd]_{\nu} \ar@{}[dddr]|{\Downarrow\nu} &
+        \ar[r]^{R\uniq_*}\ar[ddd]^{\nu} &
+        \ar[r]^{\uniq_*} &
+        \ar@{=}[ddd]\\
+        &&&&&
+        \ar[r]|{S H_X}\ar[d]_{\mu} \ar@{}[dr]|{\Downarrow\labreg{SHX}} &
+        \ar[d]^{\mu} &&&&
+        \\
+        &
+        \ar[r]_{H_X}\ar@{=}[d] &
+        \ar@{=}[rrr] \ar@{}[drrr]|{\Downarrow\labreg{HH}} &&&
+        \ar[r]_{H_X} &
+        \ar@{=}[d] &&&&
+        \\
+        \ar[r]_{\mu_*} &
+        \ar[rrrrr]_{H_X} &&&&&
+        \ar[r]_{\mu^*} &
+        \ar[r]_{\theta S^*} &
+        \ar[r]_{RY} &
+        \ar[rr]_{\uniq_*}&&
+      }}
+  \end{equation*}
+  \caption{The multiplication of $T$}
+  \label{fig:Tmult}
+\end{figure}
+The empty regions all arise from commutative diagrams of functors.
+The regions marked $\theta$ and $\nu$ are just the extension of those transformations to maps on profunctors.
+Region \refregHSX\ ``distributes'' a pairing between words to a pairing between their elements, while region \refregSHX\ discards the brackets in a list of pairings.
+
+It remains, therefore, to consider region \refregHH, and here is where the partiality enters.
+We define this partial composition law $H\otimes H \rightharpoonup H$ by ``following the paths of pairings'' until they end up on the outside, as below:
  \begin{tikzc}[scale=.7]
   \node (A1) at (0,3) {$A$};
   \node (Bo2) at (0,2) {$B\op$};
@@ -237,28 +222,30 @@ However, this composition is only defined when there are no resulting ``loops'' 
 In other words, while we allow ourselves to create ``loops'' by pairing up two edges of the same node, or more generally by creating circuits between nodes with the pairings, we do not allow ``free loops'' that contain no nodes at all.
 
 It is easy to see that both composites $T(X,Y) \to TT(X,Y) \rightharpoonup T(X,Y)$ are (total and) the identity.
-The associativity square is more tedious but still not difficult.
+The associativity square is more tedious but still essentially straightforward.
 Moreover, insofar as it makes sense, the ``monad'' $T$ is \emph{cartesian}, enabling us to apply Leinster's machinery of generalized multicategories to it.\footnote{The reason we have to forbid free loops is to obtain both the associativity square and the cartesian property: if we \emph{list} the free loops in some order, then the associativity square will only hold ``up to isomorphism'' since these lists may have to be reordered, whereas if we give them no order at all (such as considering the free abelian group on the set of objects) then cartesianness would fail.}
 % TODO: Check those more carefully.
 
-A $T$-multicategory, therefore, will consist of a span $(X_0,Y_0) \leftarrow (X_1,Y_1) \to T(X_0,Y_0)$ of node families with unit and compositional structure.
+A $T$-multicategory, therefore, consists of a span $(X_0,Y_0) \leftarrow (X_1,Y_1) \to T(X_0,Y_0)$ of node families, with unit and compositional structure.
 We deal with the partiality of the monad multiplication by only requiring the multicategory composition to be defined when the multiplication of $T$ is.
+We further restrict our $T$-multicategories by asking that $X_0$ be a discrete set, and that the functor $X_1 \to S X_0$ be a discrete fibration (thus $X_1$ is not just a span but a profunctor from $X_0$ to $S X_0$).
+A $T$-multicategory with these properties we will call a \textbf{virtual rigid double category}.
 
-We call $X_0$ the \emph{objects} and $X_1$ the \emph{arrows}.
-They form an $S_0$-multicategory; this is like an ordinary non-symmetric multicategory, but some of the objects in the domain of an arrow can be labeled ``opposite'', and such opposites ``distribute through'' when morphisms are composed.
-Of course, $(X_0,Y_0)$ is a node family; we call the elements of $Y_0$ \emph{modules} and their parametrizing word in $SX_0$ their \emph{boundary}; if $\omega\in SX_0$ we write $\cMod(\omega)$ for the set (and, later, the category) of modules with boundary $\omega$.
+We call $X_0$ the \textbf{objects} and $X_1$ the \textbf{arrows}.
+They form an $S$-multicategory; this is like an ordinary symmetric multicategory, but some of the objects in the domain of an arrow can be labeled ``opposite'', and such opposites ``distribute through'' when morphisms are composed.
+Of course, $(X_0,Y_0)$ is a node family; we call the elements of $Y_0$ \textbf{modules} and their parametrizing word in $SX_0$ their \textbf{boundary}; if $\omega\in SX_0$ we write $\cMod(\omega)$ for the set (and, later, the category) of modules with boundary $\omega$.
 
-It remains to describe $Y_1$, whose elements we call \emph{cells}.
-This is a node family over $X_1$, the set of morphisms in the underlying $S_0$-multicategory; thus each of its elements is parametrized by a finite list of arrows, some opposite.
-We call this list its \emph{arrow boundary}.
-The \emph{target} map of the $T$-multicategory assigns to any cell $\alpha$ a module whose boundary is the target of the arrow boundary of $\alpha$.
+It remains to describe $Y_1$, whose elements we call \textbf{cells}.
+This is a node family over $X_1$, the set of morphisms in the underlying $S$-multicategory; thus each of its elements is parametrized by a finite list of arrows, some opposite.
+We call this list its \textbf{arrow boundary}.
+The \textbf{target} map of the $T$-multicategory assigns to any cell $\alpha$ a module whose boundary is the target of the arrow boundary of $\alpha$.
 
-Finally, the \emph{source} of a cell $\alpha$ is a labeled graph over $(X_0,Y_0)$ (a diagram of modules that ``could be composed'').
+Finally, the \textbf{source} of a cell $\alpha$ is a labeled graph over $(X_0,Y_0)$ (a diagram of modules that ``could be composed'').
 Recalling that the outer edges of a labeled graph are decomposed into a word of words, this must match up with the word obtained from the sources of the arrow boundary of $\alpha$.
 
-Here is a picture of a generic cell $\alpha$ with its source, target, and arrow boundary.
-We have not numbered anything on the picture, but technically all the arrows, nodes, and edges appear in ordered lists.
-\begin{tikzc}[xscale=.9]
+\begin{figure}
+  \centering
+  \begin{tikzc}[xscale=.9]
   \node[draw] (Q) at (10,3) {$Q$};
   \draw[<-] (Q) -- node[ed,swap] {$A$} +(1.5,1.6) node (A1) {};
   \draw[->] (Q) -- node[ed] {$B$} +(1.4,-2) node (B1) {};
@@ -277,10 +264,10 @@ We have not numbered anything on the picture, but technically all the arrows, no
   \draw[->] (N) to[out=120,in=180,looseness=10] node[ed,swap] {$B$} (N);
   \draw[->] (1.8,4) node (E1) {} to[out=-150,in=-180,looseness=1.5] node[ed,swap] {$E$} +(.2,-.7) node (E2) {};
   %
-  \node[draw,isosceles triangle,inner sep=2pt] (r) at (5.5,4.5) {$r$};
-  \node[draw,isosceles triangle,inner sep=2pt] (s) at (6,1) {$s$};
-  \node[draw,isosceles triangle,inner sep=2pt] (u) at (4,2) {$u$};
-  \node[draw,isosceles triangle,inner sep=2pt] (v) at (3.5,5.5) {$v$};
+  \node[arr] (r) at (5.5,4.5) {$r$};
+  \node[arr] (s) at (6,1) {$s$};
+  \node[arr] (u) at (4,2) {$u$};
+  \node[arr] (v) at (3.5,5.5) {$v$};
   %
   \begin{scope}[dashed]
     \draw (D1) -- (s) -- (B1);
@@ -290,7 +277,13 @@ We have not numbered anything on the picture, but technically all the arrows, no
   \end{scope}
   \node[draw,single arrow] at (5,3.3) {$\alpha$};
 \end{tikzc}
-For the cell $\alpha$ drawn above:
+\caption{A cell in a virtual rigid double category}
+\label{fig:genericcell}
+\end{figure}
+
+In \cref{fig:genericcell} is drawn a generic cell $\alpha$ with its source, target, and arrow boundary.
+We have not numbered anything on the picture, but technically all the arrows, nodes, and edges appear in ordered lists.
+For this cell $\alpha$:
 \begin{itemize}
 \item The arrow boundary is $(r,s\op,u,v\op)$, where
   \begin{align*}
@@ -307,5 +300,94 @@ For the cell $\alpha$ drawn above:
     P &\in \cMod(C,D)
   \end{align*}
 \end{itemize}
+The composition of cells is hard to draw, but not as hard to imagine: for each module $M_i$ in the source of a given cell $\alpha$, we specify another cell $\beta_i$ having $M_i$ as its target, and we require that the arrow boundaries of the $\beta$'s match up wherever the $M$'s are paired together in the source of $\alpha$.
+(More precisely, the $\beta$'s form a labeled graph in $Y_1$.)
+Then we have a composite $\alpha(\beta_1,\dots,\beta_n)$, whose target is the target of $\alpha$, and whose source is obtained by ``grafting'' the source of each $\beta_i$ at the place where $M_i$ appears in the source of $\alpha$.
+Its arrow boundary is obtained from the multicategorical composition in the $S$-multicategory of arrows.
+
+One potentially confusing special case is when the source of $\alpha$ contains \emph{no} modules, i.e.\ it consists only of some collection of free edges.
+In this case, the labeled graph in $Y_1$ that we compose with also contains no actual cells $\beta$, but it can still be nontrivial: it consists of an analogous collection of free edges on \emph{arrows}.
+
+It is also worth considering some degenerate cases.
+For instance, the modules with fixed boundary $\omega$ form a category, also denoted $\cMod(\omega)$, in which the morphisms are cells whose arrow boundary consists only of identities.
+
+\begin{figure}
+  \centering
+  \begin{tikzc}[yscale=1.2]
+    \node[draw] (Q) at (6,2) {$N$};
+    \node[draw] (M) at (0,1) {$M_1$};
+    \node[draw] (N) at (0,2) {$M_2$};
+    \node[draw] (P) at (0,3) {$M_3$};
+    \node (A) at (0,0) {};
+    \node (D) at (0,4) {};
+    \draw[->] (A) -- node[ed] {$A_0$} (M);
+    \draw[->] (M) -- node[ed] {$A_1$} (N);
+    \draw[->] (N) -- node[ed] {$A_2$} (P);
+    \draw[->] (P) -- node[ed] {$A_3$} (D);
+    \node (E) at (6,0) {};
+    \node (F) at (6,4) {};
+    \draw[->] (E) -- node[ed] {$B$} (Q);
+    \draw[->] (Q) -- node[ed] {$C$} (F);
+    \node[arr] (f) at (3,4) {$u$};
+    \node[arr] (g) at (3,0) {$v$};
+    \draw[dashed] (A) -- (g) -- (E);
+    \draw[dashed] (D) -- (f) -- (F);
+    \node[draw,single arrow] at (3,2) {$\alpha$};
+  \end{tikzc}
+  \caption{A virtual double category cell}
+  \label{fig:vdc}
+\end{figure}
+
+On the other hand, if we consider only arrows with unary source $(A)$, and only modules with boundary of the form $(A,B\op)$, then our cells look like the one shown in \cref{fig:vdc}.
+%Note that the arrow boundary is $(u\op,v)$.
+In this way, every virtual rigid double category has an underlying ordinary virtual double category.
+
+If we retain the restriction that modules have boundary $(A,B\op)$, but allow arrows with arbitrary sources containing no opposites, then we obtain cells belonging to an (as yet undefined) notion that one might call a ``virtual monoidal double category''.
+Such a cell is shown in \cref{fig:vmdc}.
+
+\begin{figure}
+  \centering
+  \begin{tikzc}[yscale=1.2]
+    \node[draw] (Q) at (6,2) {$Q$};
+    \begin{scope}
+      \node[draw] (M) at (0,1) {$N_1$};
+      \node[draw] (N) at (0,2) {$N_2$};
+      \node[draw] (P) at (0,3) {$N_3$};
+      \node (A) at (0,0) {};
+      \node (D) at (0,4) {};
+      \draw[->] (A) -- node[ed] {$B_0$} (M);
+      \draw[->] (M) -- node[ed] {$B_1$} (N);
+      \draw[->] (N) -- node[ed] {$B_2$} (P);
+      \draw[->] (P) -- node[ed] {$B_3$} (D);
+    \end{scope}
+    \begin{scope}[xshift=1cm,yshift=-.5cm]
+      \node[draw] (M') at (0,2) {$M$};
+      \node (A') at (0,0) {};
+      \node (D') at (0,4) {};
+      \draw[->] (A') -- node[ed,swap] {$A_0$} (M');
+      \draw[->] (M') -- node[ed,swap] {$A_1$} (D');
+    \end{scope}
+    \begin{scope}[xshift=-1cm,yshift=.5cm]
+      \node[draw] (M'') at (0,1.3) {$P_1$};
+      \node[draw] (N'') at (0,2.7) {$P_2$};
+      \node (A'') at (0,0) {};
+      \node (D'') at (0,4) {};
+      \draw[->] (A'') -- node[ed] {$C_0$} (M'');
+      \draw[->] (M'') -- node[ed] {$C_1$} (N'');
+      \draw[->] (N'') -- node[ed] {$C_2$} (D'');
+    \end{scope}
+    \node (E) at (6,0) {};
+    \node (F) at (6,4) {};
+    \draw[->] (E) -- node[ed] {$D$} (Q);
+    \draw[->] (Q) -- node[ed] {$E$} (F);
+    \node[arr] (f) at (3,4) {$u$};
+    \node[arr] (g) at (3,0) {$v$};
+    \draw[dashed] (A) -- (g) -- (E); \draw[dashed] (A') -- (g); \draw[dashed] (A'') -- (g);
+    \draw[dashed] (D) -- (f) -- (F); \draw[dashed] (D') -- (f); \draw[dashed] (D'') -- (f);
+    \node[draw,single arrow] at (3,2) {$\alpha$};
+  \end{tikzc}
+  \caption{A virtual monoidal double category cell}
+  \label{fig:vmdc}
+\end{figure}
 
 \end{document}
