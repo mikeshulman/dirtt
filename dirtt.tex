@@ -182,6 +182,38 @@ Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~
 \subsection{Tensor types}
 \label{sec:tensor-types}
 
+The formation rule for the tensor type:
+
+\begin{mathpar}
+  \inferrule{\Psi_M, \Psi \types M\type \\
+    \Psi_N, \flip{\Psi} \types N\type}
+  {\Psi_M, \Psi_N \types M \otimes_\Psi N\type}\and
+\end{mathpar}
+
+The left rule
+
+\begin{mathpar}
+  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
+    \Delta' \psplit \flip{\Psi},\Psi \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M,\Psi \types M\type \\
+    \Psi_N,\flip{\Psi} \types N\type \\ \Psi_C \types C\type \\\\
+    \Delta, \Delta' \cb \Gamma,M,N \types C}
+  {\Delta \cb \Gamma, M\otimes_\Psi N \types C}\and
+\end{mathpar}
+
+and right rule
+
+\begin{mathpar}
+  \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
+    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
+    \Psi_a \types a:A \\
+    \Psi_{\Gamma_M} \types \Gamma_M\ctx \\ \Psi_{\Gamma_N} \types \Gamma_N\ctx \\\\
+    \Psi_M,x:\pm A \types M\type \\ \Psi_N,x:\mp A \types N\type \\\\
+    \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
+    \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
+  {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} B}\and
+\end{mathpar}
+
 \subsection{Hom types}
 \label{sec:hom-types}
 
