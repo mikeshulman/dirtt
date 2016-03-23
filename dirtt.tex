@@ -1,0 +1,209 @@
+\documentclass{amsart}
+\usepackage{amssymb,amsmath,latexsym,stmaryrd}
+\usepackage{cleveref}
+\usepackage{mathpartir}
+\let\types\vdash % turnstile
+\def\cb{\mid} % context break
+\def\op{^{\mathrm{op}}}
+\def\p{^+} % variances on variables
+\def\m{^-}
+\let\mypm\pm
+\let\mymp\mp
+\def\pm{^\mypm}
+\def\mp{^\mymp}
+\def\jdeq{\equiv}
+\def\cat{\;\mathsf{cat}}
+\def\type{\;\mathsf{type}}
+\def\ctx{\;\mathsf{ctx}}
+\let\splits\rightrightarrows
+\def\flip#1{#1^*} % reverse the variances of all variables
+\def\mor#1{\hom_{#1}}
+\def\ec{\cdot} % empty context
+\def\psplit{\overset{\mathsf{pair}}{\splits}}
+\title{A directed type theory for formal category theory}
+\author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+\label{sec:introduction}
+
+We describe a two-level theory with two kinds of contexts and types.
+The first level, whose types we call \textbf{categories}, is a simple linear type theory with an involutive modality, represented judgmentally by assigning variances to variables in the context.
+Thus, for instance, a typical term judgment would look like
+\[ x:\p A, y:\m B, z :\p C \types t:D \]
+As usual, linearity means that all the rules maintain the invariant that each variable in the context is used exactly once in the conclusion.
+In particular, there are no contraction and weakening rules; but we do allow an unrestricted (and usually implicit) exchange rule.
+We often write $\Psi$ for contexts of category-variables marked with variances.
+
+The second level is a more complicated sort of linear type theory, whose types we call \textbf{types} (or sometimes \textbf{sets} or \textbf{modules}), and that depends ``quadratically'' on the first level.
+Its basic type judgment is
+\[ \Psi \types M \type \]
+That is, each type depends on some collection of category-variables, with variance.
+
+The basic term judgment for types is
+\[ \Delta \cb \Gamma \types M \]
+Here $\Gamma$ is a context of type-variables and $M$ is a type.
+Unlike the first level, we formulate this second level as a sequent calculus, and instead of including terms in the judgments we regard the derivations themselves as the (normal-form) terms; later on this will necessitate adding an equational theory for derivations.
+This sequent calculus is also linear, with no contraction or weakening, but with unrestricted exchange.
+
+The interesting thing happens in the context $\Delta$, which is a list of category-variables \emph{without} variances on which the types in $\Gamma$ and $M$ can depend.
+This dependence is ``quadratic'' in the following sense: all the rules maintain the invariant that each variable in $\Delta$ appears \emph{twice} in $\Gamma$ and $M$, and that the two occurrences have opposite variance (where the variance of $\Gamma$ is flipped relative to $M$).
+In fact, to be more precise, the actual dependence of $\Gamma$ and $M$ is on a category-context \emph{with} variances that is obtained from $\Delta$ by splitting each variable into two with opposite variance.
+The implementation will, of course, use de Brujin indices; when writing judgments with named variables, if $x:A$ is a variable in $\Delta$ we write $\hat{x}:\p A$ and $\check{x}:\m A$ for the two corresponding signed variables that must appear in $\Gamma$ and $M$ (exactly once each).
+In other words:
+\begin{center}
+  $\Delta\cb\Gamma\types N$ requires as preconditions that
+  $\begin{array}{c}
+    \Delta \splits \flip{\Psi_1},\Psi_2 \\
+    \Psi_1 \types \Gamma \ctx\\
+    \Psi_2 \types M \type
+  \end{array}$
+\end{center}
+Here $\Delta\splits \flip{\Psi_1},\Psi_2$ means that each variable $x$ in the unsigned context $\Delta$ becomes a pair $\hat x, \check x$ of opposite variance in the signed context $\flip{\Psi_1},\Psi_2$, and that the variances of $\Psi_1$ are then flipped.
+
+The most intuitive version of this ``quadraticality'' rule is when $\hat{x}$ appears in $M$ and $\check{x}$ appears in $\Gamma$:
+\[ x:A \cb N(\check x) \types M(\hat x) \]
+Then we are simply talking about a morphism of types ``over the category $A$'' --- in semantic terms, a natural transformation.
+The dual case when $\check{x}$ appears in $M$ and $\hat{x}$ appears in $\Gamma$ simply represents a natural transformation between \emph{contravariant} functors rather than between covariant ones.
+With this case in mind, one might say that we resolve the problem of ``dependent linear type theory'' by stipulating that both the context and the conclusion of a ``linearly dependent judgment'' must \emph{separately} depend ``linearly'' on the same variables.
+
+However, it is the additional freedom to allow $\hat{x}$ and $\check{x}$ to \emph{both} appear in $M$ and neither in $\Gamma$, or vice versa, that gives us the ability to express formal versions of nontrivial facts about category theory.
+Semantically, these judgments correspond to what are sometimes called \emph{extraordinary natural transformations}, or simply \emph{extranatural transformations}.
+For example, each category $A$ will have a type of morphisms that is contravariant in its first variable and covariant in its second:
+\[ x:\m A, y:\p A \types \mor A(x,y) \type \]
+To express the \emph{composition} of such morphisms then requires an ``extranaturality judgment'':
+\[ x:A, y:A, z:A \cb \mor A(\hat x, \check y), \mor A(\hat y, \check z) \types \mor A(\check x, \hat z) \]
+The \emph{identity} morphism judgment is similarly extranatural on the other side:
+\[ x:A \cb \ec \types \mor A(\check x,\hat x) \]
+
+\section{Basic rules and type formers}
+\label{sec:rules}
+
+\subsection{Structural rules}
+\label{sec:structural-rules}
+
+The basic structural rules for context formation are unsurprising, given our linearity restriction:
+\begin{mathpar}
+  \inferrule{ }{\ec \types \ec \ctx} \and
+  \inferrule{\Psi_1 \types \Gamma \ctx \\ \Psi_2 \types M \type}{\Psi_1,\Psi_2 \types \Gamma,M \ctx}
+\end{mathpar}
+
+For the moment, we are hoping to describe a cut-free sequent calculus with an admissible cut rule, and also admissible substitution for category-variables.
+We postpone describing exactly what the cut rule will look like, since it is somewhat complicated, but we can state the intended identity rule at this point:
+\begin{mathpar}
+  \inferrule{\Psi \types M \type \\ \Delta\psplit \Psi_1,\Psi_2}{\Delta \cb M[\Psi_1/\Psi] \types M[\Psi_2/\Psi]}
+\end{mathpar}
+Here the splitting $\Delta \psplit \Psi_1,\Psi_2$ is of a special ``paired'' sort: of the two variables $\hat x$ and $\check x$ arising from any variable $x$ in $\Delta$, one must be in $\Psi_1$ and one in $\Psi_2$.
+That is, we apply hats and checks in the $M$ in the conclusion to make the variances match up, and then use the ones that are left over for the $M$ in the context.
+For example, we might have
+\begin{mathpar}
+  \inferrule{x:\p A, y:\m B, z:\p C \types M(x,y,z)\type}{x:A, y:B, z:C \cb M(\check x, \hat y, \check z) \types M(\hat x, \check y, \hat z)}
+\end{mathpar}
+
+The substitution rule for category-variables will be
+\begin{mathpar}
+  \inferrule{\Psi \types a:A \\ \Delta',x:A \cb \Gamma \types M \\ \Delta\psplit \Psi,\Psi'}{\Delta',\Delta \cb \Gamma[a/x] \types M[a/x]}
+\end{mathpar}
+Once again we have a paired splitting, which essentially expresses that the term $a:A$ depends on the variables in $\Delta$ with some variances.
+Recalling that a variable $x$ in the category-context of a term-judgment actually appears as two different variables $\hat x$ and $\check x$ in the type context and conclusion, the substitution notation $[a/x]$ should be regarded as a shorthand for $[\hat a/\hat x, \check a/\check x]$.
+More precisely, given the term $a:A$ in the signed context $\Psi$, we can make a new term $\hat a$ out of it by putting hats on all the covariant variables and checks on all the contravariant ones, and dually we can make $\check a$; we then substitute these for $\hat x$ and $\check x$ in both $\Gamma$ and $M$.
+(Of course, by quadraticality, each of $\hat x$ and $\check x$ appears exactly once in $\Gamma$ and $M$ combined.)
+
+\subsection{Morphism types}
+\label{sec:morphism-types}
+
+Now we are ready to start giving the rules for some type formers.
+We begin with the morphism types.
+The formation rule is straightforward given the expected variance, and incorporates a substitution.
+The right rule involves another paired splitting because it also incorporates a substitution.
+\begin{mathpar}
+  \inferrule{A\cat \\ \Psi_1\types a:A \\ \Psi_2 \types b:A}{\flip{\Psi_1},\Psi_2 \types \mor A(a,b) \type}\and
+  \inferrule{\Psi \types a:A \\ \Delta\psplit \Psi,\Psi'}{\Delta \cb \ec \types \mor A(a,a)}\and
+\end{mathpar}
+The left rule is significantly easier to state if we do not incorporate a substitution; it is an evident ``directed'' analogue of the elimination rule for equality due to Lawvere and Martin-L\"of.
+\begin{mathpar}
+  \inferrule{\Delta,x:A \cb \Gamma[\hat x/\hat y] \types M[\hat x/\hat y]}{\Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M}\and
+  % \inferrule{\Delta \cb \Gamma[\check y/\check x] \types M[\check y/\check x]}{\Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M}\and
+\end{mathpar}
+When we incorporate substitutions for $x$ and $y$, this becomes
+\begin{mathpar}
+  \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_b \psplit \flip{\Psi_b},\Psi_b \\
+    \Delta,x:A \splits \flip{\Psi_\Gamma}, \Psi_M \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
+    \Psi_a \types a:A \\ \Psi_b \types b:A \\
+    \Delta,x:A \cb \Gamma \types M}
+  {\Delta,\Delta_a,\Delta_b\cb \Gamma[a/\check x,b/\hat x],\mor A(a,b) \types M[a/\check x,b/\hat x]}\and
+\end{mathpar}
+For instance, we can use this rule to define composition of morphisms:
+\begin{equation}
+  \inferrule{\inferrule{\inferrule
+      {x:A \types x:A \\ x:A \psplit \hat x:\p A, \check x:\m A}
+      {x:A\cb \ec \types \mor A(\check x, \hat x)}}
+    {x:A,y:A \cb \mor A(\hat x, \check y) \types \mor A(\check x, \hat y)}}
+  {x:A, y:A, z:A \cb \mor A(\hat x, \check y), \mor A(\hat y, \check z) \types \mor A(\check x, \hat z)}\label{eq:composition}
+\end{equation}
+Starting from the bottom we have the left rule on $y,z$, then the left rule again on $x,y$, then the right rule on $x$.
+Note that ${x:A,y:A \cb \mor A(\hat x, \check y) \types \mor A(\check x, \hat y)}$ is an instance of the identity rule, so if we had that rule postulated we could stop there; but if identity is to be admissible then it would reduce to the above complete derivation.
+
+Similarly, we have the functorial action of any judgment $x:A \types f(x):B$:
+\begin{equation}
+  \label{eq:functor}
+  \inferrule{\inferrule{x:A \types f(x):B \\ x:A \psplit \hat x:\p A, \check x:\m A}
+    {x:A \cb \ec \types \mor B(f(\check x),f(\hat x))}}
+  {x:A, y:A \cb \mor A(\hat x, \check y) \types \mor B(f(\check x),f(\hat y))}
+\end{equation}
+
+We may also want to consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Morhing rule for identity types):
+\begin{mathpar}
+  \inferrule{\Delta_b \psplit \flip{\Psi_b},\Psi_b \\
+    \Delta,x:A \splits \flip{\Psi_\Gamma}, \Psi_M, \Psi_a \\ \hat x, \check x \notin \Psi_a \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
+    \Psi_a \types a:A \\ \Psi_b \types b:A \\
+    \Delta,x:A \cb \Gamma \types M}
+  {\Delta,\Delta_b\cb \Gamma[b/\hat x],\mor A(a,b) \types M[b/\hat x]}
+  \and
+  \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a\\
+    \Delta,x:A \splits \flip{\Psi_\Gamma}, \Psi_M, \flip{\Psi_b} \\ \hat x, \check x \notin \Psi_b \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
+    \Psi_a \types a:A \\ \Psi_b \types b:A \\
+    \Delta,x:A \cb \Gamma \types M}
+  {\Delta,\Delta_a\cb \Gamma[a/\check x],\mor A(a,b) \types M[a/\check x]}\and
+\end{mathpar}
+Either of these should straightforwardly imply the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
+The converse implication in full dependent type theory requires a universe, so we probably don't expect it to hold here.
+I think we will probably want the one-sided rules.
+Note that they can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
+
+With morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types b:B$, and the 2-cells from $b$ to $b'$ are the judgments $x:A \cb \ec \types \mor B(b,b')$.
+The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) can be obtained from~\eqref{eq:composition} once we have a cut rule.
+Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~\eqref{eq:functor}.
+
+\subsection{Tensor types}
+\label{sec:tensor-types}
+
+\subsection{Hom types}
+\label{sec:hom-types}
+
+\subsection{The type classifier}
+\label{sec:type-classifier}
+
+
+\section{Category formers}
+\label{sec:category-formers}
+
+\subsection{Opposites}
+\label{sec:opposites}
+
+\subsection{Tensor products}
+\label{sec:tensor-products}
+
+\subsection{Exponentials}
+\label{sec:exponentials}
+
+\subsection{Collages}
+\label{sec:collages}
+
+
+
+\end{document}

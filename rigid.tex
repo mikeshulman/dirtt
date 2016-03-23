@@ -1,6 +1,20 @@
 \documentclass{amsart}
 
 \newif\ifcref\creftrue
+%\usepackage{overrightarrow}
+\makeatletter
+\newcommand\reldoublebar{\mathrel{\smash=}}
+\newcommand{\Rightarrowfill@@}[1]{%
+\m@th \setboxz@h {$#1\reldoublebar $}\ht \z@ \z@ 
+$#1\copy \z@ 
+\mkern -6mu\cleaders \hbox {$#1\mkern -2mu\box \z@ \mkern -2mu$}\hfill 
+\mkern -6mu
+\mathord \Rightarrow $}
+\newcommand{\Overrightarrow}{\mathpalette{\overarrow@\Rightarrowfill@@}}
+\makeatother
+
+\usepackage{tcolorbox}
+
 \input{decls}
 \usepackage{ifmtarg,tikz}
 \tikzset{lab/.style={auto,font=\scriptsize}} % arrow labels
@@ -18,53 +32,69 @@
 
 \autodefs{\cMod}
 
+\def\cart{\chi}
+\def\opcart{\chi}
+\def\emptyvec#1{()_{#1}}
+\def\unit#1{\hom_{#1}}
+\def\bigcomp{\textstyle\bigodot\!}
+
 \newcommand{\blank}{\mathord{\hspace{1pt}\text{--}\hspace{1pt}}}
 \newcommand{\uniq}{\mathord{!}}
+\renewcommand{\o}{^{\circ}}
+\let\vec\overrightarrow
+\let\Vec\Overrightarrow
+%\renewcommand{\Vec}[1]{\overset{\Rightarrow}{#1}}
 
-\title{Cyclic virtual equipments}
+\title{Virtual compact equipments}
 \author{Michael Shulman}
 \begin{document}
 \maketitle
 
+TODO: It should be possible to generalize this construction to be parametric in the monads $S,R$ (maybe two copies of $S$) and the profunctor $H$.
+That would provide added assurance of its correctness.
+
+\section{Virtual compact double categories}
+\label{sec:virtual-compact-double}
+
 Let $S$ be the monad on $\mathbf{Cat}$ whose algebras are symmetric strict monoidal categories equipped with a symmetric strict monoidal involution.
-Concretely, the objects of $S\C$ are finite lists of objects of $\C$, some of which are marked with a formal $(\blank)\op$, such as $(A,B\op,B,C\op,A)$.
-The morphisms of $S\C$ are finite lists of morphisms of $\C$ labeled by permutations which respect the opposites, e.g.\ a morphism $(A,B\op,B,C\op,A) \to (D,B,D\op,C,A\op)$ might be given by the following:
+Concretely, the objects of $S\C$ are finite lists of objects of $\C$, some of which are marked with a formal $(\blank)\o$, such as $(A,B\o,B,C\o,A)$.
+The morphisms of $S\C$ are finite lists of morphisms of $\C$ labeled by permutations which respect the opposites, e.g.\ a morphism $(A,B\o,B,C\o,A) \to (D,B,D\o,C,A\o)$ might be given by the following:
 \begin{tikzc}
   \node (A1) at (0,3) {$A$};
-  \node (Bo2) at (1,3) {$B\op$};
+  \node (Bo2) at (1,3) {$B\o$};
   \node (B3) at (2,3) {$B$};
-  \node (Co4) at (3,3) {$C\op$};
+  \node (Co4) at (3,3) {$C\o$};
   \node (A5) at (4,3) {$A$};
   \node (D1') at (0,0) {$D$};
   \node (B2') at (1,0) {$B$};
-  \node (Do3') at (2,0) {$D\op$};
+  \node (Do3') at (2,0) {$D\o$};
   \node (C4') at (3,0) {$C$};
-  \node (Ao5') at (4,0) {$A\op$};
+  \node (Ao5') at (4,0) {$A\o$};
   \draw[->] (A1) to[out=-90,in=90] node[ed,swap,pos=.2] {$f$} (B2');
-  \draw[->] (Bo2) to[out=-90,in=90] node[ed,swap,pos=.1] {$g$} (Ao5');
+  \draw[->] (Bo2) to[out=-90,in=90] node[ed,swap,pos=.1] {$g\o$} (Ao5');
   \draw[->] (B3) to[out=-90,in=90] node[ed,swap,pos=.9] {$h$} (D1');
-  \draw[->] (Co4) to[out=-90,in=90] node[ed,swap,pos=.8] {$k$} (Do3');
+  \draw[->] (Co4) to[out=-90,in=90] node[ed,swap,pos=.8] {$k\o$} (Do3');
   \draw[->] (A5) to[out=-90,in=90] node[ed,pos=.2] {$\ell$} (C4');
 \end{tikzc}
 Here $f:A\to B$, $g:B\to A$, $h:B\to D$, $k:C\to D$, and $\ell:A\to C$ are morphisms in $\C$.
 Note that there can only be a morphism between two lists if they have the same length \emph{and} the same number of opposites.
 
 Since $S\C$ is monoidal with an involution, its objects can be concatenated and oppositized, so for instance
-\[(A,B\op)\cdot (C\op,D,A) = (A,B\op,C\op,D,A) \quad\text{and}\quad (B\op,A,A)\op = (B,A\op,A\op).\]
+\[(A,B\o)\cdot (C\o,D,A) = (A,B\o,C\o,D,A) \quad\text{and}\quad (B\o,A,A)\o = (B,A\o,A\o).\]
 Now suppose $\C$ is a groupoid.
 If $\alpha$ is a word in $S\C$ of length $n$, define a \emph{pairing} on $\alpha$ to be a partition of $[n]$ into 2-element subsets (so that in particular $n$ must be even) such that in each pair exactly one of the corresponding objects in $\alpha$ is opposite (so that in particular exactly half of the objects in $\alpha$ must be opposite), together with isomorphisms in $\C$ between each two paired objects.
-Now let $H_\C$ denote the \emph{pairing profunctor} from $S\C$ to $S\C$, where $H_\C(\alpha,\beta)$ is the set of pairings on $\alpha\op\cdot\beta$.
+Now let $H_\C$ denote the \emph{pairing profunctor} from $S\C$ to $S\C$, where $H_\C(\alpha,\beta)$ is the set of pairings on $\alpha\o\cdot\beta$.
 Thus we either pair two objects in $\alpha$ or two objects in $\beta$ of which one is opposite, or we pair an object in $\alpha$ with an object in $\beta$ that are both or neither opposite.
-For instance, an element of $H_\C((A,B\op,A\op,C),(C,B\op)$ could be drawn like this:
+For instance, an element of $H_\C((A,B\o,A\o,C),(C,B\o)$ could be drawn like this:
 \begin{tikzc}[scale=.7]
   \node (A1) at (0,3) {$A$};
-  \node (Bo2) at (0,2) {$B\op$};
-  \node (Ao3) at (0,1) {$A\op$};
+  \node (Bo2) at (0,2) {$B\o$};
+  \node (Ao3) at (0,1) {$A\o$};
   \node (C4) at (0,0) {$C$};
   \node (C1') at (3,1) {$C$};
-  \node (Bo2') at (3,0) {$B\op$};
+  \node (Bo2') at (3,0) {$B\o$};
   \node (D3') at (3,2) {$D$};
-  \node (D4') at (3,3) {$D\op$};
+  \node (D4') at (3,3) {$D\o$};
   \draw (A1) to[out=0,in=0] (Ao3);
   \draw (Bo2) to[out=0,in=180] (Bo2');
   \draw (C4) to[out=0,in=180] (C1');
@@ -83,8 +113,8 @@ Define
 This is a profunctor from $SSX$ to $RSX$; thus we have just decomposed the domain and codomain of $H$ in a particular way.
 
 Now we define a \textbf{node family} to consist of a groupoid $X$ together with a diagram $Y:SX\to\mathbf{Set}$, which we will often regard as a profunctor from $SX$ to $1$.
-We picture the elements of $Y$ as labels for nodes in directed graphs, equipped with an (ordered) labeling on their edges: the objects labeled with $(\blank)\op$ correspond to edges going out, while those without $(\blank)\op$ are edges going in.
-For instance, $M\in Y(A,B\op,B,C\op,A)$ might be drawn like this:
+We picture the elements of $Y$ as labels for nodes in directed graphs, equipped with an (ordered) labeling on their edges: the objects labeled with $(\blank)\o$ correspond to edges going out, while those without $(\blank)\o$ are edges going in.
+For instance, $M\in Y(A,B\o,B,C\o,A)$ might be drawn like this:
 \begin{tikzc}
   \node[rectangle,draw] (M) at (0,0) {$M$};
   \draw[<-] (M) -- node[ed] {$A$} (1,1) node[ed,anchor=north west] {1};
@@ -99,7 +129,7 @@ Note that these actions are not in general free: if for instance $M \in Y(A,A)$ 
 
 Given a node family $(X,Y)$, we define a new node family $T(X,Y)$ as follows.
 Its underlying groupoid is $S X$.
-To define the nodes of $T(X,Y)$, first note that the free strict monoidal category monad $R$ can be extended to act on profunctors, giving a profunctor $RY : RSX \to R1$.
+To define the nodes of $T(X,Y)$, first note that the free strict monoidal category monad $R$ can be extended to act on profunctors, giving a profunctor $RY : RSX \hto R1$.
 The elements of $RY(n,\omega)$, where $\omega$ is a list of elements of $SX$ of length $n$, are permutations of $n$ labeled by elements of $Y$.
 In other words, $RY(n,\omega)$ is a copower by $\Sigma_n$ of the set of length-$n$ lists of elements of $Y$.
 Thus, if we left Kan extend $RY$ along the unique functor $\uniq:R1\to 1$ (which is the same as composing it with the representable profunctor ``$\uniq_*$'' from $R1$ to $1$), we get a profunctor whose elements are precisely finite lists of elements of $Y$.
@@ -111,13 +141,13 @@ More concretely, they are obtained as follows.
 \item Consider a finite list of nodes in $Y$
 \item Renumber their combined edges arbitrarily (compatibly with how we already know how to renumber the edges of each node individually)
 \item Pair up some of their edges that have opposite arity (the loops on the left side of $H$) and perhaps add some new ``free'' edges having no nodes (the loops on the right side of $H$)
-\item Decompose the labels on the remaining outer edges into a word of words for $S$, e.g.\ $(A,B\op,C,B,B\op,A\op)$ could become $((A,B\op),(C),(),(B\op,B,A)\op)$.
+\item Decompose the labels on the remaining outer edges into a word of words for $S$, e.g.\ $(A,B\o,C,B,B\o,A\o)$ could become $((A,B\o),(C),(),(B\o,B,A)\o)$.
 \end{enumerate}
 We call these nodes of $T(X,Y)$ \emph{labeled graphs}.
 If the nodes are ``generalized proarrows'', then a labeled graph is a way to ``compose them up'': the pairings indicate where to perform tensor products of functors, the disconnected components of the graph are simply tensored together, and the free edges added on the right of $H$ are hom-functors to also tensor in.
 
 The operation $T$ is almost a monad on the category of node families.
-We have a map $(X,Y) \to T(X,Y)$ arising from the units of the monads $S$ and $R$: on nodes it does no renumbering, pairing, or antipairing, and decomposes $(A,B\op,C)$ as $((A),(B)\op,(C))$.
+We have a map $(X,Y) \to T(X,Y)$ arising from the units of the monads $S$ and $R$: on nodes it does no renumbering, pairing, or antipairing, and decomposes $(A,B\o,C)$ as $((A),(B)\o,(C))$.
 And we have a \emph{partial} map $TT(X,Y)\rightharpoonup T(X,Y)$ defined as follows.
 
 On objects it is simply the multiplication of the monad $S$ (and hence is total).
@@ -175,15 +205,15 @@ It remains, therefore, to consider region \refregHH, and here is where the parti
 We define this partial composition law $H\otimes H \rightharpoonup H$ by ``following the paths of pairings'' until they end up on the outside, as below:
  \begin{tikzc}[scale=.7]
   \node (A1) at (0,3) {$A$};
-  \node (Bo2) at (0,2) {$B\op$};
-  \node (Ao3) at (0,1) {$A\op$};
+  \node (Bo2) at (0,2) {$B\o$};
+  \node (Ao3) at (0,1) {$A\o$};
   \node (C4) at (0,0) {$C$};
   \node (C1') at (3,1) {$C$};
-  \node (Bo2') at (3,0) {$B\op$};
-  \node (D3') at (3,2) {$C\op$};
+  \node (Bo2') at (3,0) {$B\o$};
+  \node (D3') at (3,2) {$C\o$};
   \node (D4') at (3,3) {$C$};
   \node (Do1'') at (6,2) {$C$};
-  \node (Bo2'') at (6,1) {$B\op$};
+  \node (Bo2'') at (6,1) {$B\o$};
   \draw (A1) to[out=0,in=0] (Ao3);
   \draw (Bo2) to[out=0,in=180] (Bo2');
   \draw (C4) to[out=0,in=180] (C1');
@@ -194,11 +224,11 @@ We define this partial composition law $H\otimes H \rightharpoonup H$ by ``follo
   \node at (8,1.5) {$\Rightarrow$};
   \begin{scope}[xshift=10cm]
     \node (xA1) at (0,3) {$A$};
-    \node (xBo2) at (0,2) {$B\op$};
-    \node (xAo3) at (0,1) {$A\op$};
+    \node (xBo2) at (0,2) {$B\o$};
+    \node (xAo3) at (0,1) {$A\o$};
     \node (xC4) at (0,0) {$C$};
     \node (xDo1'') at (3,2) {$C$};
-    \node (xBo2'') at (3,1) {$B\op$};
+    \node (xBo2'') at (3,1) {$B\o$};
     \draw (xA1) to[out=0,in=0] (xAo3);
     \draw (xBo2) to[out=0,in=180] (xBo2'');
     \draw (xC4) to[out=0,in=180] (xDo1'');
@@ -207,7 +237,7 @@ We define this partial composition law $H\otimes H \rightharpoonup H$ by ``follo
 However, this composition is only defined when there are no resulting ``loops'' in the middle:
 \begin{tikzc}
   \matrix[column sep=1.2cm,row sep=.3cm]{\node (a11) {$A$}; & \node (a21) {$A$}; & \\
-    \node (a12) {$C\op$}; & \node (a22) {$D\op$}; & \node (a32) {$A$}; \\
+    \node (a12) {$C\o$}; & \node (a22) {$D\o$}; & \node (a32) {$A$}; \\
     \node (a13) {$B$}; & \node (a23) {$D$}; & \node (a33) {$B$}; \\
     \node (a14) {$C$}; & \node (a24) {$B$}; & \\
   };
@@ -229,10 +259,13 @@ Moreover, insofar as it makes sense, the ``monad'' $T$ is \emph{cartesian}, enab
 A $T$-multicategory, therefore, consists of a span $(X_0,Y_0) \leftarrow (X_1,Y_1) \to T(X_0,Y_0)$ of node families, with unit and compositional structure.
 We deal with the partiality of the monad multiplication by only requiring the multicategory composition to be defined when the multiplication of $T$ is.
 We further restrict our $T$-multicategories by asking that $X_0$ be a discrete set, and that the functor $X_1 \to S X_0$ be a discrete fibration (thus $X_1$ is not just a span but a profunctor from $X_0$ to $S X_0$).
-A $T$-multicategory with these properties we will call a \textbf{virtual rigid double category}.
+A $T$-multicategory with these properties we will call a \textbf{virtual compact double category}.
 
 We call $X_0$ the \textbf{objects} and $X_1$ the \textbf{arrows}.
 They form an $S$-multicategory; this is like an ordinary symmetric multicategory, but some of the objects in the domain of an arrow can be labeled ``opposite'', and such opposites ``distribute through'' when morphisms are composed.
+\begin{tcolorbox}[title=Added Mar 18]
+  An $S$-multicategory is the semantic version of a linear simple type theory with an involutive ``opposite'' mode, that we use for the category variables and terms.
+\end{tcolorbox}
 Of course, $(X_0,Y_0)$ is a node family; we call the elements of $Y_0$ \textbf{modules} and their parametrizing word in $SX_0$ their \textbf{boundary}; if $\omega\in SX_0$ we write $\cMod(\omega)$ for the set (and, later, the category) of modules with boundary $\omega$.
 
 It remains to describe $Y_1$, whose elements we call \textbf{cells}.
@@ -242,6 +275,26 @@ The \textbf{target} map of the $T$-multicategory assigns to any cell $\alpha$ a 
 
 Finally, the \textbf{source} of a cell $\alpha$ is a labeled graph over $(X_0,Y_0)$ (a diagram of modules that ``could be composed'').
 Recalling that the outer edges of a labeled graph are decomposed into a word of words, this must match up with the word obtained from the sources of the arrow boundary of $\alpha$.
+
+In \cref{fig:genericcell} is drawn a generic cell $\alpha$ with its source, target, and arrow boundary.
+We have not numbered anything on the picture, but technically all the arrows, nodes, and edges appear in ordered lists.
+For this cell $\alpha$:
+\begin{itemize}
+\item The arrow boundary is $(r,s\o,u,v\o)$, where
+  \begin{align*}
+    r &: (B\o,E,E\o) \to A\\
+    s &: (D\o) \to B\\
+    u &: (A,C) \to B\\
+    v &: () \to C
+  \end{align*}
+\item The target is $Q\in\cMod(A,B\o,B,C\o)$.
+\item The source is a labeled graph containing the following modules:
+  \begin{align*}
+    M &\in \cMod(A,B\o,D\o)\\
+    N &\in \cMod(A,B,B\o,A\o,D)\\
+    P &\in \cMod(C,D)
+  \end{align*}
+\end{itemize}
 
 \begin{figure}
   \centering
@@ -277,33 +330,27 @@ Recalling that the outer edges of a labeled graph are decomposed into a word of 
   \end{scope}
   \node[draw,single arrow] at (5,3.3) {$\alpha$};
 \end{tikzc}
-\caption{A cell in a virtual rigid double category}
+\caption{A cell in a virtual compact double category}
 \label{fig:genericcell}
 \end{figure}
 
-In \cref{fig:genericcell} is drawn a generic cell $\alpha$ with its source, target, and arrow boundary.
-We have not numbered anything on the picture, but technically all the arrows, nodes, and edges appear in ordered lists.
-For this cell $\alpha$:
-\begin{itemize}
-\item The arrow boundary is $(r,s\op,u,v\op)$, where
-  \begin{align*}
-    r &: (B\op,E,E\op) \to A\\
-    s &: (D\op) \to B\\
-    u &: (A,C) \to B\\
-    v &: () \to C
-  \end{align*}
-\item The target is $Q\in\cMod(A,B\op,B,C\op)$.
-\item The source is a labeled graph containing the following modules:
-  \begin{align*}
-    M &\in \cMod(A,B\op,D\op)\\
-    N &\in \cMod(A,B,B\op,A\op,D)\\
-    P &\in \cMod(C,D)
-  \end{align*}
-\end{itemize}
+\begin{tcolorbox}[title=Added Mar 18]
+  In type-theoretic syntax, this cell would be the judgment
+  \begin{multline*}
+    a_0:A, b_0:B, a_1:A, d:D, b_1:B, c:C, d:D, e:E \\
+    \mid m:M(\check a_1, \hat b_1, \hat d), n:N(\check a_0, \check b_0, \hat b_0, \hat a_1, \check d), p:P(\check c,\check d)
+    \\ \vdash \alpha :Q(u(\hat a_0,\hat c),v, r(\check b_1,\hat e,\check e),s(\hat d))
+  \end{multline*}
+\end{tcolorbox}
+
 The composition of cells is hard to draw, but not as hard to imagine: for each module $M_i$ in the source of a given cell $\alpha$, we specify another cell $\beta_i$ having $M_i$ as its target, and we require that the arrow boundaries of the $\beta$'s match up wherever the $M$'s are paired together in the source of $\alpha$.
 (More precisely, the $\beta$'s form a labeled graph in $Y_1$.)
 Then we have a composite $\alpha(\beta_1,\dots,\beta_n)$, whose target is the target of $\alpha$, and whose source is obtained by ``grafting'' the source of each $\beta_i$ at the place where $M_i$ appears in the source of $\alpha$.
 Its arrow boundary is obtained from the multicategorical composition in the $S$-multicategory of arrows.
+
+\begin{tcolorbox}[title=Added Mar 18]
+  In type-theoretic syntax, of course, composition is just substitution/cut!
+\end{tcolorbox}
 
 One potentially confusing special case is when the source of $\alpha$ contains \emph{no} modules, i.e.\ it consists only of some collection of free edges.
 In this case, the labeled graph in $Y_1$ that we compose with also contains no actual cells $\beta$, but it can still be nontrivial: it consists of an analogous collection of free edges on \emph{arrows}.
@@ -338,11 +385,11 @@ For instance, the modules with fixed boundary $\omega$ form a category, also den
   \label{fig:vdc}
 \end{figure}
 
-On the other hand, if we consider only arrows with unary source $(A)$, and only modules with boundary of the form $(A,B\op)$, then our cells look like the one shown in \cref{fig:vdc}.
-%Note that the arrow boundary is $(u\op,v)$.
-In this way, every virtual rigid double category has an underlying ordinary virtual double category.
+On the other hand, if we consider only arrows with unary source $(A)$, and only modules with boundary of the form $(A,B\o)$, then our cells look like the one shown in \cref{fig:vdc}.
+%Note that the arrow boundary is $(u\o,v)$.
+In this way, every virtual compact double category has an underlying ordinary virtual double category.
 
-If we retain the restriction that modules have boundary $(A,B\op)$, but allow arrows with arbitrary sources containing no opposites, then we obtain cells belonging to an (as yet undefined) notion that one might call a ``virtual monoidal double category''.
+If we retain the restriction that modules have boundary $(A,B\o)$, but allow arrows with arbitrary sources containing no opposites, then we obtain cells belonging to an (as yet undefined) notion that one might call a ``virtual monoidal double category''.
 Such a cell is shown in \cref{fig:vmdc}.
 
 \begin{figure}
@@ -389,5 +436,72 @@ Such a cell is shown in \cref{fig:vmdc}.
   \caption{A virtual monoidal double category cell}
   \label{fig:vmdc}
 \end{figure}
+
+\section{Universal cells}
+\label{sec:univ-cells}
+
+\subsection{Restrictions and extensions}
+\label{sec:restr-extens}
+
+Let $\K$ be a virtual compact double category, and $M\in\cMod_\K(\vec{A})$ a module, and suppose we have chosen a potential arrow boundary for a cell with target $M$.
+Speaking precisely, this means we have an element $\vec{u}\in S(X_1)$ whose image in $S(X_0)$ under $S($target$)$ is $\vec A$.
+A \textbf{restriction} of $M$ along $\vec{u}$ is a cell $\cart$ with target $M$ and arrow boundary $\vec{u}$, whose source contains exactly one module, denoted $M(\vec{u})$, with no loops or free edges (that is, its pairing in $H$ is a bijective matching from the left to the right), and which is universal in the following sense:
+Given any double word $\Vec v \in SSX_1$ composable with $\vec u$, and a cell $\alpha$ with target $M$ and arrow boundary $\vec u(\Vec v)$, there exists a unique cell $\beta$ with arrow boundary $\mu(\Vec v)$ and target $M(\vec{u})$ such that $\alpha = \cart\beta$.
+If $\vec{u}$ consists only of identities except for one arrow $f$, we may write $f^*(M)$ instead of $M(f)$.
+
+The notion of extension is dual, though not precisely so since multicategories are not self-dual in general.
+Given a potential arrow boundary $\vec{u}\in S(X_1)$ whose image in $S(X_0)$ under $\mu \circ S($source$)$ is $\vec A$, and a module $M\in \cMod_\K(\vec A)$, an \textbf{extension} of $M$ along $\vec{u}$ is a cell $\opcart$ with source $(M)$ (no loops or free edges) and arrow boundary $\vec{u}$, with target denoted $\vec{u}_!(M)$, that is universal in the following sense:
+Given any bracketing of $\vec{A} = \mu(\Vec{B})$ and a $\vec{v} \in S(X_1)$ with source $\Vec{B}$, so that $\vec{v}(\vec u)$ makes sense, and a cell $\alpha$ with source $(M)$ and arrow boundary $\vec{v}(\vec u)$, there exists a unique cell $\beta$ with arrow boundary $\vec{v}$ and source $\vec{u}_!(M)$ such that $\alpha = \beta\opcart$.
+If $\vec{u}$ consists only of identities except for one arrow $f$, we may write $f_!(M)$ instead of $\vec{u}_!(M)$.
+
+\subsection{Tensor products and opposites}
+\label{sec:tensors}
+
+Next, in the underlying $S$-multicategory of $\K$, we can speak about representability and universal arrows like an ordinary multicategory.
+Namely, an arrow $u:(\omega) \to A$ is \textbf{universal} if any arrow $v:(\xi,\omega,\zeta) \to B$ factors through $u$ via a unique arrow $w:(\xi,A,\zeta) \to B$ (that is, $v = w(\vec 1,u,\vec 1)$).
+
+If $\omega$ contains no opposites, then such a universal arrow exhibits its target as a \emph{tensor product} of its source, and we write it as $(A,B,C) \to A\ten B\ten C$.
+By the usual arguments, such composites are associative insfor as they exist, and if they all exist then they make the category of objects and arrows symmetric monoidal.
+
+On the other hand, if $\omega = (A\o)$, then a universal arrow exhibits its target as an \emph{opposite} of $A$, and we write it as $(A\o) \to A\op$.
+It has the property that (for instance) any arrow $(A\o) \to B$ factors through it by a unique arrow $A\op \to B$.
+In other words, in contrast to how modern category theorists usually define ``contravariant functors'' to be functors out of the opposite category, in a virtual compact double category the ``formal opposites'' appearing in the domains of arrows give us a notion of ``contravariance'' without necessarily a notion of ``opposite object'', while opposite objects can be determined by universal arrows when they exist.\footnote{I do not actually know of any naturally occurring virtual compact double category in which opposites --- meaning, universal arrows with source $(A\o)$ --- do \emph{not} exist, so this extra generality serves no real purpose in applications.
+However, it is technically more convenient to include ``formal contravariance'' along with the ``formal multiplication'' of a multicategory, rather than trying to add a duality involution as basic extra structure.}
+
+This notion of universal arrow, however, is not sufficient for our purposes, since it makes no reference to the modules and cells.
+It ought to be the case, for instance, that a module over $(A,B)$ is equivalent to a module over $A\ten B$.
+We say that a universal arrow $u:(\omega) \to A$ is \textbf{strong} if
+\begin{enumerate}
+\item All restrictions and extensions along $u$ (with all other arrows identities) exist.
+\item Every such restriction cell is also an extension cell and vice versa.
+  Therefore, restriction and extension along $u$ induces equivalences of module categories.
+\item Any cell with source $\emptyvec{(\xi,\xi\o,\omega,\omega\o)}$ (that is, the labeled graph with no nodes, but $\omega$ as part of its boundary in a way that no free edges connect two objects in $\omega$) whose arrow boundary factors through $(1,1\o,u,u\o)$ (which, by the universal property of $u$, is the same as saying that the induced bracketing on the source boundary doesn't break up $\omega$ or $\omega\o$) factors uniquely through the corresponding empty labeled graph of cells $\emptyvec{(1,1\o,u,u\o)}$.
+\end{enumerate}
+
+\subsection{Composites and units}
+\label{sec:composites}
+
+Finally, suppose given a labeled graph $\vec{M}$ of modules.
+A \textbf{composite} of it is a cell $\opcart$ with source $\vec M$ and arrow boundary consisting of identities, with target denoted $\bigcomp\vec{M}$, that is universal in the following sense:
+Given any labeled graph $(\vec M,\vec N)$ containing $\vec{M}$ as a subgraph (i.e.\ that can be obtained via the multiplication of the monad $T$ from a graph of graphs involving $M$) and any cell $\alpha$ with source $(\vec M,\vec N)$, there exists a unique cell $\beta$ with source $(\bigcomp\vec{M},\vec N)$ such that $\alpha = \beta(\opcart,\vec 1)$.
+
+If $\vec M = \emptyvec{(A,A\o)}$ is the graph with no nodes and a single free edge, then a composite of it is called a \textbf{unit} for $A$ and written $\unit A \in \cMod(A,A\o)$.
+Units are functorial: given any $f:\vec{A} \to B$, we can compose the unit cell for $B$ with $\emptyvec{\vec{A}}$, then successively apply the universal property of the units for each $A_i$, to obtain a cell from $\vec{\unit A}$ (the graph consisting of the units for all the $A_i$s side by side) to $\unit B$ with arrow boundary $(f,f\o)$.
+We write this cell as $\unit f$.
+
+If $f$ itself is a strong universal arrow, then the third condition in that definition, combined with the universal property of the units of the $A_i$'s, implies that $\unit f$ is actually an extension cell of its source along $(u,u\o)$.
+The second condition for strong universal arrows then implies that $\unit f$ is also a restriction cell; thus the equivalences between module categories induced by a strong universal arrow respect units.
+
+All composites with units automatically exist.
+More precisely, let $\vec M$ be a labeled graph containing one node $M$ and any number of 
+
+
+\section{Virtual compact equipments}
+\label{sec:virt-compact-equipm}
+
+We define a \textbf{virtual compact equipment} to be a virtual compact double category in which all restrictions and units exist.
+Of course, the underlying virtual double category of a virtual compact equipment is a virtual equipment.
+
+When all units exist, we can enhance the underlying $S$-multicategory to an $S$-2-multicategory, by defining its 2-cells from $f:\vec A \to B$ to $g:\vec A \to B$ to be the cells with source $\vec{\unit A}$, target $\unit B$, and arrow boundary $(g,f\o)$.
 
 \end{document}
