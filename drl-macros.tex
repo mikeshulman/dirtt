@@ -1,4 +1,14 @@
 
+% braces
+\newcommand{\set}[2]{\left\{#1\,\middle|\,#2\right\}}
+\newcommand{\paren}[1]{\left(#1\right)}
+\newcommand{\brac}[1]{\left[#1\right]}
+\newcommand{\accol}[1]{\left\{#1\right\}}
+\newcommand{\angles}[1]{\left\langle#1\right\rangle}
+\newcommand{\interp}[1]{\left\llbracket#1\right\rrbracket}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+
 \newcommand{\piset}[3]{\ensuremath{\textnormal{$\Pi$}^{\dsd{s}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
 \newcommand{\sigmaset}[3]{\ensuremath{\textnormal{$\Sigma$}^{\dsd{s}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
 \newcommand{\pitp}[3]{\ensuremath{\textnormal{$\Pi$}^{\dsd{t}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
@@ -258,7 +268,8 @@
 \newcommand\wftpc[3]{\ensuremath{#1 ; #2 \vdash #3 \, \dsd{type}_{\Cm}}}
 \newcommand\wftpcc[2]{\ensuremath{#1 \vdash #2 \, \dsd{type}_{\Cm}}} %% constant
 
-\newcommand\types{\ensuremath{\dsd{set}\/}}
+%\newcommand\types{\ensuremath{\dsd{set}\/}}
+\newcommand\types{\ensuremath{\mathbb{S}\dsd{et}}}
 
 \newcommand\vwfdimc[4]{\ensuremath{\vvoftp{#1;#2}{#3}{#4}{\,}{\dsd{dim}}}}
 \newcommand\wfdimc[3]{\ensuremath{\vvoftp{#1;#2}{#3}{}{\,}{\dsd{dim}}}}
