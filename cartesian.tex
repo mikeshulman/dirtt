@@ -76,7 +76,7 @@ w ::= \coc \mid \conc
 \begin{array}{rcl}
 \Gamma^\co & := & \Gamma \\
 \cdot^\con & := & \cdot \\
-({\Gamma},\vtptm{x}{v}{\C})^\con & := & {\Gamma^\con},\vtptm{x}{\flip{v}}{A} \\
+({\Gamma},\vtptm{x}{v}{\C})^\con & := & {\Gamma^\con},\vtptm{x}{\flip{v}}{\C} \\
 ({\Gamma},\tptmv{x}{w}{T})^\con & := & {\Gamma^\con},\tptmv{x}{\flip{w}}{T} \\
 \end{array}
 \]
@@ -115,9 +115,9 @@ functions).
 \qquad
 \infer{\wftp{\Gamma}{\Elp{S}}}
       {\oftp{\Gamma}{S}{\types}}
-\qquad
-\infer{\wftp{\Gamma}{\Eln{S}}}
-      {\oftp{\Gamma^\con}{S}{\types}}
+%% \qquad
+%% \infer{\wftp{\Gamma}{\Eln{S}}}
+%%       {\oftp{\Gamma^\con}{S}{\types}}
 \]
 
 \[
@@ -125,7 +125,7 @@ functions).
       {\oftp{\Gamma^\con}{S_1}{\types} &
         \oftp{\Gamma, \tptmv {x}{\conc}{\Elp{S_1}}}{S_2}{\types}}
 \qquad
-\Elpn{\piset{x}{S_1}{S_2}} \deq \pitp{x}{\Elpn{S_1}}{\Elpn{S_2}}
+\Elp{\piset{x}{S_1}{S_2}} \deq \pitp{x}{\Elp{S_1}}{\Elp{S_2}}
 \]
 
 \[
@@ -133,7 +133,7 @@ functions).
       {\oftp{\Gamma}{S_1}{\types} &
         \oftp{\Gamma, \tptmv {x}{\coc}{S_1}}{S_2}{\types}}
 \qquad
-\Elpn{\sigmaset{x}{S_1}{S_2}} \deq \sigmatp{x}{S_1}{\Elpn{S_2}}
+\Elp{\sigmaset{x}{S_1}{S_2}} \deq \sigmatp{x}{S_1}{\Elp{S_2}}
 \]
 
 \[
@@ -142,19 +142,21 @@ functions).
         \oftp{\Gamma^\con}{c_1}{\C} &
         \oftp{\Gamma}{c_2}{\C}}
 \qquad
-\Elpn{\homset{\C}{c_1}{c_2}} \deq \homtp{\C}{c_1}{c_2}
+\Elp{\homset{\C}{c_1}{c_2}} \deq \homtp{\C}{c_1}{c_2}
 \]
 
 \[
 \infer{\oftp{\Gamma}{\bool}{\types}}
       {}
 \qquad
-\Elpn{\bool} \deq \bool
+\Elp{\bool} \deq \bool
 \]
 
 \FIXME{directed univalence}
 
 \FIXME{maybe need *'s on the \Eln{-} computation rules}
+
+\FIXME{can we remove \Eln{S} and just use \dagtp{\Elp{S}}?}
 
 \subsection{Op Categories}
 
@@ -167,7 +169,7 @@ functions).
       {\ofdtp{\Gamma^\con}{c}{\C}}
 \qquad
 \infer{\ofdtp{\Gamma}{\unop{c}}{{\C}}}
-      {\ofdtp{\Gamma^\con}{c}{\optm{\C}}}
+      {\ofdtp{\Gamma^\con}{c}{\optp{\C}}}
 \\ \\
 \unop{\optm{c}} \deq c \\
 \optm{\unop{c}} \deq c
@@ -302,15 +304,15 @@ family of sets.
 
 \[
 \begin{array}{c}
-\infer{\wftp{\Gamma}{\picl{x}{T_1}{T_2}}}
+\infer{\wftp{\Gamma}{\pitp{x}{T_1}{T_2}}}
       {\wftp{\Gamma^\con}{T_1} &
         \wftp{\Gamma, \vstptm {x}{\conc}{T_1}}{T_2}}
 \\ \\
-\infer{\oftp{\Gamma}{\ulam{x}{M}}{\picl x {T_1} {T_2}}}
+\infer{\oftp{\Gamma}{\ulam{x}{M}}{\pitp x {T_1} {T_2}}}
       {\oftp{\Gamma, \tptmv x {\conc} {T_1} }{t}{T_2}}
 \qquad
 \infer{\oftp{\Gamma}{\app t {t'}}{\subst T {t'} x}}
-      {\oftp{\Gamma}{t}{\picl{x}{T'}{T}} &
+      {\oftp{\Gamma}{t}{\pitp{x}{T'}{T}} &
         \oftp{\Gamma^\con}{t'}{T'}}
 \end{array}
 \]
@@ -318,9 +320,11 @@ family of sets.
 \[
 \begin{array}{rcll}
 \app {(\ulam{x}{t})}{t'} & \equiv & \subst{t}{t'}{x} \\
-\tptm{t}{\picl{x}{T'}{T}} & \equiv & {(\ulam{x}{t}{x})} &
+\tptm{t}{\pitp{x}{T'}{T}} & \equiv & {(\ulam{x}{t}{x})} &
 \end{array} \\
 \]
+
+\FIXME{does the domain need to be restricted to a set?}
 
 \subsection{$\Sigma$ of a set and a type}
 
@@ -349,6 +353,9 @@ family of sets.
 \tptm{t}{\sigmatp{x}{S}{T}} & \deq & \pair{\fst t}{\snd t}
 \end{array}
 \]
+
+\FIXME{would this make sense when $S$ is contravariant as well?  and do
+  we need to put that in?}
 
 \subsection{Hom Types}
 
@@ -379,7 +386,7 @@ family of sets.
 
 \[
 \begin{array}{l}
-\infer{\oftp{\Gamma}{\morindco{y,x.S}{t}{t'}}{\Elp{\subst{\subst{A}{M_1}{x_1}}{M}{x}}}}
+\infer{\oftp{\Gamma}{\morindco{x_1,x.S}{t}{t'}}{\Elp{\subst{\subst{S}{c_1}{x_1}}{t}{x}}}}
       { \begin{array}{l}
           \wfdtp{\C} \\
           \oftp{\Gamma}{c_0,c_1}{\C} \\
