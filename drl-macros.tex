@@ -1,0 +1,418 @@
+
+\newcommand\Set[0]{\ensuremath{\mathbf{Set}}}
+
+\newcommand\wfdtp[1]{\ensuremath{#1 \, \dsd{cat}}}
+\newcommand\wfctx[1]{\ensuremath{#1 \, \dsd{ctx}}}
+
+%% \newcommand\tctx[2]{\ensuremath{#1 \mid #2}}
+
+\newcommand\wftp[2]{\ensuremath{#1 \vdash #2 \, \dsd{type}}}
+
+%% \newcommand\voftp[3]{\ensuremath{#1 \vdash #2 \, {{:}^{#3}} \, \dcd{#4}}}
+
+\newcommand\withop[1]{\ensuremath{(#1)^{\dsd{op}} \times #1}}
+
+\newcommand{\oftp}[3]{\ensuremath{{#1} \, \vdash \dcd{#2} \, \dcd{:} \, #3}}
+\newcommand{\ofdtp}[3]{\ensuremath{{#1} \, \vdash \dcd{#2} \, \dcd{:} \, #3}}
+
+\newcommand\admiss[0]{\textbf{admiss}}
+\newcommand\deriv[0]{\textbf{deriv}}
+
+\newcommand\fliptm[2]{\ensuremath{\dsd{flip}^{#1} \, #2}}
+
+\newcommand\deq[0]{\ensuremath{\equiv}}
+
+\newcommand\vvoftp[5]{\ensuremath{#1 \vdash #2 \, {\,^{#3}{:}^{#4}} \, \dcd{#5}}}
+\newcommand\vvdeqtm[6]{#1 \vdash #2 \deq #3 \, {\,^{#4}{:}^{#5}} \, #6}
+\newcommand\vvdeqtmnc[5]{#1 \deq #2 \, {\,^{#3}{:}^{#4}} \, #5}
+\newcommand\F[2]{\ensuremath{\mathsf{F}_{#1} #2}}
+\newcommand\wfsub[3]{\ensuremath{#1 \vdash #2 : #3}}
+
+\newcommand\tsubst[2]{\ensuremath{#1 [ #2 ]}}
+\newcommand\idsubst[0]{\ensuremath{\dsd{id}}}
+
+\newcommand{\ep}{\ensuremath{^{\text{\tiny +}}}}
+\newcommand{\en}{\ensuremath{^{\text{\small -}}}}
+\newcommand{\epc}{\ensuremath{^{\text{\tiny {$\oplus$}}}}}
+\newcommand{\enc}{\ensuremath{^{\text{\tiny {$\ominus$}}}}}
+\newcommand{\epn}{\ensuremath{^{\text{\tiny $\pm$}}}}
+
+\newcommand{\forw}[1]{\ensuremath{\overrightarrow{#1}}}
+\newcommand{\backw}[1]{\ensuremath{\overleftarrow{#1}}}
+
+\newcommand\co{\ensuremath{{\text{\tiny $\mathord{+}$}}}}
+\newcommand\con{\ensuremath{{\text{\tiny $\mathord{-}$}}}}
+
+\newcommand\coc{\ensuremath{{\text{\tiny $\mathord{\oplus}$}}}}
+\newcommand\conc{\ensuremath{{\text{\tiny $\mathord{\ominus}$}}}}
+
+
+\newcommand\inv{\ensuremath{{\text{\tiny $\mathord{\pm}$}}}}
+\newcommand\flip[1]{\ensuremath{\overline{#1}}}
+\newcommand\ectx[5]{\ensuremath{#1 , #2 \,^{#3}{:}^{#4} #5}}
+
+\newcommand\uncoresubst[0]{\dsd{uncore}}
+
+\newcommand\letfunc[4]{\ensuremath{\dsd{letfunc}^{#1}_{#2}(#3,#4)}}
+
+\newcommand\letcore[3]{\ensuremath{\dsd{letcore}_{#1}(#2,#3)}}
+
+\newcommand\tc[2]{\ensuremath{#1 \Rightarrow #2}}
+\newcommand\comph[2]{\ensuremath{#1 \mathbin{\circ_2} #2}}
+
+\newcommand\uncorep[0]{\ensuremath{\dsd{uncore}^\co}}
+\newcommand\uncoren[0]{\ensuremath{\dsd{uncore}^\con}}
+
+\newcommand\vtptm[3]{\ensuremath{\dcd{#1} \,^{#2}{:}^{\,} \dcd{#3}}}
+\newcommand\tptmv[3]{\ensuremath{\dcd{#1} \,^{\,}{:}^{#2} \dcd{#3}}}
+
+\newcommand\op[1]{\ensuremath{#1 ^{\dsd{op}}}}
+
+\newcommand\coretp[1]{\ensuremath{{\dsd{Core}} \: #1}}
+
+\newcommand\Ob[1]{\ensuremath{Ob(#1)}}
+\newcommand\morphismtp[3]{\ensuremath{#2 \longrightarrow_{#1} #3}}
+
+\newcommand\inF[3]{\ensuremath{\dsd{in}^{#1}_{#2}(#3)}}
+\newcommand\outF[3]{\ensuremath{\dsd{out}^{#1}_{#2}(#3)}}
+
+\newcommand\optp[1]{\ensuremath{{#1^{\dsd{op}}}}}
+\newcommand\optm[1]{\ensuremath{\dsd{op}(#1)}}
+\newcommand\unop[1]{\ensuremath{\dsd{unop}(#1)}}
+\newcommand\letop[3]{\ensuremath{\dsd{letop}_{#1}(#2,#3)}}
+
+\newcommand\obtp[1]{\ensuremath{{\dsd{Ob}(#1)}}}
+\newcommand\obtm[1]{\ensuremath{\dsd{ob}(#1)}}
+\newcommand\unob[1]{\ensuremath{\dsd{unob}(#1)}}
+\newcommand\unobv[2]{\ensuremath{\dsd{unob}_{#1}(#2)}}
+
+\newcommand\disctp[1]{\ensuremath{{\dsd{Discr}(#1)}}}
+\newcommand\disctm[1]{\ensuremath{\dsd{discr}(#1)}}
+\newcommand\letdisc[3]{\ensuremath{\dsd{letdisc}_{#1}(#2,#3)}}
+
+\newcommand\coretm[1]{\ensuremath{\dsd{core}(#1)}}
+\newcommand\letc[3]{\ensuremath{\dsd{letc}_{#1}(#2,#3)}}
+
+%% ----------------------------------------------------------------------
+
+
+\newcommand{\Hom}[3]{\ensuremath{\dsd{Hom}_{#1}(#2,#3)}}
+
+\newcommand{\Eq}[3]{\ensuremath{\dsd{Eq}_{#1}(#2,#3)}}
+
+\newcommand\ford{\ensuremath{{\text{\tiny +}}}}
+\newcommand\backd{\ensuremath{{\text{\small -}}}}
+\newcommand\symd{\ensuremath{{\text{\tiny $\pm$}}}}
+\newcommand\invd[1]{\ensuremath{\overline{#1}}}
+\newcommand\anyctx[5]{\ensuremath{#1 \stackrel{#2}{,} #3 \stackrel{#5}{:} #4}} 
+
+\newcommand\coctx[4]{\ensuremath{#1 \stackrel{\dsd{co}}{,} #2 {:} #3 [#4]}} 
+\newcommand\conctx[4]{\ensuremath{#1 \stackrel{\dsd{con}}{,} #2 {:} #3 [#4]}} 
+
+\newcommand\woftp[4]{\ensuremath{#1 \vdash \dcd{#2} \stackrel{#4}{:} \dcd{#3}}}
+
+\newcommand\ctx[1]{\text{\ensuremath{#1}}}
+
+\newcommand\FIXME[1]{\text{\textbf{FIXME:} #1}}
+
+\newcommand\wtp[2]{\ensuremath{#1 ^ #2}}
+
+\newcommand\I{\dsd{{\mathbb{I}}}}
+\newcommand\Iz{\dsd{zero}}
+\newcommand\Io{\dsd{one}}
+\newcommand\Iseg[1]{\dsd{seg}_{#1}}
+\newcommand\Ielim[5]{\ensuremath{\dsd{\I\text{-}elim}_{#1}(#2,#3,#4,#5)}}
+
+\newcommand\transportfor[3]{\dsd{transport}_{#1} \: #2 \: #3}
+
+%% \newcommand\definit[0]{\: \mathbin{\text{iff}} \: }
+
+%% \newcommand\co[1]{\ensuremath{\dcd{#1}\ep}}
+%% \newcommand\contra[1]{\ensuremath{\dcd{#1}\en}}
+%% \newcommand\cocon[1]{\ensuremath{#1 \epn}}
+%% \newcommand\conco[1]{\ensuremath{#1 ^\mp}}
+
+%% \newcommand\cons[3]{\ensuremath{#1 \mathbin{,} \tptmns{#2}{#3}}}
+%% % \newcommand\wfotp[2]{\ensuremath{#1\,\vdash \dcd{#2}\:\cocon {\dsd {type}}}}
+%% \newcommand\consp[3]{\cons{#1}{#2}{\co #3}}
+%% \newcommand\consn[3]{\cons{#1}{#2}{\contra #3}}
+%% \newcommand\gctxr[0]{\dsd{Ctx^\leftarrow}}
+%% \newcommand\gctxs[0]{\dsd{Ctx}}
+%% \newcommand\gsort[0]{\dsd{GSort}}
+%% \newcommand\ctx[1]{\text{\ensuremath{#1}}}
+%% \newcommand\data[2]{\ensuremath{\langle \ctx{#1} \rangle \dcd{#2}}}
+\newcommand\ite[4]{\ensuremath{\dsd{if}_{#1}(\dcd{#2},\dcd{#3},\dcd{#4})}}
+%% \newcommand\tsubst[2]{\ensuremath{\dcd{#1} [ #2 ]}}
+
+
+%% \renewcommand\abort[1]{\ensuremath{\dsd{abort} \, \dcd{#1}}}
+%% \newcommand\wfsub[3]{\ensuremath{#1 \vdash #2 : #3}}
+%% \newcommand\homj[3]{\ensuremath{#2 \Longrightarrow_{#1} #3}}
+%% \newcommand\ofhomj[4]{\ensuremath{#1 : \homj{#2}{#3}{#4}}}
+%% \newcommand\ofhom[5]{\ensuremath{#1 \vdash #2 : \homj{#3}{#4}{#5}}}
+%% % \newcommand\ofhominj[4]{#3 \mapsto^{#2}_{#1} {#4}}
+%% % \newcommand\ofhomin[6]{\ensuremath{#1 \vdash #2 : #5 \mapsto^{#4}_{#3} {#6}}}
+%% \newcommand\set[0]{\dsd{set}}
+
+%% \newcommand\el[1]{\ensuremath{El(#1)}}
+
+%% \newcommand\map[3]{\ensuremath{\dsd{map}_{#1} \ #2 \ #3}}
+%% \newcommand\maps[3]{\ensuremath{\dsd{map}^1_{#1} \ #2 \ #3}}
+%% \renewcommand\id[3]{\ensuremath{\dsd{Id}_{#1} \ #2 \ #3}}
+%% \renewcommand\subst[3]{\ensuremath{#1 [ #2 / #3]}}
+%% \newcommand\hlam[2]{\dcd{#1.{#2}}}
+%% \newcommand\ext[5]{\ensuremath{\lambda_{#1} \dcd{#2,#3,#4.#5}}}
+%% \newcommand\unext[4]{\dcd{#1 \ #2 \ #3 \ #4}}
+%% \newcommand\comp[2]{\ensuremath{#1 \circ #2}}
+%% \newcommand\resp[2]{\ensuremath{\dsd{resp} \ {#1} \ #2}}
+
+%% \newcommand\ido[1]{\ensuremath{\ids_{#1}}}
+%% \newcommand\idt[2]{\ensuremath{\ids^{#1}_{#2}}}
+
+%% \newcommand{\deq}[3]{\ensuremath{#1\,\vdash\,\tp{#2} \, \equiv \, \tp{#3}}}
+%% \newcommand{\deqctx}[2]{\ensuremath{#1 \equiv #2}}
+
+%% \newcommand\wffunc[3]{\ensuremath{#1 : \functp {#2} {#3}}}
+%% \newcommand\nttp[2]{\ensuremath{#1 \Longrightarrow #2}}
+%% \newcommand\wfnt[5]{\ensuremath{#1 : \nttp {#2} {#3} : \functp {#4} {#5}}}
+
+\newcommand\grothp[2]{\ensuremath{\int^{\dsd{co}}_{#1} #2}}
+\newcommand\groth[3]{\ensuremath{\int^{#1}_{#2} #3}}
+\newcommand\grothn[2]{\ensuremath{\int^{\dsd{contra}}_{#1} #2}}
+
+\newcommand\compo[2]{\ensuremath{#1 \cdot #2}}
+
+%% \newcommand\sty[1]{\ensuremath{\dsd {Ty} \ #1}}
+%% \newcommand\stm[2]{\ensuremath{\dsd {Tm} \ #1 \ #2}}
+
+%% \newcommand\dtt{2DTT}
+%% \newcommand\cats{\ensuremath{Cat}}
+
+%% \newcommand\var[1]{\ensuremath{\dsd{var}(#1)}}
+%% \newcommand\propos[1]{\ensuremath{\dsd{prop}(#1)}}
+%% \newcommand\nd[2]{\ensuremath{\dsd{nd} \, #1 \, #2}}
+
+%% \newcommand\iin[1]{\dsd{in} \, #1}
+%% \newcommand\iout[1]{\dsd{out} \, #1}
+
+%% \newcommand\sets[0]{\dcd{Sets}}
+%% \newcommand\idata[2]{\app{\dsd{#1}}{#2}}
+
+%% \newcommand\realid[1]{\dsd{id}_{#1}^{#1}}
+
+
+\newcommand\refl[1]{\ensuremath{\dsd{refl}_{#1}}}
+\newcommand\refls[0]{\dsd{refl}}
+
+\newcommand\idm[1]{\ensuremath{\dsd{id}_{#1}}}
+\newcommand\morind[3]{\ensuremath{\dsd{hind}_{#1}(#2,#3)}}
+\newcommand\morindco[3]{\ensuremath{\dsd{hind}^\co_{#1}(#2,#3)}}
+\newcommand\morindcon[3]{\ensuremath{\dsd{hind}^\con_{#1}(#2,#3)}}
+
+\newcommand\splitsig[3]{\ensuremath{\dsd{split}_{#1}(#2,#3)}}
+
+%% \newcommand{\idi}[1]{\dsd{idi} \: #1}
+%% \newcommand{\ide}[1]{\dsd{ide} \: #1}
+
+%% \newcommand\mtext[1]{\text{\emph{#1}} \\ \\}
+%% \renewcommand\irl[1]{\text{\emph{#1}}}
+
+\newcommand\Core[1]{\ensuremath{{#1^\dsd{core}}}}
+\newcommand\Cat{\ensuremath{\bold{Cat}}}
+\newcommand\Gpd{\ensuremath{\bold{Gpd}}}
+
+\newcommand\II{\ensuremath{\mathbb{I}}}
+
+\newcommand\vdimtm[2]{\ensuremath{\vtptm{#1}{#2}{\,}{\dsd{dim}}}}
+\newcommand\vwfdim[3]{\ensuremath{\vvoftp{#1}{#2}{#3}{\,}{\dsd{dim}}}}
+\newcommand\wfdim[2]{\ensuremath{\vvoftp{#1}{#2}{}{\,}{\dsd{dim}}}}
+
+\newcommand\rev[1]{\ensuremath{1-#1}}
+
+\newcommand\nsubst[3]{\ensuremath{#1 \langle #2 / #3 \rangle}}
+\newcommand\subst[3]{\ensuremath{#1 [ #2 / #3 ]}}
+
+\newcommand\wfctxs[1]{\ensuremath{#1 \: \dsd{ctx}_{\Sm}}}
+\newcommand\wfctxc[2]{\ensuremath{#1 \vdash #2 \, \dsd{ctx}_{\Cm}}}
+
+%% \newcommand\wftps[2]{\ensuremath{#1 \vdash #2 \, \dsd{type}_{\Sm}}}
+\newcommand\wftpsf[3]{\ensuremath{#1 ; #2 \vdash #3 \,{:}\, \dsd{type}_{\Sm}}} %% fibration of sets
+\newcommand\wftpp[3]{\ensuremath{#1 ; #2 \vdash #3 \,{:}\, \dsd{type}_{p}}}
+\newcommand\wftpc[3]{\ensuremath{#1 ; #2 \vdash #3 \, \dsd{type}_{\Cm}}}
+\newcommand\wftpcc[2]{\ensuremath{#1 \vdash #2 \, \dsd{type}_{\Cm}}} %% constant
+
+\newcommand\types{\ensuremath{\dsd{set}\/}}
+
+\newcommand\vwfdimc[4]{\ensuremath{\vvoftp{#1;#2}{#3}{#4}{\,}{\dsd{dim}}}}
+\newcommand\wfdimc[3]{\ensuremath{\vvoftp{#1;#2}{#3}{}{\,}{\dsd{dim}}}}
+
+\newcommand\oftps[3]{\ensuremath{#1 \vdash #2 \, {:} \, \dcd{#3}}}
+
+\newcommand\voftpc[5]{\ensuremath{#1 ; #2 \vdash #3 \, {{:}^{#4}} \, \dcd{#5}}}
+\newcommand\vvoftpc[6]{\ensuremath{#1 ; #2 \vdash #3 \, {\,^{#4}{:}^{#5}} \, \dcd{#6}}}
+
+\newcommand\Cm{\dsd{c}}
+\newcommand\Sm{\dsd{s}}
+
+\newcommand\C{\ensuremath{\mathbb{C}}}
+\newcommand\G{\ensuremath{\Gamma}}
+
+\newcommand\vptptm[3]{\ensuremath{\dcd{#1} \,^{#2}{:}^{\,} \dcd{#3}}}
+\newcommand\vstptm[3]{\ensuremath{\dcd{#1} \,^{\,}{:}^{#2} \dcd{#3}}}
+\newcommand\oftpc[4]{\ensuremath{#1 ; #2 \vdash #3 \, {{:}} \, \dcd{#4}}}
+\newcommand\oftpsf[4]{\ensuremath{#1 ; #2 \vdash #3 \, {:} \, \dcd{#4}}}
+\newcommand\oftpp[4]{\ensuremath{#1 ; #2 \vdash #3 \, {{:}} \, \dcd{#4}}}
+
+\newcommand\promote[3]{\dsd{promote}_{#1}(#2,#3)}
+
+\newcommand\nlam[2]{\ensuremath{\langle #1 \rangle #2}}
+\newcommand\napp[2]{\ensuremath{#1 @ #2}}
+
+\newcommand{\HomO}[3]{\ensuremath{\dsd{IHom}_{#1}(#2,#3)}}
+
+\newcommand{\dcd}[1]{\ensuremath{\mathit{#1}}}
+\newcommand{\dsd}[1]{\ensuremath{\mathsf{#1}}}
+\newcommand{\tptm}[2]{\ensuremath{#1 \, \dcd{:} \, #2}}
+\newcommand{\tptmns}[2]{\ensuremath{#1 \dcd{:} #2}}
+
+\newcommand{\larr}[3]{\ensuremath{\dcd{#2}\rightarrow_{\dcd{#1}} \dcd{#3}}}
+\newcommand{\arr}[2]{\larr{}{#1}{#2}}
+\newcommand{\picl}[3]{\ensuremath{\textnormal{$\Pi$}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
+\newcommand{\sigmacl}[3]{\ensuremath{\textnormal{$\Sigma$}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
+
+\newcommand{\lprd}[3]{\ensuremath{\dcd{#2} \times_{\dcd{#1}} \dcd{#3}}}
+\newcommand{\lsm}[3]{\ensuremath{\dcd{#2} +_{\dcd{#1}} \dcd{#3}}}
+\newcommand{\prd}[2]{\lprd{}{#1}{#2}}
+\newcommand{\sm}[2]{\lsm{}{#1}{#2}}
+
+\newcommand{\ulam}[2]{{\lambda\,#1.\,#2}}
+\newcommand{\lam}[3]{{\lambda\,\tptmns{#1}{#2}.\,#3}}
+\newcommand{\app}[2]{\dcd{#1 \: #2}}
+\newcommand{\appp}[3]{\dcd{#1 \: #2 \: #3}}
+\newcommand{\apppp}[4]{\dcd{#1 \: #2 \: #3 \: #4}}
+\newcommand{\appppp}[5]{\dcd{#1 \: #2 \: #3 \: #4 \: #5}}
+\newcommand{\apppppp}[6]{\dcd{#1 \: #2 \: #3 \: #4 \: #5 \: #6}}
+
+% put parens around each arg, associating to the left
+\newcommand{\lpapp}[2]{\dcd{#1\,(#2)}}
+\newcommand{\lpappp}[3]{\dcd{#1(#2)(#3)}}
+\newcommand{\lpapppp}[4]{\dcd{#1\,(#2)\,(#3)\,(#4)}}
+\newcommand{\lpappppp}[5]{\dcd{#1\,(#2)\,(#3)\,(#4)\,(#5)}}
+\newcommand{\lpapppppp}[6]{\dcd{#1\,(#2)\,(#3)\,(#4)\,(#5)\,(#6)}}
+
+% put parens around args, associating to the right 
+\newcommand{\rpapp}[2]{\dcd{#1\,(#2)}}
+\newcommand{\rpappp}[3]{\dcd{#1\,(#2\,(#3))}}
+\newcommand{\rpapppp}[4]{\dcd{#1\,(#2\,(#3\,(#4)})}
+\newcommand{\rpappppp}[5]{\dcd{#1\,(#2\,(#3\,(#4\,(#5))))}}
+\newcommand{\rpapppppp}[6]{\dcd{#1\,(#2\,(#3\,(#4\,(#5\,(#6)))))}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lambdas
+
+% a capital Lambda
+\newcommand{\lLam}[4]{\dcd{\Lambda_{#1}\,\kdcnns{#2}{#3}.\,#4}}
+\newcommand{\Lam}[3]{\lLam{}{#1}{#2}{#3}}
+\newcommand{\uLam}[2]{\dcd{\Lambda\,\cn{#1}.\,#2}}
+
+% juxtaposition with brackets 1[2]
+\newcommand{\App}[2]{\lApp{}{#1}{#2}}
+\newcommand{\Appp}[3]{\lAppp{}{#1}{#2}{#3}}
+\newcommand{\Apppp}[4]{\lApppp{}{#1}{#2}{#3}{#4}}
+\newcommand{\Appppp}[5]{\lAppppp{}{#1}{#2}{#3}{#4}{#5}}
+\newcommand{\Apppppp}[6]{\lApppppp{}{#1}{#2}{#3}{#4}{#5}{#6}}
+
+% bracket application with a level marker
+\newcommand{\lApp}[3]{\dcd{#2[#3]_{#1}}}
+\newcommand{\lAppp}[4]{\dcd{#2[#3][#4]_{#1}}}
+\newcommand{\lApppp}[5]{\dcd{#2[#3][#4][#5]_{#1}}}
+\newcommand{\lAppppp}[6]{\dcd{#2[#3][#4][#5][#6]_{#1}}}
+\newcommand{\lApppppp}[7]{\dcd{#2[#3][#4][#5][#6][#7]_{#1}}}
+
+% with a level marker
+\newcommand{\lpair}[3]{\ensuremath{\dcd{(#2,#3)_{#1}}}}
+\newcommand{\lfst}[2]{\app{\dsd{fst}_{#1}}{#2}}
+\newcommand{\lsnd}[2]{\app{\dsd{snd}_{#1}}{#2}}
+
+\newcommand{\lemptytuple}[1]{\dcd{()_{#1}}}
+
+%% without
+\newcommand{\pair}[2]{\lpair{}{#1}{#2}}
+\newcommand{\fst}[1]{\lfst{}{#1}}
+\newcommand{\snd}[1]{\lsnd{}{#1}}
+
+\newcommand{\emptytuple}[0]{\lemptytuple{}}
+
+\newcommand{\linl}[3]{\app{\dsd{inl}_{#1}[#2]}{#3}}
+\newcommand{\linr}[3]{\app{\dsd{inr}_{#1}[#2]}{#3}}
+\newcommand{\lcase}[6]{\ensuremath{\dsd{case}_{\dcd{#1}}\:\dcd{#2}\:\dcd{of}\:
+  (\app{\dsd{inl}}{#3}\,\dcd{\Rightarrow}\,\dcd{#4}\:\dcd{|}\:\app{\dsd{inr}}{#5}\,\dcd{\Rightarrow}\,\dcd{#6} )}}
+
+\newcommand{\sumscase}[5]{\lcase{}{#1}{#2}{#3}{#4}{#5}}
+
+\newcommand{\labort}[3]{\app{\dsd{abort}_{#1}[#2]}{#3}}
+
+\newcommand{\inl}[2]{\linl{}{#1}{#2}}
+\newcommand{\inr}[2]{\linr{}{#1}{#2}}
+
+
+\newcommand{\abort}[2]{\labort{}{#1}{#2}}
+
+% gamma proves t has type tau judgement
+%% \newcommand{\oftp}[3]{\ensuremath{#1 \, \vdash \dcd{#2} \, \dcd{:} \, \cn{#3}}}
+% well-formed type
+%% \newcommand{\wftp}[2]{\ensuremath{#1\,\vdash \dcd{#2}\:\dsd{type}}}
+\newcommand{\deqtm}[4]{\ensuremath{#1\,\vdash\,\tm{#2} \, \equiv \, \tm{#3} \, \dcd{:} \, \tp{#4}}}
+%% \newcommand{\wfctx}[1]{\ensuremath{#1 \: \dsd{ctx}}}
+
+\renewcommand{\cite}[1]{\citep{#1}}
+
+%% small tightcode, with space around it
+\newenvironment{stcode}
+{\smallskip
+\begin{small}
+\begin{tightcode}}
+{\end{tightcode}
+\end{small}
+\smallskip}
+
+\DeclareUnicodeCharacter{9001}{$\langle$} %% 〈
+\DeclareUnicodeCharacter{9002}{$\rangle$} %%  〉
+\DeclareUnicodeCharacter{12314}{$\llbracket$} %% 〚
+\DeclareUnicodeCharacter{12315}{$\rrbracket$}  %% 〛
+\DeclareUnicodeCharacter{8872}{$\vDash$} %% ⊢ 
+\DeclareUnicodeCharacter{9656}{\!\!\!}  %% ▸
+\DeclareUnicodeCharacter{9657}{$\triangleright$} %% ▹
+\DeclareUnicodeCharacter{8594}{$\shortrightarrow$} %% →
+\DeclareUnicodeCharacter{8675}{$\downshift$} %% ⇣
+\DeclareUnicodeCharacter{8593}{$\upshift$} %% ↑
+\DeclareUnicodeCharacter{9711}{$\bigcirc$} %% ◯
+\DeclareUnicodeCharacter{8667}{$^\shortrightarrow$} %% ⇛
+\DeclareUnicodeCharacter{8596}{$^\leftrightarrow$} %% ↔
+\DeclareUnicodeCharacter{10224}{$\uparrow$} %% ⟰
+\DeclareUnicodeCharacter{10225}{$\downarrow$} %% ⟱
+
+\newcommand\textPsi{\ensuremath{\Psi}}
+\newcommand\textXi{$\Xi$}
+\newcommand\textDelta{$\Delta$}
+\newcommand\textGamma{$\Gamma$}
+\newcommand\textsigma{$\sigma$}
+\newcommand\textSigma{$\Sigma$}
+\newcommand\textTheta{$\Theta$}
+\newcommand\texttheta{$\theta$}
+\newcommand\textPi{$\Pi$}
+\newcommand\textrho{$\rho$}
+\newcommand\textphi{$\varphi$}
+\newcommand\textlambda{$\lambda$}
+\newcommand\texttau{$\tau$}
+\newcommand\texteta{$\eta$}
+%% FIXME renewcommand when using hyperref
+\newcommand\textmu{$\mu$}
+\newcommand\textalpha{$\alpha$}
+\newcommand\textepsilon{$\epsilon$}
+\newcommand\textkappa{$\kappa$}
+\newcommand\textOmega{$\Omega$}
+\newcommand\textmho{$\mho$}
+\newcommand\textgamma{$\gamma$}
+\newcommand\textpi{$\varpi$}
+\newcommand\textpsi{\ensuremath{\psi}}
