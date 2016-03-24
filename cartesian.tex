@@ -154,9 +154,8 @@ functions).
 
 \FIXME{directed univalence}
 
-\FIXME{maybe need *'s on the \Eln{-} computation rules}
-
-\FIXME{can we remove \Eln{S} and just use \dagtp{\Elp{S}}?}
+Note: \Eln{S} for $S$ well-formed contravariantly will be definable as
+\dagtp{\Elp{S}}.
 
 \subsection{Op Categories}
 
@@ -250,7 +249,8 @@ products in \Cat).
 \subsection{Directed Types: Dependent types with families of types}
 
 Directed types also have dependent types where the dependent part is a
-family of sets.  
+family of sets.  This $\Pi$ means an end; $\Sigma$ is the same as
+context extension.  
 
 \[
 \begin{array}{c}
@@ -270,7 +270,7 @@ family of sets.
 \[
 \begin{array}{rcll}
 \app {(\lam{x}{\C}{t})}{c} & \equiv & \subst{t}{c}{x} \\
-\tptm{M}{\picl{x}{\C}{S}} & \equiv & {(\lam{x}{\C}{M}{x})} &
+\tptm{t}{\picl{x}{\C}{S}} & \equiv & {(\lam{x}{\C}{t}{x})} &
 \end{array} \\
 \]
 
@@ -300,20 +300,20 @@ family of sets.
 \end{array}
 \]
 
-\subsection{$\Pi$ Types}
+\subsection{$\Pi$ of a set and a type}
 
 \[
 \begin{array}{c}
-\infer{\wftp{\Gamma}{\pitp{x}{T_1}{T_2}}}
-      {\wftp{\Gamma^\con}{T_1} &
-        \wftp{\Gamma, \vstptm {x}{\conc}{T_1}}{T_2}}
+\infer{\wftp{\Gamma}{\pitp{x}{S}{T}}}
+      {\wftp{\Gamma^\con}{S} &
+        \wftp{\Gamma, \vstptm {x}{\conc}{\Elp{S}}}{T}}
 \\ \\
-\infer{\oftp{\Gamma}{\ulam{x}{M}}{\pitp x {T_1} {T_2}}}
-      {\oftp{\Gamma, \tptmv x {\conc} {T_1} }{t}{T_2}}
+\infer{\oftp{\Gamma}{\ulam{x}{M}}{\pitp x {S} {T}}}
+      {\oftp{\Gamma, \tptmv x {\conc} {\Elp{S}} }{t}{T}}
 \qquad
 \infer{\oftp{\Gamma}{\app t {t'}}{\subst T {t'} x}}
-      {\oftp{\Gamma}{t}{\pitp{x}{T'}{T}} &
-        \oftp{\Gamma^\con}{t'}{T'}}
+      {\oftp{\Gamma}{t}{\pitp{x}{S}{T}} &
+        \oftp{\Gamma^\con}{t'}{\Elp{S}}}
 \end{array}
 \]
 
@@ -324,7 +324,8 @@ family of sets.
 \end{array} \\
 \]
 
-\FIXME{does the domain need to be restricted to a set?}
+Note: it doesn't seem like we can have $T_1 \to T_2$ or the
+corresponding $\Pi$ for this judgement structure.
 
 \subsection{$\Sigma$ of a set and a type}
 
