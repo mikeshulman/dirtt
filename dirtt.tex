@@ -207,7 +207,8 @@ and right rule
   \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
     \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
     \Psi_a \types a:A \\
-    \Psi_{\Gamma_M} \types \Gamma_M\ctx \\ \Psi_{\Gamma_N} \types \Gamma_N\ctx \\\\
+    \Psi_{\Gamma_M},\Psi_a^{\pm} \types \Gamma_M\ctx \\
+    \Psi_{\Gamma_N},\Psi_a^{\mp} \types \Gamma_N\ctx \\\\
     \Psi_M,x:\pm A \types M\type \\ \Psi_N,x:\mp A \types N\type \\\\
     \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
     \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
