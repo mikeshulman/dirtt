@@ -51,7 +51,7 @@
 
 \[
 \begin{array}{l}
-v ::= \co \mid \con
+v ::= \co \mid \con \\
 w ::= \coc \mid \conc
 \end{array}
 \]
@@ -89,6 +89,8 @@ differentiate the $v$/$w$ notation is for readability.
 \infer{\oftp{\Gamma,\tptmv{x}{\coc}{T},\Gamma'}{x}{T}}{}
 \]
 
+\FIXME{star rule?}
+
 \[
 \infer[\textbf{admiss}]
       {\Gamma,\subst{\Gamma'}{c}{x} \vdash \subst{J}{c}{x}}
@@ -110,11 +112,51 @@ functions).
 
 \[
 \infer{\wfdtp{\types}}{}
+\qquad
+\infer{\wftp{\Gamma}{\Elp{S}}}
+      {\oftp{\Gamma}{S}{\types}}
+\qquad
+\infer{\wftp{\Gamma}{\Eln{S}}}
+      {\oftp{\Gamma^\con}{S}{\types}}
 \]
 
-\FIXME{function determines a path?}
+\[
+\infer{\oftp{\Gamma}{\piset{x}{S_1}{S_2}}{\types}}
+      {\oftp{\Gamma^\con}{S_1}{\types} &
+        \oftp{\Gamma, \tptmv {x}{\conc}{\Elp{S_1}}}{S_2}{\types}}
+\qquad
+\Elpn{\piset{x}{S_1}{S_2}} \deq \pitp{x}{\Elpn{S_1}}{\Elpn{S_2}}
+\]
 
-\subsection{Op Types}
+\[
+\infer{\oftp{\Gamma}{\sigmaset{x}{S_1}{S_2}}{\types}}
+      {\oftp{\Gamma}{S_1}{\types} &
+        \oftp{\Gamma, \tptmv {x}{\coc}{S_1}}{S_2}{\types}}
+\qquad
+\Elpn{\sigmaset{x}{S_1}{S_2}} \deq \sigmatp{x}{S_1}{\Elpn{S_2}}
+\]
+
+\[
+\infer{\oftp{\Gamma}{\homset{\C}{c_1}{c_2}}{\types}}
+      {\wfdtp{\C} &
+        \oftp{\Gamma^\con}{c_1}{\C} &
+        \oftp{\Gamma}{c_2}{\C}}
+\qquad
+\Elpn{\homset{\C}{c_1}{c_2}} \deq \homtp{\C}{c_1}{c_2}
+\]
+
+\[
+\infer{\oftp{\Gamma}{\bool}{\types}}
+      {}
+\qquad
+\Elpn{\bool} \deq \bool
+\]
+
+\FIXME{directed univalence}
+
+\FIXME{maybe need *'s on the \Eln{-} computation rules}
+
+\subsection{Op Categories}
 
 \[
 \begin{array}{c}
@@ -129,6 +171,24 @@ functions).
 \\ \\
 \unop{\optm{c}} \deq c \\
 \optm{\unop{c}} \deq c
+\end{array}
+\]
+
+\subsection{Dagger Types}
+
+\[
+\begin{array}{c}
+\infer{\wftp{\Gamma}{\dagtp{T}}}
+      {\wftp{\Gamma^\con}{T}}
+\qquad
+\infer{\oftp{\Gamma}{\dagtm{t}}{\dagtp{T}}}
+      {\oftp{\Gamma^\con}{t}{T}}
+\qquad
+\infer{\oftp{\Gamma}{\undag{t}}{{T}}}
+      {\oftp{\Gamma^\con}{t}{\dagtp{T}}}
+\\ \\
+\undag{\dagtm{t}} \deq t \\
+\dagtm{\undag{t}} \deq t
 \end{array}
 \]
 
@@ -185,7 +245,7 @@ products in \Cat).
 \end{array}
 \]
 
-\subsection{Directed Types: Dependent types with families of sets}
+\subsection{Directed Types: Dependent types with families of types}
 
 Directed types also have dependent types where the dependent part is a
 family of sets.  
@@ -199,9 +259,9 @@ family of sets.
 \infer{\ofdtp{\Gamma}{\lam{x}{\C}{t}}{\picl x \C T}}
       {\oftp{\Gamma,\vtptm{x}{\co}{\C}}{t}{T}}
 \qquad
-\infer{\oftpsf{\Delta}{\Gamma}{\app c {c'}}{\subst T {c'} x}}
-      {\oftpc{\Delta}{\Gamma}{c}{\picl{x}{\C}{T}} &
-        \oftpsf{\Delta}{\Gamma}{c'}{\C}}
+\infer{\oftp{\Gamma}{\app c {c'}}{\subst T {c'} x}}
+      {\oftp{\Gamma}{c}{\picl{x}{\C}{T}} &
+        \oftp{\Gamma}{c'}{\C}}
 \end{array}
 \]
 
@@ -216,7 +276,7 @@ family of sets.
 \begin{array}{c}
 \infer{\wfdtp{\sigmacl{x}{\C}{T}}}
       {\wfdtp{\C} &
-        \wfdtp{\vtptm{x}{\co}{\C}}{T}}
+        \wftp{\vtptm{x}{\co}{\C}}{T}}
 \qquad
 \infer{\ofdtp{\Gamma}{\pair{c}{t}}{\sigmacl x \C T}}
       {\ofdtp{\Gamma}{c}{\C} &
@@ -238,76 +298,135 @@ family of sets.
 \end{array}
 \]
 
-%% FIXME not updated below here.  
-
-\subsection{$\Pi$ sets}
+\subsection{$\Pi$ Types}
 
 \[
 \begin{array}{c}
-\infer{\wftpsf{\Delta}{\Gamma}{\picl{x}{S}{T}}}
-      {\wftpsf{\Delta}{\Gamma^\con}{S} &
-        \wftpsf{\Delta}{\Gamma, \vstptm {x}{\con}{S}}{T}}
+\infer{\wftp{\Gamma}{\picl{x}{T_1}{T_2}}}
+      {\wftp{\Gamma^\con}{T_1} &
+        \wftp{\Gamma, \vstptm {x}{\conc}{T_1}}{T_2}}
 \\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\lam{x}{S}{M}}{\picl x S T}}
-      {\oftpsf{\Delta}{\Gamma, \vstptm x {\con} S}{M}{T}}
+\infer{\oftp{\Gamma}{\ulam{x}{M}}{\picl x {T_1} {T_2}}}
+      {\oftp{\Gamma, \tptmv x {\conc} {T_1} }{t}{T_2}}
 \qquad
-\infer{\oftpsf{\Delta}{\Gamma}{\app M N}{\subst T N x}}
-      {\oftpsf{\Delta}{\Gamma}{M}{\picl{x}{S}{T}} &
-        \oftpsf{\Delta}{\Gamma^\con}{N}{S}}
+\infer{\oftp{\Gamma}{\app t {t'}}{\subst T {t'} x}}
+      {\oftp{\Gamma}{t}{\picl{x}{T'}{T}} &
+        \oftp{\Gamma^\con}{t'}{T'}}
 \end{array}
 \]
 
 \[
 \begin{array}{rcll}
-\app {(\lam{x}{S}{M})}{N} & \equiv & \subst{N}{x}{M} \\
-\tptm{M}{\picl{x}{S}{T}} & \equiv & {(\lam{x}{S}{M}{x})} &
+\app {(\ulam{x}{t})}{t'} & \equiv & \subst{t}{t'}{x} \\
+\tptm{t}{\picl{x}{T'}{T}} & \equiv & {(\ulam{x}{t}{x})} &
 \end{array} \\
 \]
 
-\subsection{$\Sigma$ sets}
+\subsection{$\Sigma$ of a set and a type}
 
 \[
 \begin{array}{c}
-\infer{\wftpsf{\Delta}{\Gamma}{\sigmacl{x}{S}{T}}}
-      {\wftpsf{\Delta}{\Gamma}{S} &
-        \wftpsf{\Delta}{\Gamma, \vstptm{x}{\co}{S}}{T}}
+\infer{\wftp{\Gamma}{\sigmatp{x}{S}{T}}}
+      {\oftp{\Gamma}{S}{\types} &
+        \wftp{\Gamma, \tptmv{x}{\coc}{\Elp{S}}}{T}}
 \qquad
-\infer{\oftpsf{\Delta}{\Gamma}{\pair{M}{N}}{\sigmacl x S T}}
-      {\oftpsf{\Delta}{\Gamma}{M}{S} &
-       \oftpsf{\Delta}{\Gamma}{N}{\subst{T}{M}x}}
+\infer{\oftp{\Gamma}{\pair{s}{t}}{\sigmatp x S T}}
+      {\oftp{\Gamma}{M}{\Elp{S}} &
+       \oftp{\Gamma}{N}{\subst{T}{M}x}}
 \\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\fst M}{S}}
-      {\oftpsf{\Delta}{\Gamma}{M}{\sigmacl{x}{S}{T}}}
+\infer{\oftp{\Gamma}{\fst t}{\Elp{S}}}
+      {\oftp{\Gamma}{t}{\sigmatp{x}{S}{T}}}
 \qquad
-\infer{\oftpsf{\Delta}{\Gamma}{\snd M}{\subst{T}{\fst M}{x}}}
-      {\oftpsf{\Delta}{\Gamma}{M}{\sigmacl{x}{S}{T}}}
+\infer{\oftp{\Gamma}{\snd t}{\subst{T}{\fst t}{x}}}
+      {\oftp{\Gamma}{t}{\sigmatp{x}{S}{T}}}
 \end{array}
 \]
 
 \[
 \begin{array}{rcll}
-\fst{\pair{M}{N}} & \deq & M \\
-\snd{\pair{M}{N}} & \deq & N \\
-\tptm{M}{\sigmacl{x}{S}{T}} & \deq & \pair{\fst M}{\snd M}
+\fst{\pair{s}{t}} & \deq & s \\
+\snd{\pair{s}{t}} & \deq & t \\
+\tptm{t}{\sigmatp{x}{S}{T}} & \deq & \pair{\fst t}{\snd t}
 \end{array}
 \]
+
+\subsection{Hom Types}
+
+\[
+\begin{array}{c}
+\infer{\wftp{\Gamma}{\Hom{\C}{c_0}{c_1}}}
+      {\wfdtp{\C} &
+        \oftp{\Gamma^*,\Gamma^\con}{c_0}{\C} & 
+        \oftp{(\Gamma^*)^\con,\Gamma}{c_1}{\C} 
+      }
+\\ \\
+\infer{\oftp{\Gamma}{\idm{c}}{\Hom{\C}{c^*}{c}}}
+      {\oftp{\Gamma}{c}{\C}
+      }
+\end{array}
+\]
+
+%% \infer{\oftpsf{\Delta}{\Gamma}{\morind{x_0,x_1,x.A}{M}{y.N}}{\subst{\subst{\subst{A}{M_0}{x_0}}{M_1}{x_1}}{M}{x}}}
+%%       { \begin{array}{l}
+%%           \wftpcc{\Delta}{\C} \\
+%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vptptm{x_1}{\co}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{x_1}}}{A} \\
+%%           \oftpp{\Delta,\tptm{y}{\obtp{\C}}}{\Gamma}{N}{\subst{\subst{\subst{A}{\unob{y}}{x_0}}{\unob{y}}{x_1}}{\refl{y}}{x}} \\
+%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{M_1}} \\
+%%         \end{array}
+%%       }
+%% \\ \\
+%% \morind{}{\refl{M}}{y.N} \deq \subst{N}{M}{y}
+
+\[
+\begin{array}{l}
+\infer{\oftp{\Gamma}{\morindco{y,x.S}{t}{t'}}{\Elp{\subst{\subst{A}{M_1}{x_1}}{M}{x}}}}
+      { \begin{array}{l}
+          \wfdtp{\C} \\
+          \oftp{\Gamma}{c_0,c_1}{\C} \\
+          \ofdtp{\Gamma,\vtptm{x_1}{\co}{\C},\tptmv{x}{\coc}{\Hom{\C}{c_0^*}{x_1}}}{S}{\types} \\
+          \oftp{\Gamma}{t'}{\Elp{\subst{\subst{S}{c_0}{x_1}}{\idm{c_0}}{x}}} \\
+          \oftp{\Gamma}{t}{\Hom{\C}{c_0^*}{c_1}} \\
+        \end{array}
+      }
+\\ \\
+\morindco{}{\idm{}}{t'} \deq t'
+\end{array}
+\]
+
+\FIXME{contravariant derivable?}
+
+%% \[
+%% \begin{array}{l}
+%% \infer{\oftpsf{\Delta}{\Gamma}{\morindcon{x_0,x.A}{M}{N}}{\subst{\subst{A}{M_0}{x_0}}{M}{x}}}
+%%       { \begin{array}{l}
+%%           \wftpcc{\Delta}{\C} \\
+%%           \oftpp{\Delta}{\Gamma}{M_1}{\obtp \C} \\
+%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{\unob{M_1}}}}{A} \\
+%%           \oftpp{\Delta}{\Gamma}{N}{\subst{\subst{A}{\unob{M_1}}{x_0}}{\refl{M_1}}{x}} \\
+%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{\unob{M_1}}} \\
+%%         \end{array}
+%%       }
+%% \\ \\
+%% \morindcon{}{\refl{M_1}}{N} \deq N
+%% \end{array}
+%% \]
 
 \subsection{Bool}
 
 \[
 \begin{array}{c}
-\infer{\wftpsf{\Delta}{\Gamma}{\dsd{2}}}
+\infer{\wftp{\Gamma}{\bool}}
       {}
 \qquad
-\infer{\oftpsf{\Delta}{\Gamma}{\dsd{true}}{\dsd{2}}}{}
+\infer{\oftp{\Gamma}{\dsd{true}}{\bool}}{}
 \qquad
-\infer{\oftpsf{\Delta}{\Gamma}{\dsd{false}}{\dsd{2}}}{}
+\infer{\oftp{\Gamma}{\dsd{false}}{\bool}}{}
 \\ \\
-\infer{\oftpp{\Delta}{\Gamma}{\ite{\vstptm{x}{v}{\dsd{2}}.A}{N_1}{N_2}{M}}{\subst{A}{M}{x}}}
-      {\wftpp{\Delta}{\Gamma,\vstptm{x}{v}{\dsd{2}}}{A} &
-        \oftpsf{\Delta}{\Gamma^v}{M}{\dsd{2}} &
-        \oftpp{\Delta}{\Gamma}{N_1}{\subst{A}{\dsd{true}}{x}} &
-        \oftpp{\Delta}{\Gamma}{N_2}{\subst{A}{\dsd{false}}{x}}
+\infer{\oftp{\Gamma}{\ite{\vstptm{x}{v}{\dsd{2}}.A}{N_1}{N_2}{t}}{\subst{A}{t}{x}}}
+      {\wftp{\Gamma,\vstptm{x}{v}{\dsd{2}}}{A} &
+        \oftp{\Gamma^v}{M}{\dsd{2}} &
+        \oftp{\Gamma}{N_1}{\subst{A}{\dsd{true}}{x}} &
+        \oftp{\Gamma}{N_2}{\subst{A}{\dsd{false}}{x}}
       }
 \\ \\
 \begin{array}{rcll}
@@ -317,306 +436,72 @@ family of sets.
 \end{array}
 \]
 
-\FIXME{what about dependency in $\Delta$?}
-
-
-\subsection{Hom Sets (Axiomatic)}
+\subsection{Interval}
 
 \[
 \begin{array}{c}
-\infer{\wftpsf{\Delta}{\Gamma}{\Hom{\C}{M}{N}}}
-      {\wftpcc{\Delta}{\C} &
-        \oftpsf{\Delta}{\Gamma^\con}{M}{\C} & 
-        \oftpsf{\Delta}{\Gamma}{N}{\C} 
-      }
-\\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\refl{M}}{\Hom{\C}{\unob M}{\unob M}}}
-      {\wftpcc{\Delta}{\C} &
-        \oftpsf{\Delta}{\Gamma}{M}{\obtp{\C}}
-      }
-\\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\morind{x_0,x_1,x.A}{M}{y.N}}{\subst{\subst{\subst{A}{M_0}{x_0}}{M_1}{x_1}}{M}{x}}}
-      { \begin{array}{l}
-          \wftpcc{\Delta}{\C} \\
-          \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vptptm{x_1}{\co}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{x_1}}}{A} \\
-          \oftpp{\Delta,\tptm{y}{\obtp{\C}}}{\Gamma}{N}{\subst{\subst{\subst{A}{\unob{y}}{x_0}}{\unob{y}}{x_1}}{\refl{y}}{x}} \\
-          \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{M_1}} \\
-        \end{array}
-      }
-\\ \\
-\morind{}{\refl{M}}{y.N} \deq \subst{N}{M}{y}
-\end{array}
-\]
-
-
-\[
-\begin{array}{l}
-\infer{\oftpsf{\Delta}{\Gamma}{\morindco{x_1,x.A}{M}{N}}{\subst{\subst{A}{M_1}{x_1}}{M}{x}}}
-      { \begin{array}{l}
-          \wftpcc{\Delta}{\C} \\
-          \oftpp{\Delta}{\Gamma}{M_0}{\obtp \C} \\
-          \wftpp{\Delta}{\Gamma,\vptptm{x_1}{\co}{\C},\vstptm{x}{\co}{\Hom{\C}{\unob{M_0}}{x_1}}}{A} \\
-          \oftpp{\Delta}{\Gamma}{N}{\subst{\subst{A}{\unob{M_0}}{x_1}}{\refl{M_0}}{x}} \\
-          \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{\unob{M_0}}{M_1}} \\
-        \end{array}
-      }
-\\ \\
-\morindco{}{\refl{M_0}}{N} \deq N
-\end{array}
-\]
-
-\[
-\begin{array}{l}
-\infer{\oftpsf{\Delta}{\Gamma}{\morindcon{x_0,x.A}{M}{N}}{\subst{\subst{A}{M_0}{x_0}}{M}{x}}}
-      { \begin{array}{l}
-          \wftpcc{\Delta}{\C} \\
-          \oftpp{\Delta}{\Gamma}{M_1}{\obtp \C} \\
-          \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{\unob{M_1}}}}{A} \\
-          \oftpp{\Delta}{\Gamma}{N}{\subst{\subst{A}{\unob{M_1}}{x_0}}{\refl{M_1}}{x}} \\
-          \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{\unob{M_1}}} \\
-        \end{array}
-      }
-\\ \\
-\morindcon{}{\refl{M_1}}{N} \deq N
-\end{array}
-\]
-
-\subsection{Equality in Sets}
-
-This could be done like ITT instead.  
-
-\[
-\begin{array}{c}
-\infer{\wftpsf{\Delta}{\Gamma}{\Eq{S}{M}{N}}}
-      {\wftpsf{\Delta}{\Gamma}{S} &
-        \oftpsf{\Delta}{\Gamma}{M}{S} & 
-        \oftpsf{\Delta}{\Gamma}{N}{S} 
-      }
+\infer{\wftp{\Gamma}{\I}}
+      {}
 \qquad
-\infer{\oftpsf{\Delta}{\Gamma}{\refl{M}}{\Eq{S}{M}{M}}}
-      {\oftpsf{\Delta}{\Gamma}{M}{S}}
-\\ \\
-\infer{M \deq N}
-      {\oftpsf{\Delta}{\Gamma}{P}{\Eq{S}{M}{N}}}
+\infer{\oftp{\Gamma}{\Iz}{\I}}{}
 \qquad
-\infer{P \deq \refl{M}}
-      {\oftpsf{\Delta}{\Gamma}{P}{\Eq{S}{M}{N}}}
+\infer{\oftp{\Gamma}{\Io}{\I}}{}
+%% \infer{\oftp{\Gamma}{\ite{\vstptm{x}{v}{\dsd{2}}.A}{N_1}{N_2}{t}}{\subst{A}{t}{x}}}
+%%       {\wftp{\Gamma,\vstptm{x}{v}{\dsd{2}}}{A} &
+%%         \oftp{\Gamma^v}{M}{\dsd{2}} &
+%%         \oftp{\Gamma}{N_1}{\subst{A}{\dsd{true}}{x}} &
+%%         \oftp{\Gamma}{N_2}{\subst{A}{\dsd{false}}{x}}
+%%       }
+%% \\ \\
+%% \begin{array}{rcll}
+%% \ite{}{M_1}{M_2}{\dsd{true}} & \equiv & M_1 \\
+%% \ite{}{M_1}{M_2}{\dsd{false}} & \equiv & M_2 \\
+%%\end{array} 
 \end{array}
 \]
+
+\FIXME{elim}
+
+\subsection{Equality of Elements of Types}
+
+%% This could be done like ITT instead.  
+
+%% \[
+%% \begin{array}{c}
+%% \infer{\wftpsf{\Delta}{\Gamma}{\Eq{S}{M}{N}}}
+%%       {\wftpsf{\Delta}{\Gamma}{S} &
+%%         \oftpsf{\Delta}{\Gamma}{M}{S} & 
+%%         \oftpsf{\Delta}{\Gamma}{N}{S} 
+%%       }
+%% \qquad
+%% \infer{\oftpsf{\Delta}{\Gamma}{\refl{M}}{\Eq{S}{M}{M}}}
+%%       {\oftpsf{\Delta}{\Gamma}{M}{S}}
+%% \\ \\
+%% \infer{M \deq N}
+%%       {\oftpsf{\Delta}{\Gamma}{P}{\Eq{S}{M}{N}}}
+%% \qquad
+%% \infer{P \deq \refl{M}}
+%%       {\oftpsf{\Delta}{\Gamma}{P}{\Eq{S}{M}{N}}}
+%% \end{array}
+%% \]
 
 \section{Examples}
 
-\paragraph{Invariant $\Pi$ Sets}
-
-\newcommand\piinv[3]{\ensuremath{\textnormal{$\Pi$}^{\dsd{inv}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
-
-\[
-\begin{array}{l}
-\infer{\wftpsf{\Delta}{\Gamma}{\piinv{x}{S}{T} := \picl{y}{S}{\promote{}{y}{x.T}}}}
-      {\wftpsf{\Delta}{\cdot}{S} &
-       \wftpsf{\Delta,\tptm{x}{S}}{\Gamma}{T}}
-\\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\ulam{x}{M} := \ulam{y}{\promote{\promote{}{y}{x.T}}{y}{x.M}}}{\piinv{x}{S}{T}}}
-      {\oftpsf{\Delta,\tptm{x}{S}}{\Gamma}{M}{T}}
-\\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\app{M}{N}}{\subst{T}{N}{x}}}
-      {\oftpsf{\Delta}{\Gamma}{M}{\piinv{x}{S}{T}} &
-        \oftpsf{\Delta}{\cdot}{N}{S}}
-\\ \\
-\app{\ulam{x}{M}}{N} \deq \subst{M}{N}{x} \\
-M : \piinv{x}{S}{T} \deq \ulam{x}{\app{M}{x}} \\
-\end{array}
-\]
-The $\eta$ needs the $\eta$ for promote, so without equality reflection
-it would only hold propositionally.  
-
 \paragraph{Composition}
 
-Suppose $\wftpcc{\Delta}{\C}$, then we have 
+%% Suppose $\wftpcc{\Delta}{\C}$, then we have 
 
-\[
-\begin{array}{rcl}
-comp & : & \piinv{x}{\obtp{\C}}{\piinv{y}{\obtp{\C}}{\piinv{z}{\obtp{\C}}{}}}\\
-     &   & {\piinv{p}{\Hom{\C}{\unob{x}}{\unob{y}}}{\piinv{q}{\Hom{\C}{\unob{y}}{\unob{z}}}{\Hom{\C}{\unob{x}}{\unob{z}}}}}
-\end{array}
-\]
-
-\section{Intervals}
-
-\[
-\infer{\wfctxc{\Delta}{({\Gamma},\vdimtm{x}{v})}}
-      {\wfctxc{\Delta}{\Gamma}}
-\]
-
-\[
-({\Gamma},\vdimtm{x}{v})^\con := \Gamma^\con,\vdimtm{x}{\flip{v}}
-\]
-
-As a notational definition, we write 
-\[
-\begin{array}{rcl}
-\vwfdimc{\Delta}{\Gamma}{r}{\co} & := & \wfdimc{\Delta}{\Gamma}{r} \\
-\vwfdimc{\Delta}{\Gamma}{r}{\con} & := & \wfdimc{\Delta}{\Gamma^\con}{r} \\
-\end{array}
-\]
-with the idea that a map into \op{\II} is equivalently a map from
-$\op{\Gamma}$.
-
-The main interval judgement on the right is \wfdim{\Gamma}{r}, which
-represents a covariant element of $\II$ in $\Gamma$.
-\[
-\begin{array}{c}
-\infer{\wfdimc{\Delta}{\Gamma}{0}}{} 
-\qquad
-\infer{\wfdimc{\Delta}{\Gamma}{1}}{} 
-\qquad
-\infer{\wfdimc{\Delta}{\Gamma}{x}}{\vdimtm{x}{\co} \in \Gamma} 
-\qquad
-\infer{\wfdimc{\Delta}{\Gamma}{\rev{r}}}
-      {\vwfdimc{\Delta}{\Gamma}{r}{\con}}
-\\ \\
-\infer[\deriv]{\vwfdimc{\Delta}{\Gamma}{0}{\con}}{} 
-\qquad
-\infer[\deriv]{\vwfdimc{\Delta}{\Gamma}{1}{\con}}{} 
-\qquad
-\infer[\deriv]{\vwfdimc{\Delta}{\Gamma}{x}{\con}}{\vdimtm{x}{\con} \in \Gamma} 
-\qquad
-\infer[\deriv]{\vwfdimc{\Delta}{\Gamma}{\rev{r}}{\con}}{\wfdimc{\Delta}{\Gamma}{r}}
-\\ \\
-\rev{0} \deq 1 \\
-\rev{1} \deq 0 \\
-\rev{(\rev{r})} \deq r \\
-\end{array}
-\]
-Note that \rev{r} represents the reversor map from \op{\II} to \II.
-(\FIXME{add connections?})
-
-When \wfdimc{\Delta}{\Gamma,\vdimtm{x}{v},\Gamma'}{r'} and
-\vwfdimc{\Delta}{\Gamma,\Gamma'}{r}{v}, then we have
-\wfdimc{\Delta}{\Gamma,\nsubst{\Gamma'}{r}{x}}{\nsubst{r'}{r}{x}} defined as
-follows:
-\[
-\begin{array}{rcl}
-\nsubst{0}{r}{x} & := & 0 \\ 
-\nsubst{1}{r}{x} & := & 1 \\
-\nsubst{x}{r}{x} & := & r \\
-\nsubst{y}{r}{x} & := & y \\
-\nsubst{(\rev{r})}{r'}{x} & := & \rev{\nsubst{r}{r'}{x}} \\ 
-\end{array}
-\]
-
-\[
-\infer[\textbf{admiss}]
-      {\Gamma,\nsubst{\Gamma'}{r}{x} \vdash \nsubst{J}{r}{x}}
-      {\Gamma,\vdimtm{x}{v},\Gamma' \vdash {J} &
-        \vwfdimc{\Delta}{\Gamma}{r}{v}}
-\]
-
-\subsection{Directed Interval HIT}
-
-\[
-\begin{array}{c}
-\infer{\wftpcc{\Delta}{\I}}
-      {}
-\qquad
-\infer{\oftpc{\Delta}{\Gamma}{\Iz}{\I}}{}
-\qquad
-\infer{\oftpc{\Delta}{\Gamma}{\Io}{\I}}{}
-\qquad
-\infer{\oftpc{\Delta}{\Gamma}{\Iseg{r}}{\I}}{\wfdimc{\Delta}{\Gamma}{r}}
-\\ \\
-\Iseg{0} \deq \Iz \\
-\Iseg{1} \deq \Io \\
-\\
-\infer{\voftpc{\Delta}{\Gamma}{\Ielim{x.A}{N_0}{N_1}{N}{M}}{u}{\subst{A}{M}{x}}}
-      {\begin{array}{l}
-          \wftpp{\Delta}{\Gamma,\vptptm{x}{\co}{\I}}{A} \\
-          \oftpc{\Delta}{\Gamma}{M}{\I} \\
-          \oftpp{\Delta}{\Gamma}{N_0}{\subst{A}{\Iz}{x}} \\
-          \oftpp{\Delta}{\Gamma}{N_1}{\subst{A}{\Io}{x}} \\
-          \oftpp{\Delta}{\Gamma,\vdimtm{y}{\co}}{N}{\subst{A}{\Iseg{y}}{x}}
-        \end{array}
-      }
-\end{array}
-\]
-
-\FIXME{is contravariant elim derivable? or does it need to be primitive?}
-
-\[
-\begin{array}{rcll}
-\Ielim{}{N_1}{N_2}{N}{\Iz} & \equiv & N_1 \\
-\Ielim{}{N_1}{N_2}{N}{\Io} & \equiv & N_2 \\
-\Ielim{}{N_1}{N_2}{N}{\Iseg{r}} & \equiv & \nsubst{N}{r}{y} \\
-\end{array} \\
-\]
-
-\subsection{Hom Sets (Interval)}
-
-\[
-\begin{array}{c}
-\infer{\wftpsf{\Delta}{\Gamma}{\HomO{\C}{M}{N}}}
-      {\wftpcc{\Delta}{\C} &
-        \oftpsf{\Delta}{\Gamma}{M}{\obtp \C} & 
-        \oftpsf{\Delta}{\Gamma}{N}{\obtp \C} 
-      }
-\\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\nlam{x}{M}}{\HomO{\C}{M_0}{M_1}}}
-      {\begin{array}{lll}
-          \wftpcc{\Delta}{\C} & 
-          \oftpsf{\Delta}{\Gamma}{M_0}{\obtp{\C}} & 
-          \oftpsf{\Delta}{\Gamma}{M_1}{\obtp{\C}} \\
-          \oftpc{\Delta}{\Gamma,\vdimtm{x}{\co}}{M}{\C} &
-          \nsubst{M}{0}{x} \deq \unob{M_0} & 
-          \nsubst{M}{1}{x} \deq \unob{M_1} \\
-       \end{array}
-      }
-\\ \\
-\infer{\oftpsf{\Delta}{\Gamma}{\napp{M}{r}}{\C}}
-      {\oftpc{\Delta}{\Gamma}{M}{\HomO{\C}{M_0}{M_1}} &
-        \wfdimc{\Delta}{\Gamma}{r}
-      }
-\\ \\
-\napp{M}{0} \deq \unob{M_0} \\ 
-\napp{M}{1} \deq \unob{M_1} \\ 
-\\ 
-\napp{(\nlam{x}{M})}{r} \deq \nsubst{M}{r}{x} \\
-M : \HomO{\C}{M_0}{M_1} \deq \nlam{x}{\napp{M}{x}}\\
-\end{array}
-\]
+%% \[
+%% \begin{array}{rcl}
+%% comp & : & \piinv{x}{\obtp{\C}}{\piinv{y}{\obtp{\C}}{\piinv{z}{\obtp{\C}}{}}}\\
+%%      &   & {\piinv{p}{\Hom{\C}{\unob{x}}{\unob{y}}}{\piinv{q}{\Hom{\C}{\unob{y}}{\unob{z}}}{\Hom{\C}{\unob{x}}{\unob{z}}}}}
+%% \end{array}
+%% \]
 
 
 \section{Properties}
 
-%% \begin{lem}
-%% For all $v, \flip{\flip{v}}$ is $v$.
-%% \end{lem}
-
-%% \begin{lem}
-%% For all $\Gamma$, ${\Gamma^\con}^\con$ is $\Gamma$.
-%% \end{lem}
-
-%% \begin{lem}
-%% If \wfctx{\Gamma} then \wfctx{{\Gamma}^\con}.  
-%% \end{lem}
-
-%% \begin{lem}
-%% If ${\ectx \Gamma x {v}{w}A d , \Gamma' \vdash J}$ and $\vvoftp \Gamma M {v}{w} A$
-%% then $\Gamma,\subst M x {\ctx {\Gamma'}} \vdash \subst M x J$.  
-%% \end{lem}
-
-%% \begin{lem}
-%% If $\vvoftp{\Gamma}{M}{\inv}{w}{A}{d}$ then
-%%  $\vvoftp{\Gamma}{M}{v}{w}{A}$.
-%% \end{lem}
-%% FIXME $u$ or $v$?
-
-%% \begin{lem}
-%% If $\Gamma \vdash J$ then $\Gamma,\Gamma' \vdash J$.
-%% \end{lem}
-
 \section{Examples}
-
-\subsection{Invariant $\Pi$ sets}
 
 %% \subsection{\op{-} is an involution}
 
