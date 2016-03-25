@@ -193,24 +193,6 @@ functions).
 \infer{\wfdtp{\types}}{}
 \]
 
-\[
-\infer{\oftp{\Gamma}{\sigmaset{x}{S_1}{S_2}}{\types}}
-      {\oftp{\Gamma}{S_1}{\types} &
-        \oftp{\Gamma, \tptmv {x}{\vcond}{S_1}}{S_2}{\types}}
-\]
-
-\[
-\infer{\oftp{\Gamma}{\homset{\C}{c_1}{c_2}}{\types}}
-      {\wfdtp{\C} &
-        \oftp{\Gamma^\con}{c_1}{\C} &
-        \oftp{\Gamma}{c_2}{\C}}
-\]
-
-\[
-\infer{\oftp{\Gamma}{\bool}{\types}}
-      {}
-\]
-
 \FIXME{directed univalence}
 
 \subsection{Op Categories}
@@ -238,10 +220,71 @@ then it should be admissible that
 \ofdtp{\dupctx{\Gamma^\con}{\vcond}}{S^*}{\types} 
 so we don't need delayed dagger types.  
 
-\subsection{Directed Types: Functions and Products}
+\subsection{Hom Types}
 
-Directed types have simple functions and products (exponentials and
-products in \Cat).
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\Hom{\C}{c_0}{c_1}}{\types}}
+      {\wfdtp{\C} &
+        \oftp{\Gamma^\con}{c_0}{\C} & 
+        \oftp{\Gamma}{c_1}{\C} 
+      }
+\\ \\
+\infer{\oftpe{\Gamma}{\idm{c}}{\vcond}{\Hom{\C}{c^\vcond}{c}}}
+      {\oftpe{\dupctx{\Gamma}{\vcond}}{c}{\vcond}{\C} 
+      }
+\end{array}
+\]
+
+%% \infer{\oftpsf{\Delta}{\Gamma}{\morind{x_0,x_1,x.A}{M}{y.N}}{\subst{\subst{\subst{A}{M_0}{x_0}}{M_1}{x_1}}{M}{x}}}
+%%       { \begin{array}{l}
+%%           \wftpcc{\Delta}{\C} \\
+%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vptptm{x_1}{\co}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{x_1}}}{A} \\
+%%           \oftpp{\Delta,\tptm{y}{\obtp{\C}}}{\Gamma}{N}{\subst{\subst{\subst{A}{\unob{y}}{x_0}}{\unob{y}}{x_1}}{\refl{y}}{x}} \\
+%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{M_1}} \\
+%%         \end{array}
+%%       }
+%% \\ \\
+%% \morind{}{\refl{M}}{y.N} \deq \subst{N}{M}{y}
+
+\[
+\begin{array}{l}
+\infer{\oftpe{\Gamma}{\morindco{x_1,x.S}{t}{t'}}{\vcond}{{\subst{\subst{S}{c_1}{x_1}}{t}{x}}}}
+      { \begin{array}{l}
+          \wfdtp{\C} \\
+          \oftp{\dupctx{\Gamma}{\vcond}}{c_0,c_1}{\C} \\
+          \ofdtp{\dupctx{\Gamma}{\vcond},\vtptm{x_1}{\co}{\C},\tptmv{x}{\vcond}{\Hom{\C}{c_0^\vcond}{x_1}}}{S}{\types} \\
+          \oftpe{\Gamma}{t'}{\vcond}{{\subst{\subst{S}{c_0}{x_1}}{\idm{c_0}}{x}}} \\
+          \oftpe{\Gamma}{t}{\vcond}{\Hom{\C}{c_0^\vcond}{c_1}} \\
+        \end{array}
+      }
+\\ \\
+\morindco{}{\idm{}}{t'} \deq t'
+\end{array}
+\]
+
+\FIXME{contravariant derivable?}
+
+%% \[
+%% \begin{array}{l}
+%% \infer{\oftpsf{\Delta}{\Gamma}{\morindcon{x_0,x.A}{M}{N}}{\subst{\subst{A}{M_0}{x_0}}{M}{x}}}
+%%       { \begin{array}{l}
+%%           \wftpcc{\Delta}{\C} \\
+%%           \oftpp{\Delta}{\Gamma}{M_1}{\obtp \C} \\
+%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{\unob{M_1}}}}{A} \\
+%%           \oftpp{\Delta}{\Gamma}{N}{\subst{\subst{A}{\unob{M_1}}{x_0}}{\refl{M_1}}{x}} \\
+%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{\unob{M_1}}} \\
+%%         \end{array}
+%%       }
+%% \\ \\
+%% \morindcon{}{\refl{M_1}}{N} \deq N
+%% \end{array}
+%% \]
+
+
+\subsection{$\Pi$-like Things}
+
+\subsection{Functor Categories}
 
 \[
 \begin{array}{c}
@@ -264,66 +307,6 @@ products in \Cat).
 \tptm{c}{\arr{\C_1}{\C_2}} & \equiv & {(\lam{x}{\C_1}{c}{x})} &
 \end{array} \\
 \]
-
-\[
-\begin{array}{c}
-\infer{\wfdtp{\prd{\C_1}{\C_2}}}
-      {\wfdtp{\C_1} &
-        \wfdtp{\C_2}}
-\qquad
-\infer{\ofdtp{\Gamma}{\pair{c_1}{c_2}}{\prd {\C_1} {\C_2}}}
-      {\ofdtp{\Gamma}{c_1}{\C_1} &
-       \ofdtp{\Gamma}{c_2}{\C_2}}
-\\ \\
-\infer{\ofdtp{\Gamma}{\fst c}{\C_1}}
-      {\ofdtp{\Gamma}{c}{\prd{\C_1}{\C_2}}}
-\qquad
-\infer{\ofdtp{\Gamma}{\snd c}{\C_2}}
-      {\ofdtp{\Gamma}{c}{\prd{\C_1}{\C_2}}}
-\end{array}
-\]
-
-\[
-\begin{array}{rcll}
-\fst{\pair{c_1}{c_2}} & \deq & c_1 \\
-\snd{\pair{c_1}{c_2}} & \deq & c_1 \\
-\tptm{c}{\prd{\C_1}{\C_2}} & \deq & \pair{\fst c}{\snd c}
-\end{array}
-\]
-
-\subsection{Directed Types: Dependent types with families of sets}
-
-Directed types also have dependent types where the dependent part is a
-family of sets or types. The product is the end type, the sum is the
-category whose sections are ends.
-
-\[
-\begin{array}{c}
-\infer{\wfdtp{\sigmacat{\vcond}{x}{\C}{S}}}
-      {\wfdtp{\C} &
-        \wftp{\dupctx{\vtptm{x}{\co}{\C}}{\vcond}}{S}}
-\qquad
-\infer{\ofdtp{\Gamma}{\pair{c}{t}}{\sigmacat{\vcond} x \C S}}
-      {\ofdtp{\Gamma}{c}{\C} &
-       \oftpe{\Gamma}{t}{\vcond}{\tsubst{S}{\substdup{(c^\vcond/x)}{\vcond}{c/x}}}}
-\\ \\
-\infer{\ofdtp{\Gamma}{\fst c}{\C}}
-      {\ofdtp{\Gamma}{c}{\sigmacat{\vcond}{x}{\C}{S}}}
-\qquad
-\infer{\oftpe{\Gamma}{\snd c}{\vcond}{\tsubst{S}{\substdup{(\fst c^\vcond / x)}{\vcond}{\fst c/x}}}}
-      {\ofdtp{\Gamma}{c}{\sigmacat{\vcond}{x}{\C}{T}}}
-\end{array}
-\]
-
-\[
-\begin{array}{rcll}
-\fst{\pair{c}{t}} & \deq & c \\
-\snd{\pair{c}{t}} & \deq & t \\
-\tptm{c}{\sigmacl{x}{\C}{S}} & \deq & \pair{\fst c}{\snd c}
-\end{array}
-\]
-
-\subsection{$\Pi$-like Sets}
 
 \subsubsection{Dependent}
 
@@ -357,11 +340,11 @@ anywhere.
 \[
 \begin{array}{rcll}
 \app {(\ulam{x}{t})}{t'} & \equiv & \subst{t}{t'}{x} \\
-\tptm{t}{\piset{x}{S_1}{S_2}} & \equiv & {(\ulam{x}{t}{x})} &
+\tptmv{t}{\bullet}{\piset{x}{S_1}{S_2}} & \equiv & {(\ulam{x}{t}{x})} &
 \end{array} \\
 \]
 
-\subsubsection{Non-dependent}
+\subsubsection{Non-dependent functions between sets}
 
 \textbf{Works for a bifunctor, but no dependency of $S_2$ on $S_1$.}
 
@@ -423,23 +406,122 @@ anywhere.
 \end{array} \\
 \]
 
-\subsection{$\Sigma$ of a set and a type}
+\subsection{$\Sigma$-like things}
+
+\subsubsection{Product Categories}
+
+Directed types have simple functions and products (exponentials and
+products in \Cat).
+
 
 \[
 \begin{array}{c}
-\infer{\wftp{\Gamma}{\sigmatp{x}{S}{T}}}
-      {\oftp{\Gamma}{S}{\types} &
-        \wftp{\Gamma, \tptmv{x}{\coc}{\Elp{S}}}{T}}
+\infer{\wfdtp{\prd{\C_1}{\C_2}}}
+      {\wfdtp{\C_1} &
+        \wfdtp{\C_2}}
 \qquad
-\infer{\oftp{\Gamma}{\pair{s}{t}}{\sigmatp x S T}}
-      {\oftp{\Gamma}{s}{\Elp{S}} &
-       \oftp{\Gamma}{t}{\subst{T}{s}x}}
+\infer{\ofdtp{\Gamma}{\pair{c_1}{c_2}}{\prd {\C_1} {\C_2}}}
+      {\ofdtp{\Gamma}{c_1}{\C_1} &
+       \ofdtp{\Gamma}{c_2}{\C_2}}
 \\ \\
-\infer{\oftp{\Gamma}{\fst t}{\Elp{S}}}
-      {\oftp{\Gamma}{t}{\sigmatp{x}{S}{T}}}
+\infer{\ofdtp{\Gamma}{\fst c}{\C_1}}
+      {\ofdtp{\Gamma}{c}{\prd{\C_1}{\C_2}}}
 \qquad
-\infer{\oftp{\Gamma}{\snd t}{\subst{T}{\fst t}{x}}}
-      {\oftp{\Gamma}{t}{\sigmatp{x}{S}{T}}}
+\infer{\ofdtp{\Gamma}{\snd c}{\C_2}}
+      {\ofdtp{\Gamma}{c}{\prd{\C_1}{\C_2}}}
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\fst{\pair{c_1}{c_2}} & \deq & c_1 \\
+\snd{\pair{c_1}{c_2}} & \deq & c_1 \\
+\tptm{c}{\prd{\C_1}{\C_2}} & \deq & \pair{\fst c}{\snd c}
+\end{array}
+\]
+
+\subsubsection{Category of elements of a bifunctor ($\hat{\Sigma}$)}
+
+Directed types also have dependent types where the dependent part is a
+family of sets or types. The product is the end type, the sum is the
+category whose sections are ends.
+
+\[
+\begin{array}{c}
+\infer{\wfdtp{\sigmacat{\vcond}{x}{\C}{S}}}
+      {\wfdtp{\C} &
+        \wftp{\dupctx{\vtptm{x}{\co}{\C}}{\vcond}}{S}}
+\qquad
+\infer{\ofdtp{\Gamma}{\pair{c}{t}}{\sigmacat{\vcond} x \C S}}
+      {\ofdtp{\Gamma}{c}{\C} &
+       \oftpe{\Gamma}{t}{\vcond}{\tsubst{S}{\substdup{(c^\vcond/x)}{\vcond}{c/x}}}}
+\\ \\
+\infer{\ofdtp{\Gamma}{\fst c}{\C}}
+      {\ofdtp{\Gamma}{c}{\sigmacat{\vcond}{x}{\C}{S}}}
+\qquad
+\infer{\oftpe{\Gamma}{\snd c}{\vcond}{\tsubst{S}{\substdup{(\fst c^\vcond / x)}{\vcond}{\fst c/x}}}}
+      {\ofdtp{\Gamma}{c}{\sigmacat{\vcond}{x}{\C}{T}}}
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\fst{\pair{c}{t}} & \deq & c \\
+\snd{\pair{c}{t}} & \deq & t \\
+\tptm{c}{\sigmacl{x}{\C}{S}} & \deq & \pair{\fst c}{\snd c}
+\end{array}
+\]
+
+\subsection{$\Sigma$ of sets}
+
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\sigmaset{x}{S_1}{S_1}}{\types}}
+      {\ofdtp{\Gamma}{S_1}{\types} &
+        \ofdtp{\Gamma, \tptmv{x}{\bullet}{{S_1}}}{S_2}{\types}}
+\qquad
+\infer{\oftpe{\Gamma}{\pair{t_1}{t_2}}{\bullet}{\sigmaset x {S_1} {S_2}}}
+      {\ofdtp{\Gamma}{S_1}{\types} &
+        \ofdtp{\Gamma, \tptmv{x}{\bullet}{{S_1}}}{S_2}{\types} &
+        \oftpe{\Gamma}{t_1}{\bullet}{S_1} &
+        \oftpe{\Gamma}{t_2}{\bullet}{\subst{S_2}{t_1}x}}
+\\ \\
+\infer{\oftpe{\Gamma}{\fst t}{\bullet}{{S_1}}}
+      {\oftpe{\Gamma}{t}{\bullet}{\sigmaset{x}{S_1}{S_2}}}
+\qquad
+\infer{\oftpe{\Gamma}{\snd t}{\bullet}{\subst{S_2}{\fst t}{x}}}
+      {\oftpe{\Gamma}{t}{\bullet}{\sigmaset{x}{S_1}{S_2}}}
+\end{array}
+\]
+
+\FIXME{bullets necessary on the elim rules?}
+
+\[
+\begin{array}{rcll}
+\fst{\pair{s}{t}} & \deq & s \\
+\snd{\pair{s}{t}} & \deq & t \\
+\tptmv{t}{\bullet}{\sigmaset{x}{S_1}{S_2}} & \deq & \pair{\fst t}{\snd t}
+\end{array}
+\]
+
+\subsubsection{Non-dependent product of sets}
+
+
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\prd{S_1}{S_1}}{\types}}
+      {\ofdtp{\Gamma}{S_1}{\types} &
+        \ofdtp{\Gamma}{S_2}{\types}}
+\qquad
+\infer{\oftpe{\Gamma}{\pair{t_1}{t_2}}{\vcond}{\prd {S_1} {S_2}}}
+      { \oftpe{\Gamma}{t_1}{\vcond}{S_1} &
+        \oftpe{\Gamma}{t_2}{\vcond}{S_2}}
+\\ \\
+\infer{\oftpe{\Gamma}{\fst t}{\vcond}{{S_1}}}
+      {\oftpe{\Gamma}{t}{\vcond}{\prd{S_1}{S_2}}}
+\qquad
+\infer{\oftpe{\Gamma}{\snd t}{\vcond}{{S_2}}}
+      {\oftpe{\Gamma}{t}{\vcond}{\prd{S_1}{S_2}}}
 \end{array}
 \]
 
@@ -447,124 +529,32 @@ anywhere.
 \begin{array}{rcll}
 \fst{\pair{s}{t}} & \deq & s \\
 \snd{\pair{s}{t}} & \deq & t \\
-\tptm{t}{\sigmatp{x}{S}{T}} & \deq & \pair{\fst t}{\snd t}
+\tptm{t}{\prd{S_1}{S_2}} & \deq & \pair{\fst t}{\snd t}
 \end{array}
 \]
-
-\FIXME{would this make sense when $S$ is contravariant as well?  and do
-  we need to put that in?}
-
-The contravariant sum is derivable:
-\begin{equation}
-	\infer{
-		\wftp{ \Gamma }{ \paren{\sigmatp{x}{S}{(T^\dagger)}}^\dagger }
-	}{
-		\infer{
-			\wftp{ \Gamma^- }{ \sigmatp{x}{S}{(T^\dagger)} }
-		}{
-			\ofdtp{ \Gamma^- }{ S }{ \types }
-			\qquad \qquad
-			\infer{
-				\wftp{\Gamma^-, \tptmv{x}{\coc}{\Elp S}}{T^\dagger}
-			}{
-				\wftp{\Gamma^+, \tptmv{x}{\conc}{\Elp S}}{T}
-			}
-		}	
-	}
-\end{equation}
-\begin{equation}
-	\infer{
-		\oftp{\Gamma}{\dagtm{(\undag s, \dagtm t)}}{ \paren{\sigmatp{x}{S}{(T^\dagger)}}^\dagger }
-	}{
-		\oftp{\Gamma}{s}{\Elp S^\dagger}
-		\qquad \qquad
-		\oftp{\Gamma}{t}{\subst T {\undag s} x}
-	}
-\end{equation}
-We have projections $\dagtm{\fst{\undag -}}$ and $\undag{\snd{\undag -}}$.
-
-\subsection{Hom Types}
-
-\[
-\begin{array}{c}
-\infer{\wftp{\Gamma}{\Hombind{\C}{\rho}{c_0}{c_1}}}
-      {\wfdtp{\C} &
-        \oftp{\Gamma',\Gamma^\con}{c_0}{\C} & 
-        \oftp{(\Gamma')^\con,\Gamma}{c_1}{\C} &
-        \rho : \Gamma' =_\alpha \Gamma
-      }
-\\ \\
-\infer{\oftp{\Gamma}{\idm{c}}{\Hombind{\C}{\rho}{c[\rho]}{c}}}
-      {\oftp{\Gamma}{c}{\C} &
-      \rho : \Gamma' =_\alpha \Gamma
-      }
-\end{array}
-\]
-
-%% \infer{\oftpsf{\Delta}{\Gamma}{\morind{x_0,x_1,x.A}{M}{y.N}}{\subst{\subst{\subst{A}{M_0}{x_0}}{M_1}{x_1}}{M}{x}}}
-%%       { \begin{array}{l}
-%%           \wftpcc{\Delta}{\C} \\
-%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vptptm{x_1}{\co}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{x_1}}}{A} \\
-%%           \oftpp{\Delta,\tptm{y}{\obtp{\C}}}{\Gamma}{N}{\subst{\subst{\subst{A}{\unob{y}}{x_0}}{\unob{y}}{x_1}}{\refl{y}}{x}} \\
-%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{M_1}} \\
-%%         \end{array}
-%%       }
-%% \\ \\
-%% \morind{}{\refl{M}}{y.N} \deq \subst{N}{M}{y}
-
-\[
-\begin{array}{l}
-\infer{\oftp{\Gamma}{\morindco{x_1,x.S}{t}{t'}}{\Elp{\subst{\subst{S}{c_1}{x_1}}{t}{x}}}}
-      { \begin{array}{l}
-          \wfdtp{\C} \\
-          \rho : \Gamma' =_\alpha \Gamma \\
-          \oftp{\Gamma}{c_0,c_1}{\C} \\
-          \ofdtp{\Gamma,\vtptm{x_1}{\co}{\C},\tptmv{x}{\coc}{\Hombind{\C}{\rho,x_1^*/x_1}{c_0[\rho]}{x_1}}}{S}{\types} \\
-          \oftp{\Gamma}{t'}{\Elp{\subst{\subst{S}{c_0}{x_1}}{\idm{c_0}}{x}}} \\
-          \oftp{\Gamma}{t}{\Hombind{\C}{\rho}{c_0[\rho]}{c_1}} \\
-        \end{array}
-      }
-\\ \\
-\morindco{}{\idm{}}{t'} \deq t'
-\end{array}
-\]
-
-I suggest the following approach: the Hom type former binds a variable for every variable in the \emph{current} context (for a type that is itself in the context, that means everything to its left). When we prove weakening/substitution/\ldots are admissible, we have to take care of that.
-
-\FIXME{contravariant derivable?}
-
-%% \[
-%% \begin{array}{l}
-%% \infer{\oftpsf{\Delta}{\Gamma}{\morindcon{x_0,x.A}{M}{N}}{\subst{\subst{A}{M_0}{x_0}}{M}{x}}}
-%%       { \begin{array}{l}
-%%           \wftpcc{\Delta}{\C} \\
-%%           \oftpp{\Delta}{\Gamma}{M_1}{\obtp \C} \\
-%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{\unob{M_1}}}}{A} \\
-%%           \oftpp{\Delta}{\Gamma}{N}{\subst{\subst{A}{\unob{M_1}}{x_0}}{\refl{M_1}}{x}} \\
-%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{\unob{M_1}}} \\
-%%         \end{array}
-%%       }
-%% \\ \\
-%% \morindcon{}{\refl{M_1}}{N} \deq N
-%% \end{array}
-%% \]
 
 \subsection{Bool}
 
 \[
 \begin{array}{c}
-\infer{\wftp{\Gamma}{\bool}}
+\infer{\ofdtp{\Gamma}{\bool}{\types}}
       {}
 \qquad
-\infer{\oftp{\Gamma}{\dsd{true}}{\bool}}{}
+\infer{\oftpe{\Gamma}{\dsd{true}}{\bullet}{\bool}}{}
 \qquad
-\infer{\oftp{\Gamma}{\dsd{false}}{\bool}}{}
+\infer{\oftpe{\Gamma}{\dsd{false}}{\bullet}{\bool}}{}
 \\ \\
-\infer{\oftp{\Gamma}{\ite{\vstptm{x}{v}{\dsd{2}}.A}{N_1}{N_2}{t}}{\subst{A}{t}{x}}}
-      {\wftp{\Gamma,\vstptm{x}{v}{\dsd{2}}}{A} &
-        \oftp{\Gamma^v}{M}{\dsd{2}} &
-        \oftp{\Gamma}{N_1}{\subst{A}{\dsd{true}}{x}} &
-        \oftp{\Gamma}{N_2}{\subst{A}{\dsd{false}}{x}}
+\infer{\oftpe{\Gamma}{\ite{\tptm{x}{\dsd{2}}.S}{t_1}{t_2}{t}}{\vcond}{\tsubst{S}{\substdup{(t^\vcond/x)}{\vcond}{t/x}}}}
+      {\ofdtp{\dupctx{\Gamma,\tptmv{x}{\bullet}{\dsd{2}}}{\vcond}}{S}{\types} &
+        \oftpe{\Gamma}{t}{\bullet}{\dsd{2}} &
+        \oftpe{\Gamma}{t_1}{\vcond}{\tsubst{S}{\substdup{(\dsd{true}^\vcond/x)}{\vcond}{\dsd{true}/x}}} &
+        \oftpe{\Gamma}{t_2}{\vcond}{\tsubst{S}{\substdup{(\dsd{false}^\vcond/x)}{\vcond}{\dsd{false}/x}}}
+      }
+\\ \\
+\infer{\oftp{\Gamma}{\ite{}{t_1}{t_2}{t}}{\C}}
+      { \oftpe{\Gamma}{t}{\bullet}{\dsd{2}} &
+        \ofdtp{\Gamma}{t_1}{\C} &
+        \ofdtp{\Gamma}{t_2}{\C}
       }
 \\ \\
 \begin{array}{rcll}
@@ -624,6 +614,35 @@ I suggest the following approach: the Hom type former binds a variable for every
 %% \]
 
 \section{Examples}
+
+The contravariant sum is derivable:
+\begin{equation}
+	\infer{
+		\wftp{ \Gamma }{ \paren{\sigmatp{x}{S}{(T^\dagger)}}^\dagger }
+	}{
+		\infer{
+			\wftp{ \Gamma^- }{ \sigmatp{x}{S}{(T^\dagger)} }
+		}{
+			\ofdtp{ \Gamma^- }{ S }{ \types }
+			\qquad \qquad
+			\infer{
+				\wftp{\Gamma^-, \tptmv{x}{\coc}{\Elp S}}{T^\dagger}
+			}{
+				\wftp{\Gamma^+, \tptmv{x}{\conc}{\Elp S}}{T}
+			}
+		}	
+	}
+\end{equation}
+\begin{equation}
+	\infer{
+		\oftp{\Gamma}{\dagtm{(\undag s, \dagtm t)}}{ \paren{\sigmatp{x}{S}{(T^\dagger)}}^\dagger }
+	}{
+		\oftp{\Gamma}{s}{\Elp S^\dagger}
+		\qquad \qquad
+		\oftp{\Gamma}{t}{\subst T {\undag s} x}
+	}
+\end{equation}
+We have projections $\dagtm{\fst{\undag -}}$ and $\undag{\snd{\undag -}}$.
 
 \paragraph{Composition}
 
