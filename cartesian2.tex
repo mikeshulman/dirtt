@@ -253,7 +253,7 @@ so we don't need delayed dagger types.
       { \begin{array}{l}
           \wfdtp{\C} \\
           \oftp{\dupctx{\Gamma}{\vcond}}{c_0,c_1}{\C} \\
-          \ofdtp{\dupctx{\Gamma}{\vcond},\vtptm{x_1}{\co}{\C},\tptmv{x}{\vcond}{\Hom{\C}{c_0^\vcond}{x_1}}}{S}{\types} \\
+          \ofdtp{\dupctx{\Gamma}{\vcond},\vtptm{x_1}{\co}{\C},\tptmv{x}{\sim}{\Hom{\C}{c_0^\sim}{x_1}}}{S}{\types} \\
           \oftpe{\Gamma}{t'}{\vcond}{{\subst{\subst{S}{c_0}{x_1}}{\idm{c_0}}{x}}} \\
           \oftpe{\Gamma}{t}{\vcond}{\Hom{\C}{c_0^\vcond}{c_1}} \\
         \end{array}
@@ -263,7 +263,13 @@ so we don't need delayed dagger types.
 \end{array}
 \]
 
+\FIXME{box contexts for $c_0$, $c_1$}
+
+\FIXME{should the $\sim$ in the type of $x$ be referring to the inner or
+  outer duplication/does it matter?}
+
 \FIXME{contravariant derivable?}
+
 
 %% \[
 %% \begin{array}{l}
