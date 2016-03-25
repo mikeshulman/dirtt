@@ -20,7 +20,7 @@
 \def\mor#1{\hom_{#1}}
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
-\newcommand{\esh}{\Rbag}
+\newcommand{\coend}{\int}
 \newcommand{\Set}{\mathrm{Set}}
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
@@ -221,9 +221,9 @@ and right rule
 Formation rule:
 \begin{mathpar}
 	\inferrule{
-		\Psi_A, x:\pm A \types M \type \\
+		\Psi_A, \hat x:\p A, \check x:\m A \types M \type \\
 	}{
-		\Psi_A \types \esh^{x:A} M \type
+		\Psi_A \types \coend^{x:A} M \type
 	}\and
 \end{mathpar}
 Left rule:
@@ -235,7 +235,7 @@ Left rule:
 		\Psi_C \types C \type \\
 		\Delta, x:A \cb \Gamma, M \types C
 	}{
-		\Delta \cb \Gamma, \esh^{x:A} M \types C
+		\Delta \cb \Gamma, \coend^{x:A} M \types C
 	}\and
 \end{mathpar}
 Right rule:
@@ -243,19 +243,19 @@ Right rule:
 %	\inferrule{
 %		r
 %	}{
-%		\Delta, \Delta_a, \Delta_b \cb \Gamma \types \esh_{}
+%		\Delta, \Delta_a, \Delta_b \cb \Gamma \types \coend_{}
 %	}
 %\end{mathpar}
 We should probably base the right rule on the following function:
 \begin{equation}
-	\lambda f.\lambda z.(z, fzz) : [\esh_x \esh_y G(x^-, x^+, y^-, y^+)] \to [\esh_z \esh^w G(z^-, w^+, w^-, z^+)]
+	\lambda f.\lambda z.(z, fzz) : [\coend_x \coend_y G(x^-, x^+, y^-, y^+)] \to [\coend_z \coend^w G(z^-, w^+, w^-, z^+)]
 \end{equation}
 Without built-in substitution, that principle becomes (thinking $G = \Gamma \to M$, where only $M$ depends on $w$):
 \begin{mathpar}
 	\inferrule{
 		\Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
 	}{
-		\Delta, z : A \cb \Gamma \types \esh^{w:A} M
+		\Delta, z : A \cb \Gamma \types \coend^{w:A} M
 	}\and
 \end{mathpar}
 For instance, we can prove:
@@ -277,7 +277,7 @@ For instance, we can prove:
 			X : \Set, Y : \Set \cb x : \check X \types \hat X \otimes \hom_{\Set}(\check Y, \hat Y)
 		}
 	}{
-		Z : \Set \cb z : \check Z \types \esh^{W:\Set} \hat W \otimes \hom_{\Set}(\check W, \hat Z)
+		Z : \Set \cb z : \check Z \types \coend^{W:\Set} \hat W \otimes \hom_{\Set}(\check W, \hat Z)
 	}
 \end{equation}
 
@@ -289,7 +289,7 @@ Formation rule:
 	\inferrule{
 		\Psi_A, x:\pm A \types M \type \\
 	}{
-		\Psi_A \types \esh_{x:A} M \type
+		\Psi_A \types \coend_{x:A} M \type
 	}\and
 \end{mathpar}
 Right rule:
@@ -300,12 +300,12 @@ Right rule:
 		\Psi_M, x:\pm A \types M \type \\
 		\Delta, x:A \cb \Gamma \types M
 	}{
-		\Delta \cb \Gamma \types \esh_{x:A} M
+		\Delta \cb \Gamma \types \coend_{x:A} M
 	}\and
 \end{mathpar}
 The left rule can based on the function
 \begin{equation*}
-	[\esh_x \esh_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \esh_{z}[(\esh_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
+	[\coend_x \coend_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \coend_{z}[(\coend_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
 \end{equation*}
 where $F: A \times A\op \times A \times A\op \to \Set$ and $G : A\op \times A \to \Set$, defined by
 \begin{equation}
@@ -316,7 +316,7 @@ which should be in the end as we have only passed $z$ to ends. Then it becomes
 	\inferrule{
 		\Delta, x : A, y : A \cb \Gamma[\check x / \check z , \hat y / \hat z], M[\check x / \check z , \hat x / \hat w , \check x / \check w , \hat y / \hat z] \types C[\check x / \check z , \hat y / \hat z]
 	}{
-		\Delta, z : A \cb \Gamma, \esh_{w : A} M \types C
+		\Delta, z : A \cb \Gamma, \coend_{w : A} M \types C
 	}
 \end{mathpar}
 
