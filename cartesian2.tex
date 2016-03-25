@@ -252,8 +252,8 @@ so we don't need delayed dagger types.
 \infer{\oftpe{\Gamma}{\morindco{x_1,x.S}{t}{t'}}{\vcond}{{\subst{\subst{S}{c_1}{x_1}}{t}{x}}}}
       { \begin{array}{l}
           \wfdtp{\C} \\
-          \oftp{\dupctx{\Gamma}{\vcond}}{c_0,c_1}{\C} \\
-          \ofdtp{\dupctx{\Gamma}{\vcond},\vtptm{x_1}{\co}{\C},\tptmv{x}{\sim}{\Hom{\C}{c_0^\sim}{x_1}}}{S}{\types} \\
+          \oftp{\Gamma}{c_0,c_1}{\C} \\
+          \ofdtp{\dupctx{\Gamma}{\vcond},\vtptm{x_1}{\co}{\C},\tptmv{x}{\bullet}{\Hom{\C}{c_0^\vcond}{x_1}}}{S}{\types} \\
           \oftpe{\Gamma}{t'}{\vcond}{{\subst{\subst{S}{c_0}{x_1}}{\idm{c_0}}{x}}} \\
           \oftpe{\Gamma}{t}{\vcond}{\Hom{\C}{c_0^\vcond}{c_1}} \\
         \end{array}
@@ -263,7 +263,13 @@ so we don't need delayed dagger types.
 \end{array}
 \]
 
-\FIXME{box contexts for $c_0$, $c_1$}
+Note: we drew some pictures and having $\dupctx{\Gamma}{\vcond}$ in the
+premise for $c_0,c_1$ doesn't seem to work.
+
+For the hom assumption $x_1$, it seems like binding a new variable
+constructor is gratuitous, because it doesn't mention $x_1$ at either
+variance, and having two copies of $\dupctx{\Gamma}{\vcond}$ is
+gratuitous.  
 
 \FIXME{should the $\sim$ in the type of $x$ be referring to the inner or
   outer duplication/does it matter?}
