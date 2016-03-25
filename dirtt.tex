@@ -275,21 +275,21 @@ For instance, we can prove:
 	\inferrule{
 		\inferrule{
 			\inferrule{
-				X : \Set \types X \type
+				x :\p A \types F(x) \type
 			}{
-				X : \Set \cb x : \check X \types \hat X
+				x : A \cb F(\check x) \types F(\hat x)
 			}
 			\qquad
 			\inferrule{
-				Y :^+ \Set \types Y : \Set
+				y :\p A \types y :\p A
 			}{
-				Y : \Set \cb \cdot \types \hom_{\Set}(\check Y, \hat Y)
+				y : A \cb \ec \types \hom_A(\check y, \hat y)
 			}
 		}{
-			X : \Set, Y : \Set \cb x : \check X \types \hat X \otimes \hom_{\Set}(\check Y, \hat Y)
+			x : A, y : A \cb F(\check x) \types F(\hat x) \otimes \hom_A(\check y, \hat y)
 		}
 	}{
-		Z : \Set \cb z : \check Z \types \coend^{W:\Set} \hat W \otimes \hom_{\Set}(\check W, \hat Z)
+		z : A \cb F(\check z) \types \coend^{w:A} F(\hat w) \otimes \hom_A(\check w, \hat z)
 	}
 \end{equation}
 
