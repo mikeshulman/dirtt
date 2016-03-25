@@ -264,7 +264,7 @@ family of sets or types. The product is the end type, the sum is the category wh
 \[
 \begin{array}{rcll}
 \app {(\lam{x}{\C}{t})}{c} & \equiv & \subst{t}{c}{x} \\
-\tptm{t}{\picl{x}{\C}{S}} & \equiv & {(\lam{x}{\C}{t}{x})} &
+\tptm{M}{\picl{x}{\C}{S}} & \equiv & {(\lam{x}{\C}{M}{x})} &
 \end{array} \\
 \]
 
@@ -294,20 +294,20 @@ family of sets or types. The product is the end type, the sum is the category wh
 \end{array}
 \]
 
-\subsection{$\Pi$ of a set and a type}
+\subsection{$\Pi$ Types}
 
 \[
 \begin{array}{c}
-\infer{\wftp{\Gamma}{\pitp{x}{S}{T}}}
-      {\wftp{\Gamma^\con}{S} &
-        \wftp{\Gamma, \vstptm {x}{\conc}{\Elp{S}}}{T}}
+\infer{\wftp{\Gamma}{\pitp{x}{T_1}{T_2}}}
+      {\wftp{\Gamma^\con}{T_1} &
+        \wftp{\Gamma, \vstptm {x}{\conc}{T_1}}{T_2}}
 \\ \\
-\infer{\oftp{\Gamma}{\ulam{x}{M}}{\pitp x {S} {T}}}
-      {\oftp{\Gamma, \tptmv x {\conc} {\Elp{S}} }{t}{T}}
+\infer{\oftp{\Gamma}{\ulam{x}{M}}{\pitp x {T_1} {T_2}}}
+      {\oftp{\Gamma, \tptmv x {\conc} {T_1} }{t}{T_2}}
 \qquad
 \infer{\oftp{\Gamma}{\app t {t'}}{\subst T {t'} x}}
-      {\oftp{\Gamma}{t}{\pitp{x}{S}{T}} &
-        \oftp{\Gamma^\con}{t'}{\Elp{S}}}
+      {\oftp{\Gamma}{t}{\pitp{x}{T'}{T}} &
+        \oftp{\Gamma^\con}{t'}{T'}}
 \end{array}
 \]
 
@@ -318,8 +318,7 @@ family of sets or types. The product is the end type, the sum is the category wh
 \end{array} \\
 \]
 
-Note: it doesn't seem like we can have $T_1 \to T_2$ or the
-corresponding $\Pi$ for this judgement structure.
+\FIXME{does the domain need to be restricted to a set?}
 
 \subsection{$\Sigma$ of a set and a type}
 
@@ -352,7 +351,7 @@ corresponding $\Pi$ for this judgement structure.
 \FIXME{would this make sense when $S$ is contravariant as well?  and do
   we need to put that in?}
 
-The contravariant sum is admissible:
+The contravariant sum is derivable:
 \begin{equation}
 	\infer{
 		\wftp{ \Gamma }{ \paren{\sigmatp{x}{S}{(T^\dagger)}}^\dagger }
@@ -385,14 +384,16 @@ We have projections $\dagtm{\fst{\undag -}}$ and $\undag{\snd{\undag -}}$.
 
 \[
 \begin{array}{c}
-\infer{\wftp{\Gamma}{\Hom{\C}{c_0}{c_1}}}
+\infer{\wftp{\Gamma}{\Hombind{\C}{\rho}{c_0}{c_1}}}
       {\wfdtp{\C} &
-        \oftp{\Gamma^*,\Gamma^\con}{c_0}{\C} & 
-        \oftp{(\Gamma^*)^\con,\Gamma}{c_1}{\C} 
+        \oftp{\Gamma',\Gamma^\con}{c_0}{\C} & 
+        \oftp{(\Gamma')^\con,\Gamma}{c_1}{\C} &
+        \rho : \Gamma' =_\alpha \Gamma
       }
 \\ \\
-\infer{\oftp{\Gamma}{\idm{c}}{\Hom{\C}{c^*}{c}}}
-      {\oftp{\Gamma}{c}{\C}
+\infer{\oftp{\Gamma}{\idm{c}}{\Hombind{\C}{\rho}{c[\rho]}{c}}}
+      {\oftp{\Gamma}{c}{\C} &
+      \rho : \Gamma' =_\alpha \Gamma
       }
 \end{array}
 \]
@@ -413,16 +414,19 @@ We have projections $\dagtm{\fst{\undag -}}$ and $\undag{\snd{\undag -}}$.
 \infer{\oftp{\Gamma}{\morindco{x_1,x.S}{t}{t'}}{\Elp{\subst{\subst{S}{c_1}{x_1}}{t}{x}}}}
       { \begin{array}{l}
           \wfdtp{\C} \\
+          \rho : \Gamma' =_\alpha \Gamma \\
           \oftp{\Gamma}{c_0,c_1}{\C} \\
-          \ofdtp{\Gamma,\vtptm{x_1}{\co}{\C},\tptmv{x}{\coc}{\Hom{\C}{c_0^*}{x_1}}}{S}{\types} \\
+          \ofdtp{\Gamma,\vtptm{x_1}{\co}{\C},\tptmv{x}{\coc}{\Hombind{\C}{\rho,x_1^*/x_1}{c_0[\rho]}{x_1}}}{S}{\types} \\
           \oftp{\Gamma}{t'}{\Elp{\subst{\subst{S}{c_0}{x_1}}{\idm{c_0}}{x}}} \\
-          \oftp{\Gamma}{t}{\Hom{\C}{c_0^*}{c_1}} \\
+          \oftp{\Gamma}{t}{\Hombind{\C}{\rho}{c_0[\rho]}{c_1}} \\
         \end{array}
       }
 \\ \\
 \morindco{}{\idm{}}{t'} \deq t'
 \end{array}
 \]
+
+I suggest the following approach: the Hom type former binds a variable for every variable in the \emph{current} context (for a type that is itself in the context, that means everything to its left). When we prove weakening/substitution/\ldots are admissible, we have to take care of that.
 
 \FIXME{contravariant derivable?}
 

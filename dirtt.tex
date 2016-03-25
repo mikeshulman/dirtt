@@ -20,6 +20,8 @@
 \def\mor#1{\hom_{#1}}
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
+\newcommand{\coend}{\int}
+\newcommand{\Set}{\mathrm{Set}}
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
 \begin{document}
@@ -213,6 +215,109 @@ and right rule
     \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
     \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
   {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
+\end{mathpar}
+
+\subsection{Co-end type?}
+Formation rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi_A, \hat x:\p A, \check x:\m A \types M \type \\
+	}{
+		\Psi_A \types \coend^{x:A} M \type
+	}\and
+\end{mathpar}
+Left rule:
+\begin{mathpar}
+	\inferrule{
+		\Delta \splits \flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C \\
+		\Psi_\Gamma \types \Gamma \ctx \\
+		\Psi_M, x:\pm A \types M \type \\
+		\Psi_C \types C \type \\
+		\Delta, x:A \cb \Gamma, M \types C
+	}{
+		\Delta \cb \Gamma, \coend^{x:A} M \types C
+	}\and
+\end{mathpar}
+Right rule:
+%\begin{mathpar}
+%	\inferrule{
+%		r
+%	}{
+%		\Delta, \Delta_a, \Delta_b \cb \Gamma \types \coend_{}
+%	}
+%\end{mathpar}
+We should probably base the right rule on the following function:
+\begin{equation}
+	\lambda f.\lambda z.(z, fzz) : [\coend_x \coend_y G(x^-, x^+, y^-, y^+)] \to [\coend_z \coend^w G(z^-, w^+, w^-, z^+)]
+\end{equation}
+Without built-in substitution, that principle becomes (thinking $G = \Gamma \to M$, where only $M$ depends on $w$):
+\begin{mathpar}
+	\inferrule{
+		\Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	}{
+		\Delta, z : A \cb \Gamma \types \coend^{w:A} M
+	}\and
+\end{mathpar}
+For instance, we can prove:
+\begin{equation}
+	\inferrule{
+		\inferrule{
+			\inferrule{
+				X : \Set \types X \type
+			}{
+				X : \Set \cb x : \check X \types \hat X
+			}
+			\qquad
+			\inferrule{
+				Y :^+ \Set \types Y : \Set
+			}{
+				Y : \Set \cb \cdot \types \hom_{\Set}(\check Y, \hat Y)
+			}
+		}{
+			X : \Set, Y : \Set \cb x : \check X \types \hat X \otimes \hom_{\Set}(\check Y, \hat Y)
+		}
+	}{
+		Z : \Set \cb z : \check Z \types \coend^{W:\Set} \hat W \otimes \hom_{\Set}(\check W, \hat Z)
+	}
+\end{equation}
+
+I have not been able to make sense of a rule with built-in substitution.
+
+\subsection{End type?}
+Formation rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi_A, x:\pm A \types M \type \\
+	}{
+		\Psi_A \types \coend_{x:A} M \type
+	}\and
+\end{mathpar}
+Right rule:
+\begin{mathpar}
+	\inferrule{
+		\Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\
+		\Psi_\Gamma \types \Gamma \ctx \\
+		\Psi_M, x:\pm A \types M \type \\
+		\Delta, x:A \cb \Gamma \types M
+	}{
+		\Delta \cb \Gamma \types \coend_{x:A} M
+	}\and
+\end{mathpar}
+The left rule can based on the function
+\begin{equation*}
+	[\coend_x \coend_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \coend_{z}[(\coend_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
+\end{equation*}
+where $F: A \times A\op \times A \times A\op \to \Set$ and $G : A\op \times A \to \Set$, defined by
+\begin{equation}
+	\lambda h.\lambda z.\lambda k.h(z, z, k(z))
+\end{equation}
+which should be in the end as we have only passed $z$ to ends. Then it becomes
+\begin{mathpar}
+	\inferrule{
+		\Delta, x : A, y : A \cb \Gamma[\check x / \check z , \hat y / \hat z], M[\check x / \check z , \hat x / \hat w , \check x / \check w , \hat y / \hat z] \types C[\check x / \check z , \hat y / \hat z]
+	}{
+		\Delta, z : A \cb \Gamma, \coend_{w : A} M \types C
+	}
 \end{mathpar}
 
 \subsection{Hom types}
