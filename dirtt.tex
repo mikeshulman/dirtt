@@ -20,7 +20,7 @@
 \def\mor#1{\hom_{#1}}
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
-\newcommand{\coend}{\int}
+\newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
@@ -217,28 +217,40 @@ and right rule
   {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
 \end{mathpar}
 
-\subsection{Co-end type?}
+\subsection{Co-end type}
 Formation rule:
 \begin{mathpar}
-	\inferrule{
-		\Psi_A, \hat x:\p A, \check x:\m A \types M \type \\
-	}{
-		\Psi_A \types \coend^{x:A} M \type
-	}\and
+  \inferrule{
+    \Psi, \hat x:\p A, \check x:\m A \types M \type \\
+    }{
+    \Psi \types \coend^{x:A} M \type
+  }\and
 \end{mathpar}
 Left rule:
 \begin{mathpar}
-	\inferrule{
-		\Delta \splits \flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C \\
-		\Psi_\Gamma \types \Gamma \ctx \\
-		\Psi_M, x:\pm A \types M \type \\
-		\Psi_C \types C \type \\
-		\Delta, x:A \cb \Gamma, M \types C
-	}{
-		\Delta \cb \Gamma, \coend^{x:A} M \types C
-	}\and
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C \\
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M, \hat x:\p A, \check x:\m A \types M \type \\
+    \Psi_C \types C \type \\
+    \Delta, x:A \cb \Gamma, M \types C
+    }{
+    \Delta \cb \Gamma, \coend^{x:A} M \types C
+  }\and
 \end{mathpar}
 Right rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \psplit \flip{\Psi_a},\Psi_a \\
+    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\\\
+    \Psi_a \types a:A \\ \Psi_{\Gamma_M},\flip{\Psi_a},\Psi'_a \types \Gamma_M\ctx \\
+    \Psi_M,\hat x:\p A, \check x:\m A \types M\type \\\\
+    \Delta_M,\Delta_a,\Delta'_a \cb \Gamma_M \types M[(a[\Psi'_a/\Psi_a])/\hat x,\flip{a}/\check x]
+    }{
+    \Delta_M,\Delta_a \cb \Gamma_M \types \coend^{x:A} M
+  }\and
+\end{mathpar}
+\subsubsection{Older stuff}
 %\begin{mathpar}
 %	\inferrule{
 %		r
