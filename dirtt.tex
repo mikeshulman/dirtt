@@ -242,15 +242,15 @@ Left rule:
 Right rule:
 \begin{mathpar}
   \inferrule{
-    \Delta \iso \Delta' \\
-    \Delta \psplit (\flip{\Psi_1},\Psi_2),\Psi_a \\
-    \Delta' \psplit \flip{\Psi_a'},(\Psi_1',\flip{\Psi_2'}) \\
-    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
+    \Delta_a \iso \Delta'_a \\
+    \Delta_a \psplit (\flip{\Psi_1},\Psi_2),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\flip{\Psi_2'}) \\
+    \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
     \Psi_a \types a:A \\ \Psi_{\Gamma_M},\Psi_1,\Psi_1' \types \Gamma\ctx \\
     \Psi_M,\Psi_2,\Psi'_2,\hat x:\p A,\check x:\m A \types M\type \\\\
-    \Delta_M,\Delta,\Delta' \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
   }{
-    \Delta_M,\Delta \cb \Gamma[\Psi_1/\Psi'_1] \types \coend^{x:A} M[\Psi_2/\Psi'_2]
+    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1] \types \coend^{x:A} M[\Psi_2/\Psi'_2]
   }\and
 \end{mathpar}
 Co-Yoneda lemma:
@@ -260,30 +260,30 @@ Co-Yoneda lemma:
       \inferrule*{
         \vdots
       }{
-        \Delta_M,\Delta,\Delta' \cb M(a) \types M(a)
+        \Delta,\Delta_a,\Delta'_a \cb M(a) \types M(a)
       } \\
       \inferrule*{
         \vdots
       }{
-        \Delta_M,\Delta,\Delta' \cb \cdot \types \hom_A(a',a')
+        \Delta,\Delta_a,\Delta'_a \cb \cdot \types \hom_A(a',a')
       }
     }{
-      \Delta_M,\Delta,\Delta' \cb M(a) \types M(a) \otimes \hom_A(a',a')
+      \Delta,\Delta_a,\Delta'_a \cb M(a) \types M(a) \otimes \hom_A(a',a')
     }
   }{
-    \Delta_M,\Delta \cb M(a) \types \coend^{x:A} M(\hat x)\otimes \hom_A(\check x,a)
+    \Delta,\Delta_a \cb M(a) \types \coend^{x:A} M(\hat x)\otimes \hom_A(\check x,a)
   }\and
 \end{mathpar}
 and conversely
 \begin{mathpar}
   \inferrule{
     \inferrule{
-      \Delta_M,\Delta \cb M(a) \types M(a)
+      \Delta,\Delta_a \cb M(a) \types M(a)
     }{
-      \Delta_M,\Delta,x:A \cb M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+      \Delta,\Delta_a,x:A \cb M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
     }
   }{
-    \Delta_M,\Delta \cb \coend^{x:A} M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+    \Delta,\Delta_a \cb \coend^{x:A} M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
   }
 \end{mathpar}
 \subsubsection{Older stuff}
@@ -334,23 +334,40 @@ I have not been able to make sense of a rule with built-in substitution.
 \subsection{End type?}
 Formation rule:
 \begin{mathpar}
-	\inferrule{
-		\Psi_A, x:\pm A \types M \type \\
-	}{
-		\Psi_A \types \coend_{x:A} M \type
-	}\and
+  \inferrule{
+    \Psi,\hat x:\p A,\check x:\m A \types M \type \\
+    }{
+    \Psi \types \coend_{x:A} M \type
+  }\and
 \end{mathpar}
 Right rule:
 \begin{mathpar}
-	\inferrule{
-		\Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\
-		\Psi_\Gamma \types \Gamma \ctx \\
-		\Psi_M, x:\pm A \types M \type \\
-		\Delta, x:A \cb \Gamma \types M
-	}{
-		\Delta \cb \Gamma \types \coend_{x:A} M
-	}\and
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\\\
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M,\hat x:\p A,\check x:\m A \types M \type \\
+    \Delta, x:A \cb \Gamma \types M
+    }{
+    \Delta \cb \Gamma \types \coend_{x:A} M
+  }\and
 \end{mathpar}
+Left rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \iso \Delta'_a \\\\
+    \Delta_a \psplit (\flip{\Psi_1},\flip{\Psi_2},\Psi_3),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\Psi_2',\flip{\Psi_3'}) \\
+    \Delta \splits \flip{\Psi_{\Gamma}},\flip{\Psi_M},\Psi_C \\\\
+    \Psi_a \types a:A \\ \Psi_{\Gamma},\Psi_1,\Psi_1' \types \Gamma\ctx \\
+    \Psi_M,\Psi_2,\Psi'_2,\hat x:\p A,\check x:\m A \types M\type \\
+    \Psi_C,\Psi_3,\Psi'_3 \types C\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma, M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x] \types C
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1], \coend_{x:A}M[\Psi_2/\Psi'_2] \types C[\Psi_3/\Psi'_3]
+  }\and
+\end{mathpar}
+
+\subsubsection{Older stuff}
 The left rule can based on the function
 \begin{equation*}
 	[\coend_x \coend_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \coend_{z}[(\coend_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
