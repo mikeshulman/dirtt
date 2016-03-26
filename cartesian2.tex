@@ -1,0 +1,919 @@
+\documentclass[11pt]{article}
+\usepackage{times}
+
+\usepackage{fullpage}
+\usepackage{ifthen}
+\usepackage{latexsym,amsmath,amsfonts,amssymb,stmaryrd,amsthm}
+\usepackage{verbatim,fancyvrb}
+\usepackage{multicol}
+\usepackage{proof}
+\usepackage[square]{natbib}
+
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+\input{drl-macros}
+
+\DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small,fontfamily=tt}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}{Lemma}[section]
+
+\title{All's Well That Ends Well}
+\author{Daniel R. Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
+
+\begin{document}
+\maketitle
+
+\section{Judgements}
+
+\begin{itemize}
+
+\item \wfdtp{\C} means \C\/ is a category; note that categories cannot
+  depend on the context at all.  
+
+\item \wfctx{\G} means $\Gamma$ is a category
+
+\item \ofdtp{\G}{c}{\C} means $c$ is a functor
+  ${\G} \to \C$, we also write $S$ when $c$ is of category $\types$.  
+
+\item \oftpe{\G}{t}{\vcond}{S} where
+  \ofdtp{\dupctx{\Gamma}{\vcond}}{S}{\types} means (descibe context
+  extension; it's a section), equivalently an end.
+
+\end{itemize}
+
+\section{Contexts and Structural Rules}
+
+We write $x$ for a variable and $\vcond$\/ for a variable constructor
+variable.  
+
+\[
+\begin{array}{l}
+v ::= \co \mid \con \\
+\end{array}
+\]
+
+\[
+\begin{array}{c}
+\infer{\wfctx{\cdot}}{} 
+\qquad
+\infer{\wfctx{\dupctx{\Gamma}{\vcond}}}
+      {\wfctx{\Gamma}
+      } 
+\qquad
+\infer{\wfctx{(\Gamma,\vtptm{x}{v}{\C})}}
+      {\wfctx{\Gamma} & 
+       \wfdtp{\C}
+      } 
+\qquad
+\infer{\wfctx{(\Gamma,\tptmv{x}{\vcond}{S})}}
+      {\wfctx{\Gamma} & 
+        \wftp{\dupctx{\Gamma}{\vcond}}{S}
+      } 
+\end{array}
+\]
+
+\[
+u ::= x \mid u^{\vcond} \\
+\]
+
+\[
+\begin{array}{rcl}
+\Gamma^\co & := & \Gamma \\
+\cdot^\con & := & \cdot \\
+({\Gamma},\vtptm{x}{v}{\C})^\con & := & {\Gamma^\con},\vtptm{x}{\flip{v}}{\C} \\
+({\Gamma},\tptmv{x}{\vcond}{S})^\con & := & {\Gamma^\con},\tptmv{x}{\vcond}{\togglev{S}{\vcond}} \\
+{\dupctx{\Gamma}{\vcond}}^\con & := & \dupctx{{\Gamma^\con}}{{\vcond}} \\
+\\ 
+\togglev{t}{\vcond} & := & \text{ flip $\vcond$ bit on all $u$ in $t$ } \\
+\end{array}
+\]
+
+\[
+\begin{array}{l}
+\infer{\vtptm{x}{v}{\C} \in (\Gamma,\vtptm{x}{v}{\C})}
+      {}
+\qquad
+\infer{\vtptm{u}{v}{\C} \in (\Gamma,\_)}
+      {\vtptm{u}{v}{\C} \in \Gamma}
+\qquad
+\infer{\vtptm{u}{v}{\C} \in {\dupctx{\Gamma}{\vcond}}}
+      {\vtptm{u}{v}{\C} \in \Gamma}
+\qquad
+\infer{\vtptm{\togglev{u}{\vcond}}{\flip{v}}{\C} \in {\dupctx{\Gamma}{\vcond}}}
+      {\vtptm{u}{v}{\C} \in \Gamma}
+\\ \\ 
+\infer{\tptmv{x}{\vcond}{S} \in (\Gamma,\tptmv{x}{\vcond}{S})}
+      {}
+\qquad
+\infer{\tptmv{u}{\vcond}{S} \in (\Gamma,\_)}
+      {\tptmv{u}{\vcond}{S} \in \Gamma}
+\qquad
+\infer{\tptmv{u}{\vcond_1}{S} \in {\dupctx{\Gamma}{\vcond}}}
+      {\tptmv{u}{\vcond_1}{S} \in \Gamma}
+\qquad
+\infer{\tptmv{\togglev{u}{\vcond}}{\vcond_1}{\togglev{S}{\vcond}} \in {\dupctx{\Gamma}{\vcond}}}
+      {\tptmv{u}{\vcond_1}{S} \in {\Gamma}}
+\end{array}
+\]
+
+\[
+\infer{\ofdtp{\Gamma}{u}{\C}}{\vtptm{u}{\co}{\C} \in \Gamma}
+\qquad
+\infer{\oftpe{\Gamma}{u}{\vcond}{S}}
+      {\tptmv{u}{\vcond}{S} \in \Gamma}
+\]
+
+\[
+\infer{\wfsub{\Gamma}{\cdot}{\cdot}}{} 
+\qquad
+\infer{\wfsub{\Gamma}{(\theta,c/x)}{(\Delta,\vtptm{x}{v}{\C})}}
+      {\wfsub{\Gamma}{\theta}{\Delta} & 
+        \ofdtp{\Gamma^v}{c}{\C}
+      }
+\qquad
+\infer{\wfsub{\Gamma}{(\theta,t/x)}{(\Delta,\tptmv{x}{\vcond}{S})}}
+      {\wfsub{\Gamma}{\theta}{\Delta} & 
+        \oftpe{\Gamma}{t}{\vcond}{\tsubst{S}{\substdup{\theta^\vcond}{\vcond}{\theta}}}
+      }
+\qquad
+\infer{\wfsub{\Gamma}{\substdup{\theta'}{\vcond}{\theta}}{\dupctx{\Delta}{\vcond}}}
+      {\wfsub{\Gamma}{\theta'}{\Delta^\con} &
+       \wfsub{\Gamma}{\theta}{\Delta} 
+      }
+%% \infer[\textbf{admiss}]
+%%       {\Gamma,\subst{\Gamma'}{c}{x} \vdash \subst{J}{c}{x}}
+%%       {\Gamma,\vtptm{x}{v}{\C},\Gamma' \vdash {J} &
+%%         \oftp{\Gamma^v}{c}{\C}}
+%% \qquad
+%% \infer[\textbf{admiss}]
+%%       {\Gamma,\subst{\Gamma'}{t}{x} \vdash \subst{J}{t}{x}}
+%%       {\Gamma,\tptmv{x}{w}{T},\Gamma' \vdash {J} &
+%%         \oftp{\Gamma^w}{t}{T}}
+\]
+
+(Hopefully) admissible rules (with corresponding versions for terms):   
+\[
+\begin{array}{c}
+\infer[\admiss]
+      {\wfsub{\Gamma,\_}{\theta}{\Delta}}
+      {\wfsub{\Gamma}{\theta}{\Delta}}
+\qquad
+\infer[\admiss]
+      {\wfsub{\dupctx{\Gamma}{\vcond}}{\theta}{\Delta}}
+      {\wfsub{\Gamma}{\theta}{\Delta}}
+\qquad
+\infer[\admiss]
+      {\wfsub{\dupctx{\Gamma}{\vcond}}{\theta^\vcond}{\Delta^\con}}
+      {\wfsub{\Gamma}{\theta}{\Delta}}
+\qquad
+\infer[\admiss]
+      {\wfsub{{\Gamma}}{\idsubst}{\Gamma}}
+      {}
+\\ \\
+\infer[\admiss]
+      {\wfsub{{\Gamma_1}}{\tsubst{\theta_2}{\theta_1}}{\Gamma_3}}
+      {\wfsub{{\Gamma_1}}{\theta_1}{\Gamma_2} &
+        \wfsub{{\Gamma_2}}{\theta_2}{\Gamma_3} &
+      }
+\end{array}
+\]
+
+\section{Types}
+
+\subsection{Universe}
+
+The universe of sets is a directed type (e.g. the category of sets and
+functions).
+
+\[
+\infer{\wfdtp{\types}}{}
+\]
+
+\FIXME{directed univalence}
+
+\subsection{Op Categories}
+
+\[
+\begin{array}{c}
+\infer{\wfdtp{\optp{\C}}}
+      {\wfdtp{\C}}
+\qquad
+\infer{\ofdtp{\Gamma}{\optm{c}}{\optp{\C}}}
+      {\ofdtp{\Gamma^\con}{c}{\C}}
+\qquad
+\infer{\ofdtp{\Gamma}{\unop{c}}{{\C}}}
+      {\ofdtp{\Gamma^\con}{c}{\optp{\C}}}
+\\ \\
+\unop{\optm{c}} \deq c \\
+\optm{\unop{c}} \deq c
+\end{array}
+\]
+
+\subsection{Dagger Types}
+
+If \ofdtp{\dupctx{\Gamma}{\vcond}}{S}{\types} 
+then it should be admissible that
+\ofdtp{\dupctx{\Gamma^\con}{\vcond}}{S^*}{\types} 
+so we don't need delayed dagger types.  
+
+\subsection{Hom Types}
+
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\Hom{\C}{c_0}{c_1}}{\types}}
+      {\wfdtp{\C} &
+        \oftp{\Gamma^\con}{c_0}{\C} & 
+        \oftp{\Gamma}{c_1}{\C} 
+      }
+\\ \\
+\infer{\oftpe{\Gamma}{\idm{c}}{\vcond}{\Hom{\C}{c^\vcond}{c}}}
+      {\oftpe{\dupctx{\Gamma}{\vcond}}{c}{\vcond}{\C} 
+      }
+\end{array}
+\]
+
+%% \infer{\oftpsf{\Delta}{\Gamma}{\morind{x_0,x_1,x.A}{M}{y.N}}{\subst{\subst{\subst{A}{M_0}{x_0}}{M_1}{x_1}}{M}{x}}}
+%%       { \begin{array}{l}
+%%           \wftpcc{\Delta}{\C} \\
+%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vptptm{x_1}{\co}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{x_1}}}{A} \\
+%%           \oftpp{\Delta,\tptm{y}{\obtp{\C}}}{\Gamma}{N}{\subst{\subst{\subst{A}{\unob{y}}{x_0}}{\unob{y}}{x_1}}{\refl{y}}{x}} \\
+%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{M_1}} \\
+%%         \end{array}
+%%       }
+%% \\ \\
+%% \morind{}{\refl{M}}{y.N} \deq \subst{N}{M}{y}
+
+\[
+\begin{array}{l}
+\infer{\oftpe{\Gamma}{\morindco{x_1,x.S}{t}{t'}}{\vcond}{{\subst{\subst{S}{c_1}{x_1}}{t}{x}}}}
+      { \begin{array}{l}
+          \wfdtp{\C} \\
+          \oftp{\Gamma}{c_0,c_1}{\C} \\
+          \ofdtp{\dupctx{\Gamma}{\vcond},\vtptm{x_1}{\co}{\C},\tptmv{x}{\bullet}{\Hom{\C}{c_0^\vcond}{x_1}}}{S}{\types} \\
+          \oftpe{\Gamma}{t'}{\vcond}{{\subst{\subst{S}{c_0}{x_1}}{\idm{c_0}}{x}}} \\
+          \oftpe{\Gamma}{t}{\vcond}{\Hom{\C}{c_0^\vcond}{c_1}} \\
+        \end{array}
+      }
+\\ \\
+\morindco{}{\idm{}}{t'} \deq t'
+\end{array}
+\]
+
+Note: we drew some pictures and having $\dupctx{\Gamma}{\vcond}$ in the
+premise for $c_0,c_1$ doesn't seem to work.
+
+For the hom assumption $x$, it seems like binding a new variable
+constructor is gratuitous, because it doesn't mention $x_1$ at either
+variance, and having two copies of $\dupctx{\Gamma}{\vcond}$ is
+gratuitous.
+
+\FIXME{contravariant derivable?}
+
+
+%% \[
+%% \begin{array}{l}
+%% \infer{\oftpsf{\Delta}{\Gamma}{\morindcon{x_0,x.A}{M}{N}}{\subst{\subst{A}{M_0}{x_0}}{M}{x}}}
+%%       { \begin{array}{l}
+%%           \wftpcc{\Delta}{\C} \\
+%%           \oftpp{\Delta}{\Gamma}{M_1}{\obtp \C} \\
+%%           \wftpp{\Delta}{\Gamma,\vptptm{x_0}{\con}{\C},\vstptm{x}{\co}{\Hom{\C}{x_0}{\unob{M_1}}}}{A} \\
+%%           \oftpp{\Delta}{\Gamma}{N}{\subst{\subst{A}{\unob{M_1}}{x_0}}{\refl{M_1}}{x}} \\
+%%           \oftpsf{\Delta}{\Gamma}{M}{\Hom{\C}{M_0}{\unob{M_1}}} \\
+%%         \end{array}
+%%       }
+%% \\ \\
+%% \morindcon{}{\refl{M_1}}{N} \deq N
+%% \end{array}
+%% \]
+
+
+\subsection{$\Pi$-like Things}
+
+\subsection{Functor Categories}
+
+\[
+\begin{array}{c}
+\infer{\wfdtp{\arr{\C_1}{\C_2}}}
+      {\wfdtp{\C_1} &
+        \wfdtp{\C_2}}
+\qquad
+\infer{\ofdtp{\Gamma}{\lam{x}{\C_1}{c}}{\arr {\C_1} {\C_2}}}
+      {\ofdtp{\Gamma,\vptptm{x}{\co}{\C_1}}{c}{\C_2}}
+\qquad
+\infer{\ofdtp{\Gamma}{\app c {c'}}{\C_2}}
+      {\ofdtp{\Gamma}{c}{\arr{\C_1}{\C_2}} &
+        \ofdtp{\Gamma}{c'}{\C_1}}
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\app {(\lam{x}{\C_1}{c})}{c'} & \equiv & \subst{c}{c'}{x} \\
+\tptm{c}{\arr{\C_1}{\C_2}} & \equiv & {(\lam{x}{\C_1}{c}{x})} &
+\end{array} \\
+\]
+
+\subsubsection{Dependent}
+
+\textbf{Allows dependency of $S_2$ on $S_1$, but whole type must be
+  covariant functor, not bifunctor, in intro and elim.}
+
+\[
+\infer{\oftp{\Gamma}{\piset{x}{S_1}{S_2}}{\types}}
+      {\oftp{\Gamma^\con}{S_1}{\types} &
+        \oftp{\Gamma, \tptmv {x}{\vcond}{S_1^\vcond}}{S_2}{\types}}
+\]
+Note that only the starred variables occur in $S_1^\vcond$ in the
+context, not any unstarred variables.  
+
+\[
+\begin{array}{c}
+\infer{\oftpe{\Gamma}{\ulam{x}{t}}{\bullet}{\piset x {S_1} {S_2}}}
+      { \ofdtp{\Gamma}{\piset{x}{S_1}{S_2}}{\types} & 
+        & \oftpe{\Gamma, \tptmv x {\vcond} {S_1^\vcond} }{t}{\bullet}{S_2}}
+\qquad
+\infer{\oftpe{\Gamma}{\app t {t'}}{\bullet}{\tsubst {S_2} {{t'}/ x}}}
+      {\oftpe{\Gamma}{t}{\bullet}{\piset{x}{S_1}{S_2}} &
+        \oftpe{\Gamma}{t'}{\vcond}{S_1^\vcond}}
+\end{array}
+\]
+Note that these rules only apply when the type is well-formed in
+$\Gamma$, not with the secret context, which we notate by writing
+$\bullet$ for a fresh variable constructor variable that doesn't occur
+anywhere.
+
+\[
+\begin{array}{rcll}
+\app {(\ulam{x}{t})}{t'} & \equiv & \subst{t}{t'}{x} \\
+\tptmv{t}{\bullet}{\piset{x}{S_1}{S_2}} & \equiv & {(\ulam{x}{t}{x})} &
+\end{array} \\
+\]
+
+\subsubsection{Non-dependent functions between sets}
+
+\textbf{Works for a bifunctor, but no dependency of $S_2$ on $S_1$.}
+
+\[
+\infer{\oftp{\Gamma}{\arr{S_1}{S_2}}{\types}}
+      {\oftp{\Gamma^\con}{S_1}{\types} &
+        \oftp{\Gamma}{S_2}{\types}}
+\]
+Note that the starred variables are not free in $S_1$ because we wrote
+$\Gamma^\con$ not $\dupctx{\Gamma^\con}{\vcond}$ in the premise, so $S_1$ is
+weakened in the context extension.  This is because we want to take the
+$\Pi$ of an opfibration and a fibration, not a bifibration and a
+fibration, or something?  Semantically, the context extension will mean
+the co/contravariant category of elements instead of the end.  
+
+\[
+\begin{array}{c}
+\infer{\oftpe{\Gamma}{\ulam{x}{t}}{\vcond}{\arr {S_1} {S_2}}}
+      {\oftpe{\Gamma, \tptmv x {\vcond} {S_1^\vcond} }{t}{\vcond}{S_2}}
+\qquad
+\infer{\oftpe{\Gamma}{\app t {t'}}{\vcond}{{S_2}}}
+      {\oftpe{\Gamma}{t}{\vcond}{\arr{S_1}{S_2}} &
+        \oftpe{\Gamma}{t'}{\vcond}{S_1^\vcond}}
+\end{array}
+\]
+Note that these rules only apply when the type is well-formed in
+$\Gamma$, not with the secret context, which we notate by writing
+$\bullet$ for a fresh variable constructor variable that doesn't occur
+anywhere.
+
+\[
+\begin{array}{rcll}
+\app {(\ulam{x}{t})}{t'} & \equiv & \subst{t}{t'}{x} \\
+\tptm{t}{\arr{S_1}{S_2}} & \equiv & {(\ulam{x}{t}{x})} &
+\end{array} \\
+\]
+
+\subsubsection{$\Pi$ of a category and a set (End)}
+
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\picat{(x,y)}{\C}{S}}{\types}}
+      {\wfdtp{\C} &
+        \ofdtp{\Gamma,\vtptm{x}{\con}{\C},\vtptm{y}{\co}{\C}}{S}{\types}}
+\qquad
+\infer{\oftpe{\Gamma}{\lam{z}{\C}{t}}{\vcond}{\picat {(x,y)} \C S}}
+      {\oftpe{\Gamma,\vtptm{z}{\co}{\C}}{t}{\vcond}{\tsubst{S}{z^*/x,z/y}}}
+\qquad
+\infer{\oftpe{\Gamma}{\app t {c}}{\vcond}{\tsubst S {c^*/x,c/y}}}
+      {\oftpe{\Gamma}{t}{\vcond}{\picat{(x,y)}{\C}{S}} &
+        \ofdtp{\Gamma}{c}{\C}}
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\app {(\lam{z}{\C}{t})}{c} & \equiv & \subst{t}{c}{z} \\
+\tptm{M}{\picat{(x,y)}{\C}{S}} & \equiv & {(\lam{z}{\C}{M}{z})} &
+\end{array} \\
+\]
+
+\subsection{$\Sigma$-like things}
+
+\subsubsection{Product Categories}
+
+Directed types have simple functions and products (exponentials and
+products in \Cat).
+
+
+\[
+\begin{array}{c}
+\infer{\wfdtp{\prd{\C_1}{\C_2}}}
+      {\wfdtp{\C_1} &
+        \wfdtp{\C_2}}
+\qquad
+\infer{\ofdtp{\Gamma}{\pair{c_1}{c_2}}{\prd {\C_1} {\C_2}}}
+      {\ofdtp{\Gamma}{c_1}{\C_1} &
+       \ofdtp{\Gamma}{c_2}{\C_2}}
+\\ \\
+\infer{\ofdtp{\Gamma}{\fst c}{\C_1}}
+      {\ofdtp{\Gamma}{c}{\prd{\C_1}{\C_2}}}
+\qquad
+\infer{\ofdtp{\Gamma}{\snd c}{\C_2}}
+      {\ofdtp{\Gamma}{c}{\prd{\C_1}{\C_2}}}
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\fst{\pair{c_1}{c_2}} & \deq & c_1 \\
+\snd{\pair{c_1}{c_2}} & \deq & c_1 \\
+\tptm{c}{\prd{\C_1}{\C_2}} & \deq & \pair{\fst c}{\snd c}
+\end{array}
+\]
+
+\subsubsection{Category of elements of a bifunctor ($\hat{\Sigma}$)}
+
+Directed types also have dependent types where the dependent part is a
+family of sets or types. The product is the end type, the sum is the
+category whose sections are ends.
+
+\[
+\begin{array}{c}
+\infer{\wfdtp{\sigmacat{\vcond}{x}{\C}{S}}}
+      {\wfdtp{\C} &
+        \wftp{\dupctx{\vtptm{x}{\co}{\C}}{\vcond}}{S}}
+\qquad
+\infer{\ofdtp{\Gamma}{\pair{c}{t}}{\sigmacat{\vcond} x \C S}}
+      {\ofdtp{\Gamma}{c}{\C} &
+       \oftpe{\Gamma}{t}{\vcond}{\tsubst{S}{\substdup{(c^\vcond/x)}{\vcond}{c/x}}}}
+\\ \\
+\infer{\ofdtp{\Gamma}{\fst c}{\C}}
+      {\ofdtp{\Gamma}{c}{\sigmacat{\vcond}{x}{\C}{S}}}
+\qquad
+\infer{\oftpe{\Gamma}{\snd c}{\vcond}{\tsubst{S}{\substdup{(\fst c^\vcond / x)}{\vcond}{\fst c/x}}}}
+      {\ofdtp{\Gamma}{c}{\sigmacat{\vcond}{x}{\C}{T}}}
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\fst{\pair{c}{t}} & \deq & c \\
+\snd{\pair{c}{t}} & \deq & t \\
+\tptm{c}{\sigmacl{x}{\C}{S}} & \deq & \pair{\fst c}{\snd c}
+\end{array}
+\]
+
+\subsection{$\Sigma$ of sets}
+
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\sigmaset{x}{S_1}{S_1}}{\types}}
+      {\ofdtp{\Gamma}{S_1}{\types} &
+        \ofdtp{\Gamma, \tptmv{x}{\bullet}{{S_1}}}{S_2}{\types}}
+\qquad
+\infer{\oftpe{\Gamma}{\pair{t_1}{t_2}}{\bullet}{\sigmaset x {S_1} {S_2}}}
+      {\ofdtp{\Gamma}{S_1}{\types} &
+        \ofdtp{\Gamma, \tptmv{x}{\bullet}{{S_1}}}{S_2}{\types} &
+        \oftpe{\Gamma}{t_1}{\bullet}{S_1} &
+        \oftpe{\Gamma}{t_2}{\bullet}{\subst{S_2}{t_1}x}}
+\\ \\
+\infer{\oftpe{\Gamma}{\fst t}{\bullet}{{S_1}}}
+      {\oftpe{\Gamma}{t}{\bullet}{\sigmaset{x}{S_1}{S_2}}}
+\qquad
+\infer{\oftpe{\Gamma}{\snd t}{\bullet}{\subst{S_2}{\fst t}{x}}}
+      {\oftpe{\Gamma}{t}{\bullet}{\sigmaset{x}{S_1}{S_2}}}
+\end{array}
+\]
+
+\FIXME{bullets necessary on the elim rules?}
+
+\[
+\begin{array}{rcll}
+\fst{\pair{s}{t}} & \deq & s \\
+\snd{\pair{s}{t}} & \deq & t \\
+\tptmv{t}{\bullet}{\sigmaset{x}{S_1}{S_2}} & \deq & \pair{\fst t}{\snd t}
+\end{array}
+\]
+
+\subsubsection{Non-dependent product of sets}
+
+
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\prd{S_1}{S_1}}{\types}}
+      {\ofdtp{\Gamma}{S_1}{\types} &
+        \ofdtp{\Gamma}{S_2}{\types}}
+\qquad
+\infer{\oftpe{\Gamma}{\pair{t_1}{t_2}}{\vcond}{\prd {S_1} {S_2}}}
+      { \oftpe{\Gamma}{t_1}{\vcond}{S_1} &
+        \oftpe{\Gamma}{t_2}{\vcond}{S_2}}
+\\ \\
+\infer{\oftpe{\Gamma}{\fst t}{\vcond}{{S_1}}}
+      {\oftpe{\Gamma}{t}{\vcond}{\prd{S_1}{S_2}}}
+\qquad
+\infer{\oftpe{\Gamma}{\snd t}{\vcond}{{S_2}}}
+      {\oftpe{\Gamma}{t}{\vcond}{\prd{S_1}{S_2}}}
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\fst{\pair{s}{t}} & \deq & s \\
+\snd{\pair{s}{t}} & \deq & t \\
+\tptm{t}{\prd{S_1}{S_2}} & \deq & \pair{\fst t}{\snd t}
+\end{array}
+\]
+
+\subsection{Bool}
+
+\[
+\begin{array}{c}
+\infer{\ofdtp{\Gamma}{\bool}{\types}}
+      {}
+\qquad
+\infer{\oftpe{\Gamma}{\dsd{true}}{\bullet}{\bool}}{}
+\qquad
+\infer{\oftpe{\Gamma}{\dsd{false}}{\bullet}{\bool}}{}
+\\ \\
+\infer{\oftpe{\Gamma}{\ite{\tptm{x}{\dsd{2}}.S}{t_1}{t_2}{t}}{\vcond}{\tsubst{S}{\substdup{(t^\vcond/x)}{\vcond}{t/x}}}}
+      {\ofdtp{\dupctx{\Gamma,\tptmv{x}{\bullet}{\dsd{2}}}{\vcond}}{S}{\types} &
+        \oftpe{\Gamma}{t}{\bullet}{\dsd{2}} &
+        \oftpe{\Gamma}{t_1}{\vcond}{\tsubst{S}{\substdup{(\dsd{true}^\vcond/x)}{\vcond}{\dsd{true}/x}}} &
+        \oftpe{\Gamma}{t_2}{\vcond}{\tsubst{S}{\substdup{(\dsd{false}^\vcond/x)}{\vcond}{\dsd{false}/x}}}
+      }
+\\ \\
+\infer{\oftp{\Gamma}{\ite{}{t_1}{t_2}{t}}{\C}}
+      { \oftpe{\Gamma}{t}{\bullet}{\dsd{2}} &
+        \ofdtp{\Gamma}{t_1}{\C} &
+        \ofdtp{\Gamma}{t_2}{\C}
+      }
+\\ \\
+\begin{array}{rcll}
+\ite{}{M_1}{M_2}{\dsd{true}} & \equiv & M_1 \\
+\ite{}{M_1}{M_2}{\dsd{false}} & \equiv & M_2 \\
+\end{array} \\
+\end{array}
+\]
+
+\subsection{Interval}
+
+\[
+\begin{array}{c}
+\infer{\wftp{\Gamma}{\I}}
+      {}
+\qquad
+\infer{\oftp{\Gamma}{\Iz}{\I}}{}
+\qquad
+\infer{\oftp{\Gamma}{\Io}{\I}}{}
+%% \infer{\oftp{\Gamma}{\ite{\vstptm{x}{v}{\dsd{2}}.A}{N_1}{N_2}{t}}{\subst{A}{t}{x}}}
+%%       {\wftp{\Gamma,\vstptm{x}{v}{\dsd{2}}}{A} &
+%%         \oftp{\Gamma^v}{M}{\dsd{2}} &
+%%         \oftp{\Gamma}{N_1}{\subst{A}{\dsd{true}}{x}} &
+%%         \oftp{\Gamma}{N_2}{\subst{A}{\dsd{false}}{x}}
+%%       }
+%% \\ \\
+%% \begin{array}{rcll}
+%% \ite{}{M_1}{M_2}{\dsd{true}} & \equiv & M_1 \\
+%% \ite{}{M_1}{M_2}{\dsd{false}} & \equiv & M_2 \\
+%%\end{array} 
+\end{array}
+\]
+
+\FIXME{elim}
+
+\subsection{Equality of Elements of Types}
+
+%% This could be done like ITT instead.  
+
+%% \[
+%% \begin{array}{c}
+%% \infer{\wftpsf{\Delta}{\Gamma}{\Eq{S}{M}{N}}}
+%%       {\wftpsf{\Delta}{\Gamma}{S} &
+%%         \oftpsf{\Delta}{\Gamma}{M}{S} & 
+%%         \oftpsf{\Delta}{\Gamma}{N}{S} 
+%%       }
+%% \qquad
+%% \infer{\oftpsf{\Delta}{\Gamma}{\refl{M}}{\Eq{S}{M}{M}}}
+%%       {\oftpsf{\Delta}{\Gamma}{M}{S}}
+%% \\ \\
+%% \infer{M \deq N}
+%%       {\oftpsf{\Delta}{\Gamma}{P}{\Eq{S}{M}{N}}}
+%% \qquad
+%% \infer{P \deq \refl{M}}
+%%       {\oftpsf{\Delta}{\Gamma}{P}{\Eq{S}{M}{N}}}
+%% \end{array}
+%% \]
+
+\section{Examples}
+
+The contravariant sum is derivable:
+\begin{equation}
+	\infer{
+		\wftp{ \Gamma }{ \paren{\sigmatp{x}{S}{(T^\dagger)}}^\dagger }
+	}{
+		\infer{
+			\wftp{ \Gamma^- }{ \sigmatp{x}{S}{(T^\dagger)} }
+		}{
+			\ofdtp{ \Gamma^- }{ S }{ \types }
+			\qquad \qquad
+			\infer{
+				\wftp{\Gamma^-, \tptmv{x}{\coc}{\Elp S}}{T^\dagger}
+			}{
+				\wftp{\Gamma^+, \tptmv{x}{\conc}{\Elp S}}{T}
+			}
+		}	
+	}
+\end{equation}
+\begin{equation}
+	\infer{
+		\oftp{\Gamma}{\dagtm{(\undag s, \dagtm t)}}{ \paren{\sigmatp{x}{S}{(T^\dagger)}}^\dagger }
+	}{
+		\oftp{\Gamma}{s}{\Elp S^\dagger}
+		\qquad \qquad
+		\oftp{\Gamma}{t}{\subst T {\undag s} x}
+	}
+\end{equation}
+We have projections $\dagtm{\fst{\undag -}}$ and $\undag{\snd{\undag -}}$.
+
+\paragraph{Composition}
+
+%% Suppose $\wftpcc{\Delta}{\C}$, then we have 
+
+%% \[
+%% \begin{array}{rcl}
+%% comp & : & \piinv{x}{\obtp{\C}}{\piinv{y}{\obtp{\C}}{\piinv{z}{\obtp{\C}}{}}}\\
+%%      &   & {\piinv{p}{\Hom{\C}{\unob{x}}{\unob{y}}}{\piinv{q}{\Hom{\C}{\unob{y}}{\unob{z}}}{\Hom{\C}{\unob{x}}{\unob{z}}}}}
+%% \end{array}
+%% \]
+
+
+\section{Properties}
+
+\section{Examples}
+
+%% \subsection{\op{-} is an involution}
+
+%% Suppose \wftpc{\Delta}{\Gamma^w}{A}.  
+
+%% \[
+%% \infer{\voftp{\Gamma,\vtptm{x}{\co}{w}{A}}{\optm{\optm{x}}}{w}{\optp{(\optp{A})}}}
+%%       {\infer{\voftp{\Gamma^\con,\vtptm{x}{\con}{\flip{w}}{A}}{\optm{x}}{\flip{w}}{{\optp{A}}}}
+%%              {{\voftp{\Gamma,\vtptm{x}{\co}{{w}}{A}}{x}{{w}}{{{A}}}}}}
+%% \]
+
+%% \[
+%% \infer{\voftp{\Gamma,\vtptm{x}{\co}{w}{\optp{(\optp{A})}}}{\letop{}{x}{y.{\letop{}{y}{z.z}}}}{w}{A}}
+%%       {{\vvoftp{\Gamma,\vtptm{x}{\co}{w}{\optp{(\optp{A})}}}{x}{\co}{w}{\optp{(\optp{A})}}} &
+%%         \infer{\voftp{\Gamma,\vtptm{x}{\co}{w}{\optp{(\optp{A})}},\vtptm{y}{\con}{w}{\op{A}}}{\letop{}{y}{z.z}}{w}{A}}
+%%               {\begin{array}{l}
+%%                   \vvoftp{\Gamma,\vtptm{x}{\co}{w}{\optp{(\optp{A})}},\vtptm{y}{\con}{w}{\op{A}}}{y}{\con}{w}{\op{A}} \\
+%%                   \vvoftp{\Gamma,\vtptm{x}{\co}{w}{\optp{(\optp{A})}},\vtptm{y}{\con}{w}{\op{A}},\vtptm{z}{\co}{w}{A}}{z}{\co}{w}{A}
+%%                 \end{array}}
+%%       }
+%% \]
+
+%% \[
+%% {\Gamma,\vtptm{x}{\co}{w}{A}} \vdash {\letop{}{{\optm{\optm{x}}}}{y.{\letop{}{y}{z.z}}}} \deq x
+%% \]
+
+%% \FIXME{need some sort of identity type to do the other direction}
+
+%% %% \[
+%% %% {\Gamma,\vtptm{x}{\co}{w}{\op{(\op{A})}} \vdash {\letop{}{x}{y.{\letop{}{y}{z.z}}}} \deq x
+%% %% \]
+
+%% \subsection{Paths in \op{-}}
+
+%% Suppose \wftpc{\Delta}{\Gamma^w}{A} and \voftp{\Gamma,\vdimtm{x}{\co}}{a}{w}{A}.
+
+%% \[
+%% \infer{\voftp{\Gamma,\vdimtm{x}{\co}}{\optm{?}}{w}{\op{A}}}
+%%       {\voftp{{\Gamma}^\con,\vdimtm{x}{\con}}{?}{\flip{w}}{A}}
+%% \]
+
+
+
+%% \subsection{Core and Op}
+
+%% \begin{enumerate}
+%% \item $A$ and $\op{(\op{A})}$. Suppose \wftp{\Gamma^w}{A}.  
+
+%% If \voftp{\Gamma}{M}{w}{A}, then we have
+%% \[
+%% \infer{\voftp{\Gamma}{\optm{\optm{M}}}{w}{\op{(\op{A})}}}
+%%       {\infer{\voftp{\Gamma^\con}{\optm{M}}{\flip{w}}{\op{A}}}
+%%              {\voftp{{\Gamma^\con}^\con}{M}{\flip{\flip{w}}}{A}}}
+%% \]
+%% using ${{\Gamma^\con}^\con} = \Gamma$ 
+%% and ${\flip{\flip{w}}} = w$.  
+
+%% If \voftp{\Gamma}{M}{w}{\op{(\op{A})}} then we have 
+%% \[
+%% \infer{\voftp{\Gamma}{\letop{}{\co}{x.M}{\letop{}{\con}{x}{y.y}}}{w}{A}}
+%%       {{\voftp{\Gamma}{M}{w}{\op{(\op{A})}}} &
+%%         \infer{\voftp{\ectx{\Gamma}{x}{\con}{w}{\op{A}}}{\letop{}{\con}{x}{y.y}}{w}{A}}
+%%               {\infer{\vvoftp{\ectx{\Gamma}{x}{\co}{w}{\op{A}}}{x}{\con}{w}{\op{A}}}
+%%                      {\infer{\voftp{\ectx{\Gamma^\con}{x}{\co}{\flip{w}}{\op{A}}}{x}{\flip{w}}{\op{A}}}{}} &
+%%                \infer{\voftp{\ectx{\ectx{\Gamma}{x}{\con}{w}{\op{A}}}{y}{\co}{w}{A}}{y}{w}{A}}
+%%                      {}
+%%               }}
+%% \]
+
+%% \item \Core{(\Core{A})} and \Core{A}.  Suppose \wftp{\Gamma^w}{A}.  
+
+%% If \voftp{\Gamma}{M}{w}{\Core{A}}, then 
+%% \[
+%% \infer{\voftp{\Gamma}{?}{w}{\Core{A}}}
+%%       {\voftp{\Gamma}{M}{w}{\Core{A}} &
+%%         \voftp{\ectx{\Gamma}{x}{\inv}{w}{A}}{?}{w}{\Core{(\Core{A})}}
+%%       }
+%% \]
+
+%% \end{enumerate}
+
+%% \paragraph{Symmetry}
+
+%% Suppose \wftp{\Gamma}{A}.
+%% The following context is well-formed (for any $d$):
+%% \[
+%% \Gamma_0 := \coctx {\coctx {\coctx \Gamma x A \backd} y A \ford} p {\Hom{\wtp{A}{\ford}}{x}{y}} d
+%% \]
+%% However, the judgement 
+%% \[
+%% \wftp{\Gamma_0}{\Hom{\wtp{A}{\ford}} y x}
+%% \]
+%% is not derivable, because to show this, we would need that
+%% $\wftp{\Gamma_0}{A}$ (which is true, by weakening) and 
+%% \oftp{\Gamma_0}{y}{A}{\backd} 
+%% and 
+%% \oftp{\Gamma_0}{x}{A}{\ford}.  These are not derivable, 
+%% it would require, e.g. $\wtptm{y}{d}{A} \in \Gamma_0$ for $d \le \backd$,
+%% but we have $\wtptm{y}{\ford}{A} \in \Gamma_0$, and $\ford \not \le
+%% \backd$.  
+
+%% Dually, in 
+%% \[
+%% \Gamma_1 := \coctx {\coctx {\coctx \Gamma x A \ford} y A \backd} p {\Hom{\wtp{A}{\backd}}{x}{y}} d
+%% \]
+%% it is not the case that $\wftp{\Gamma_1}{\Hom{\wtp{A}{\backd}}{y}{x}}$.  
+
+%% However, in 
+%% \[
+%% \Gamma_3 := \coctx {\coctx {\coctx \Gamma x A \symd} y A \symd} p {\Hom{\wtp{A}{\symd}}{x}{y}} d
+%% \]
+%% we have \wftp{\Gamma_3}{\Hom{\wtp{A}{\symd}}{y}{x}} because
+%% \wftp{\Gamma_3}{A} (by weakening) 
+%% and \woftp{\Gamma_3}{y}{A}{\invd{\symd}}
+%% and \woftp{\Gamma_3}{x}{A}{\symd}.  Thus, we can apply $\dsd{J}$, and to
+%% derive
+%% \[
+%% \woftp{\Gamma_3}{\jay{\Gamma_3.{\Hom{\wtp{A}{\symd}}{y}{x}}}{?}{p}}{\Hom{\wtp{A}{\symd}}{y}{x}}{d}
+%% \]
+%% it suffices to derive
+%% \[
+%% \oftp{\coctx \Gamma x A \symd}{\refl{x}}{\Hom{\wtp{A}{\symd}}{x}{x}}
+%% \]
+%% which is true.  
+
+%% Thus, symmetry is not statable when $A$ is considered with direction
+%% \ford\/ or \backd, but true when considered at direction \symd.  
+
+%% \paragraph{Groupoid Structure}
+
+%% Assume \wftp{\Gamma}{A}.
+
+%% The following context is well-formed (for any $d_1,d_2$):
+
+%% \[
+%% \Gamma_0 := \coctx {\coctx {\coctx {\coctx {\coctx \Gamma x A \backd} y A \symd} z A \ford} p {\Hom{\wtp{A}{\ford}}{x}{y}} {d_1}} q {\Hom{\wtp{A}{\ford}}{y}{z}} {d_2}
+%% \]
+%% Note that $y$ must be symmetric, because it occurs on both sides of an equation.  
+
+%% \wftp{\Gamma_0}{\Hom{\wtp{A}{\ford}}{x}{z}} because 
+%% \woftp{\Gamma_0}{x}{A}{\backd} and 
+%% \woftp{\Gamma_0}{z}{A}{\ford}.
+
+%% \paragraph{Tethering}
+
+%% The elimination rule for \dsd{bool} is ``untethered'': the direction of
+%% the boolean being analyzed is unrelated to the direction of the 
+%% result.  This allows you to define, for example,
+
+%% \[
+%% \woftp{\coctx \cdot x {\dsd{2}} \ford}{\ite{\_.\dsd{2}}{\dsd{true}}{\dsd{false}}{x}}{\dsd{2}}{\backd}
+%% \]
+%% which casts a forward boolean to a backwards one.  The opposite is also
+%% definable, and (conjecture) these should give an equivalence between
+%% \dsd{2} and \op{\dsd{2}} (use bool-elim to prove that they compose to
+%% the identity).  
+
+%% Similarly, the elimination rule for $\Sigma$ is untethered; for example,
+%% for \wftp{\Gamma}{A},
+%% \[
+%% \woftp{\coctx \Gamma p {\wsigma x \ford A B}
+%%   \ford}{\splitsig{\_.\wsigma{x}{\backd}{A}{B}}{x,y.(\optm x, \optm y)}{p}}{\wsigma x \backd
+%%   {\op A} {\op B}}{\backd}
+%% \]
+%% So we get a (covariant) map from $\wsigma x \ford A B$ to $\op{(\wsigma
+%%   x \backd {\op A} {\op B})}$, which (conjecture) should be an
+%% equivalence.    
+
+%% \paragraph{Transport}
+
+%% \paragraph{Ap}
+
+%% \paragraph{Properties of Op}
+
+%% \paragraph{Swapping directions}
+
+%% \subsection{Exact Equalities}
+
+%% Add new world $\dsd{exact} \le \symd$.  Variations:
+%% \begin{itemize}
+%% \item no extra axioms: usual computational interp with $J$ just
+%%   computing on \refls\/ should work if you only ever use exact equalities.
+
+%% \item extensional: add equality reflection for 
+%% \Hom{A^\dsd{exact}}{M}{N}.
+
+%% \item OTT-style: add funext and
+%% propositional univalence?  
+%% \end{itemize}
+%% In all of these, hopefully \Hom{A^\dsd{exact}}{M}{N} and any transports
+%% on it are erasable at run-time.  
+
+%% \subsection{Open Issues}
+
+%% \begin{enumerate}
+%% \item Check that the typing makes sense for the defeq rules; should
+%%   both terms have the same direction $d$?
+
+%% \item \wftp{\op \Gamma}{A} for $\Pi$ and \wftp{\Gamma}{A} for \dsd{Hom}
+%%   are necessary, right?
+
+%% \item Do you need the labels on $\Pi$ and $\Sigma$?  Or can types be
+%%   more modal, with the direction being passed in from the outside?  
+
+%%   Problem: need to write \wtptm{x}{d}{A} and \wtptm{x}{\invd d}{A} for
+%%   the same $A$, so you don't want $d$ to need to be something specific.
+
+%% \item Would coprodcuts/lists be for a labelled type, or would you flow
+%%   the direction in from outside?
+
+%% \item What do the directions on
+%% \wtptm{p}{d}{\Hom{\wtp{A}{\ford}}{M}{N}} mean?
+%% E.g. the ? in $\Ielimfor{}{}{}{}{}$.
+
+%% \item Should $d_1$ and $d_2$ in J be the same?
+
+%% \end{enumerate}
+
+\section{Related Work}
+
+\subsection{Warren's Directed Type Theory}
+
+\begin{verbatim}
+x',x,y,y',u: \Hom{x'}{x}, v:\Hom{x}{y}, w: \Hom{y}{y'}, Delta |- E
+x,y,u,Delta |- E[x/x',y/y',refl/u,refl/v]
+------------------------------------------
+x',x,y,y',u: \Hom{x'}{x}, v:\Hom{x}{y}, w: \Hom{y}{y'}, Delta |- J(...) : E
+
+If z\in{x',x,y,y'} occurs in Delta, then it occurs in E
+x and y occur in E[x/x',y/y',refl/u,refl/v]
+
+E.g. 
+
+x',x,y,y',u,v,w |- Hom(y,x) -- y and x don't get contracted
+x',x,y,y',u,v,w |- Hom(x,x') -- doesn't mention y
+
+x',x,y,y',u,v,w |- Hom(x,x') * Hom(x,y) -- need to extend the side conditions for pairs...
+\end{verbatim}
+
+
+%% \setlength{\bibsep}{-1pt} %% dirty trick: make this negative
+{ %% \small
+%% \linespread{0.70}
+\bibliographystyle{abbrvnat}
+\bibliography{drl-common/cs}
+}
+
+
+\end{document}

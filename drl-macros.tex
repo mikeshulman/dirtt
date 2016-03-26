@@ -10,9 +10,21 @@
 
 \newcommand{\catvar}[1]{\mathbf{#1}}
 
+\newcommand{\substdup}[3]{\ensuremath{(#1_{#2};#3)}}
+
+\newcommand{\vcond}[0]{\ensuremath{{\mathord{*}}}}
+\newcommand{\vconabs}[2]{\ensuremath{#1.#2}}
+
+\newcommand{\togglev}[2]{\ensuremath{#1^{#2}}}
+
+\newcommand{\dupctx}[2]{\brac{#1}^{#2}}
+
+\newcommand{\picat}[3]{\ensuremath{\textnormal{\dsd{End}}_{\tptmns{#1}{#2}} \,\dcd{#3}}}
+\newcommand{\sigmacat}[4]{\ensuremath{\textnormal{$\Sigma$}^{#1}\,\tptmns{#2}{#3}.\,\dcd{#4}}}
+
 \newcommand{\piset}[3]{\ensuremath{\textnormal{$\Pi$}^{\dsd{s}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
 \newcommand{\sigmaset}[3]{\ensuremath{\textnormal{$\Sigma$}^{\dsd{s}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
-\newcommand{\pitp}[3]{\ensuremath{\textnormal{$\Pi$}^{\dsd{t}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
+%% \newcommand{\pitp}[4]{\ensuremath{\textnormal{$\Pi$}^{#3}\,\tptmns{#1}{#2}.\,\dcd{#4}}}
 \newcommand{\sigmatp}[3]{\ensuremath{\textnormal{$\Sigma$}^{\dsd{t}}\,\tptmns{#1}{#2}.\,\dcd{#3}}}
 
 \newcommand{\homset}[3]{\ensuremath{\dsd{hom}_{#1}(#2,#3)}}
@@ -39,6 +51,7 @@
 
 \newcommand{\oftp}[3]{\ensuremath{{#1} \, \vdash \dcd{#2} \, \dcd{:} \, #3}}
 \newcommand{\ofdtp}[3]{\ensuremath{{#1} \, \vdash \dcd{#2} \, \dcd{:} \, #3}}
+\newcommand{\oftpe}[4]{\ensuremath{{#1} \, \vdash \dcd{#2} \, \dcd{:}^{#3} \, #4}}
 
 \newcommand\admiss[0]{\textbf{admiss}}
 \newcommand\deriv[0]{\textbf{deriv}}
@@ -54,7 +67,7 @@
 \newcommand\wfsub[3]{\ensuremath{#1 \vdash #2 : #3}}
 
 \newcommand\tsubst[2]{\ensuremath{#1 [ #2 ]}}
-\newcommand\idsubst[0]{\ensuremath{\dsd{id}}}
+\newcommand\idsubst[0]{\ensuremath{\dsd{idsubst}}}
 
 \newcommand{\ep}{\ensuremath{^{\text{\tiny +}}}}
 \newcommand{\en}{\ensuremath{^{\text{\small -}}}}
