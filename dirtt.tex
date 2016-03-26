@@ -20,6 +20,7 @@
 \def\mor#1{\hom_{#1}}
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
+\def\iso{\cong}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
 \title{A directed type theory for formal category theory}
@@ -241,14 +242,49 @@ Left rule:
 Right rule:
 \begin{mathpar}
   \inferrule{
-    \Delta_a \psplit \flip{\Psi_a},\Psi_a \\
-    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\\\
-    \Psi_a \types a:A \\ \Psi_{\Gamma_M},\flip{\Psi_a},\Psi'_a \types \Gamma_M\ctx \\
-    \Psi_M,\hat x:\p A, \check x:\m A \types M\type \\\\
-    \Delta_M,\Delta_a,\Delta'_a \cb \Gamma_M \types M[(a[\Psi'_a/\Psi_a])/\hat x,\flip{a}/\check x]
-    }{
-    \Delta_M,\Delta_a \cb \Gamma_M \types \coend^{x:A} M
+    \Delta \iso \Delta' \\
+    \Delta \splits (\flip{\Psi_1},\Psi_2),\Psi_a \\
+    \Delta' \psplit \flip{\Psi_a'},(\Psi_1',\flip{\Psi_2'}) \\
+    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
+    \Psi_a \types a:A \\ \Psi_{\Gamma_M},\Psi_1,\Psi_1' \types \Gamma\ctx \\
+    \Psi_M,\Psi_2,\Psi'_2,\hat x:\p A,\check x:\m A \types M\type \\\\
+    \Delta_M,\Delta,\Delta' \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
+  }{
+    \Delta_M,\Delta \cb \Gamma[\Psi_1/\Psi'_1] \types \coend^{x:A} M[\Psi_2/\Psi'_2]
   }\and
+\end{mathpar}
+Co-Yoneda lemma:
+\begin{mathpar}
+  \inferrule{
+    \inferrule*{
+      \inferrule*{
+        \vdots
+      }{
+        \Delta_M,\Delta,\Delta' \cb M(a) \types M(a)
+      } \\
+      \inferrule*{
+        \vdots
+      }{
+        \Delta_M,\Delta,\Delta' \cb \cdot \types \hom_A(a',a')
+      }
+    }{
+      \Delta_M,\Delta,\Delta' \cb M(a) \types M(a) \otimes \hom_A(a',a')
+    }
+  }{
+    \Delta_M,\Delta \cb M(a) \types \coend^{x:A} M(\hat x)\otimes \hom_A(\check x,a)
+  }\and
+\end{mathpar}
+and conversely
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \Delta_M,\Delta \cb M(a) \types M(a)
+    }{
+      \Delta_M,\Delta,x:A \cb M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+    }
+  }{
+    \Delta_M,\Delta \cb \coend^{x:A} M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+  }
 \end{mathpar}
 \subsubsection{Older stuff}
 %\begin{mathpar}
