@@ -186,15 +186,12 @@ Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~
 \label{sec:tensor-types}
 
 The formation rule for the tensor type:
-
 \begin{mathpar}
   \inferrule{\Psi_M, \Psi \types M\type \\
     \Psi_N, \flip{\Psi} \types N\type}
   {\Psi_M, \Psi_N \types M \otimes_\Psi N\type}\and
 \end{mathpar}
-
 The left rule
-
 \begin{mathpar}
   \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
     \Delta' \psplit \flip{\Psi},\Psi \\\\
@@ -203,9 +200,7 @@ The left rule
     \Delta, \Delta' \cb \Gamma,M,N \types C}
   {\Delta \cb \Gamma, M\otimes_\Psi N \types C}\and
 \end{mathpar}
-
 and right rule
-
 \begin{mathpar}
   \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
     \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
@@ -216,6 +211,40 @@ and right rule
     \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
     \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
   {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
+\end{mathpar}
+
+\subsubsection{Non-binding tensor}
+With coends and non-binding tensor, the binding tensor rules become admissible.
+
+The non-binding tensor formation rule is
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+    }{
+    \Psi_M,\Psi_N \types M\otimes N\type
+  }
+\end{mathpar}
+with left rule
+\begin{mathpar}
+  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
+    \Psi_\Gamma \types \Gamma\ctx \\\\
+    \Psi_M \types M\type \\ \Psi_N \types N\type \\ \Psi_C \types C\type \\\\
+    \Delta \cb \Gamma,M,N \types C}
+  {\Delta \cb \Gamma, M\otimes N \types C}\and
+\end{mathpar}
+and right rule
+\begin{mathpar}
+  \inferrule{
+    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
+    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
+    \Psi_{\Gamma_M} \types \Gamma_M\ctx \\
+    \Psi_{\Gamma_N} \types \Gamma_N\ctx \\
+    \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
+    \Delta_M \cb \Gamma_M \types M \\
+    \Delta_N \cb \Gamma_N \types N
+  }{
+    \Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes N
+  }\and
 \end{mathpar}
 
 \subsection{Co-end type}
@@ -331,7 +360,7 @@ For instance, we can prove:
 
 I have not been able to make sense of a rule with built-in substitution.
 
-\subsection{End type?}
+\subsection{End type}
 Formation rule:
 \begin{mathpar}
   \inferrule{
@@ -387,6 +416,37 @@ which should be in the end as we have only passed $z$ to ends. Then it becomes
 
 \subsection{Hom types}
 \label{sec:hom-types}
+
+The type former for the (non-binding) hom type is
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+  }{
+    \flip{\Psi_M},\Psi_N \types M\multimap N\type
+  }
+\end{mathpar}
+with right rule
+\begin{mathpar}
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\Psi_N \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
+    \Delta \cb \Gamma, M \types N
+  }{
+    \Delta \cb \Gamma \types M\multimap N
+  }
+\end{mathpar}
+and left rule
+\begin{mathpar}
+  \inferrule{
+    \Delta_1 \splits \flip{\Psi_{\Gamma_1}},\Psi_M \\
+    \Delta_2 \splits \flip{\Psi_{\Gamma_2}},\flip{\Psi_N},\Psi_C \\\\
+    \Psi_{\Gamma_1} \types \Gamma_1\ctx \\ \Psi_{\Gamma_2} \types \Gamma_2\ctx \\\\
+    \Psi_M \types M\type \\ \Psi_N \types N\type\\ \Psi_C \types C\type \\\\
+    \Delta_1 \cb \Gamma_1 \types M \\ \Delta_2 \cb \Gamma_2,N \types C
+  }{
+    \Delta_1,\Delta_2 \cb \Gamma_1,\Gamma_2,M\multimap N \types C
+  }
+\end{mathpar}
 
 \subsection{The type classifier}
 \label{sec:type-classifier}
