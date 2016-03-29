@@ -18,6 +18,7 @@
 \let\splits\rightrightarrows
 \def\flip#1{#1^*} % reverse the variances of all variables
 \def\mor#1{\hom_{#1}}
+\def\id{\mathrm{id}}
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
 \def\iso{\cong}
@@ -469,4 +470,57 @@ and left rule
 
 
 
+\section{Terms}
+(Patrick: I would like to start working out forms of all the rules with a term level equational theory.
+I will just collect them here, unless somebody would rather they go somewhere else.
+Also, I don't really know what I'm doing---I just wanted to start experimenting.)
+
+Morphism types:
+\begin{mathpar}
+  \inferrule{ }{x:A \cb \ec \types \id(x):\mor A(\check x,\hat x)}\and
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \Delta,x:A \cb \Gamma[\hat x/\hat y] \types m:M[\hat x/\hat y]
+  }{
+    \Delta,x:A,y:A\cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.y.M, x.m, x, y, f):M
+  }\and
+\end{mathpar}
+with computation rule $J(x.y.M, x.m, x, x, \id(x))=m$
+
+Tensor types:
+\begin{mathpar}
+  \inferrule{
+    \Delta_M \cb \Gamma_M \types m:M \\
+    \Delta_N \cb \Gamma_N \types n:N
+  }{
+    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types m\otimes n : M\otimes N
+  }\and
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \Delta \cb \Gamma,m:M,n:N \types c:C
+  }{
+    \Delta \cb \Gamma,t:M\otimes N \types \text{``\texttt{let $m\otimes n$ = $t$ in $c$}''} : C
+  }\and
+\end{mathpar}
+with $\text{``\texttt{let $m\otimes n$ = $m\otimes n$ in $c$}''}=c$ and $\text{``\texttt{let $m\otimes n$ = $t$ in $m\otimes n$}''}=t$.
+
+Coend types:
+\begin{mathpar}
+  \inferrule{
+    \Delta,x:A,x':A \cb \Gamma \types m : M[\check x'/\check x]
+  }{
+    \Delta,y:A \cb \Gamma[y/x'] \types \langle y,m[y/x,y/x']\rangle : \coend^{x:A} M[y/x']
+  }\and
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \Psi_C \types C \type \\
+    \Delta, x:A \cb \Gamma, m:M \types c : C
+    }{
+    \Delta \cb \Gamma, t:\coend^{x:A} M \types \text{``\texttt{let $\langle x,m\rangle$ = $t$ in c}''} : C
+  }\and
+\end{mathpar}
+with $\text{``\texttt{let $\langle x,m\rangle$ = $\langle x,m\rangle$ in $c$}''}=c$ and $\text{``\texttt{let $\langle x,m\rangle$ = $t$ in $\langle x,m\rangle$}''}=t$.
 \end{document}
