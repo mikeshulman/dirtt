@@ -611,6 +611,14 @@ but this latter cut involves nontrivial category-variable manipulation because i
 In particular, the category-variables $x,y$ appearing in one of the premises disappear in the conclusion and I don't see how to represent that disappearance in terms of ``substituting'' something for them.
 But possibly I'm just being dense.
 
+Part of the solution is probably recognizing that, as Patrick said, category-variables do \emph{not} generally occur linearly in type-terms.
+In fact, the splitting of $x:A$ into $\hat x:\p A$ and $\check x:\m A$ probably \emph{doesn't} happen in the terms, only in the types.
+So it might make sense to write something like:
+\begin{mathpar}
+  \left(\clet w,m := \left({\mix x,y with z in n}\right) in c\right) \jdeq c\Big[n[z/x,z/y]\Big/m\Big]
+\end{mathpar}
+But I'm still stuck on the co-Yoneda lemma, below.
+
 Proof of co-Yoneda lemma, starting with one direction:
 \begin{mathpar}
   \inferrule{
@@ -649,6 +657,14 @@ Now the other direction:
     y:A \cb n:N(\check y) \types \left({\mix x,x' with y in \tpair{n}{\id(x')}}\right) : \coend^{w:A}N(\hat w)\otimes\hom_A(\check w,\hat y)
   }
 \end{mathpar}
-It remains to check that they are inverse\dots
+It remains to check that they are inverse.
+Given $n':N(\check x)$, we have
+\begin{align*}
+  &\left(\clet x,t := \left({\mix x,x' with y in \tpair{n'}{\id(x')}}\right) in (\tlet n,f := t in \hat J(n,y,f))\right)\\
+  &\jdeq (\tlet n,f := \tpair{n'}{\id(y)} in \hat J(n,y,f))\\
+  &\jdeq \hat J(n',y,\id(y))\\
+  &\jdeq 
+\end{align*}
+This looks good superficially, but what does it actually mean?  What is $\tpair{n'}{\id(y)}$?
 
 \end{document}
