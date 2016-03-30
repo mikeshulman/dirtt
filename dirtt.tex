@@ -1,5 +1,5 @@
 \documentclass{amsart}
-\usepackage{amssymb,amsmath,latexsym,stmaryrd}
+\usepackage{amssymb,amsmath,latexsym,stmaryrd,mathtools}
 \usepackage{cleveref}
 \usepackage{mathpartir}
 \let\types\vdash % turnstile
@@ -22,6 +22,11 @@
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
 \def\iso{\cong}
+\def\tpair#1#2{#1\otimes #2}
+\def\cpair#1#2{\langle #1,#2\rangle}
+\def\tlet#1,#2:=#3in{\mathsf{let}\; \tpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\clet#1,#2:=#3in{\mathsf{let}\; \cpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\mix#1,#2 with #3 in{\mathsf{mix} {\scriptsize \begin{array}{c} \check{#1} \coloneqq \check{#3} \\ \hat{#2} \coloneqq \hat{#3} \end{array}  }\mathsf{in}\;}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
 \title{A directed type theory for formal category theory}
@@ -515,60 +520,98 @@ and left rule
 
 
 \section{Terms}
-(Patrick: I would like to start working out forms of all the rules with a term level equational theory.
-I will just collect them here, unless somebody would rather they go somewhere else.
-Also, I don't really know what I'm doing---I just wanted to start experimenting.)
+
+For now, the rules for terms are written without substitutions incorporated.
+We just take care that for variables mentioned explicitly in the contexts of the conclusion, it would make sense to substitute any reasonable term for them wherever they occur in the term being defined.
 
 Morphism types:
 \begin{mathpar}
   \inferrule{ }{x:A \cb \ec \types \id(x):\mor A(\check x,\hat x)}\and
-\end{mathpar}
-\begin{mathpar}
   \inferrule{
     \Delta,x:A \cb \Gamma[\hat x/\hat y] \types m:M[\hat x/\hat y]
   }{
-    \Delta,x:A,y:A\cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.y.M, x.m, x, y, f):M
-  }\and
+    \Delta,x:A,y:A\cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.m, x, y, f):M
+  }\textsc{(2-sided)}\and
+  \inferrule{\Delta\cb \Gamma[a/\hat x] \types m:M[a/\hat x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(a, \check x) \types \hat J(m,x,f) :M}\textsc{(covariant)}\and
+  \inferrule{\Delta\cb \Gamma[b/\check x] \types m:M[b/\check x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(\hat x, b) \types \check J(m,x,f):M}\textsc{(contravariant)}\\
+  J(x.y.M, x.m, x, x, \id(x))\jdeq m\and
+  \hat J(m,x,\id(x)) \jdeq m\and
+  \check J(m,x,\id(x)) \jdeq m
 \end{mathpar}
-with computation rule $J(x.y.M, x.m, x, x, \id(x))=m$
-
 Tensor types:
 \begin{mathpar}
   \inferrule{
     \Delta_M \cb \Gamma_M \types t_m:M \\
     \Delta_N \cb \Gamma_N \types t_n:N
   }{
-    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types t_m\otimes t_n : M\otimes N
+    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types \tpair{t_m}{t_n} : M\otimes N
   }\and
-\end{mathpar}
-\begin{mathpar}
   \inferrule{
     \Delta \cb \Gamma,m:M,n:N \types c:C
   }{
-    \Delta \cb \Gamma,t:M\otimes N \types \text{``\texttt{let $m\otimes n$ = $t$ in $c$}''} : C
+    \Delta \cb \Gamma,t:M\otimes N \types (\tlet m,n := t in c) : C
   }\and
+  (\tlet m,n := \tpair{t_m}{t_n} in c) \jdeq c[t_m/m,t_n/n]\and
+  (\tlet m,n := t in c[\tpair{m}{n}/z])\jdeq c[t/z]
 \end{mathpar}
-with $\text{``\texttt{let $m\otimes n$ = $t_m\otimes t_n$ in $c$}''}=c[t_m/m,t_n/n]$ and $\text{``\texttt{let $m\otimes n$ = $t$ in $c[m\otimes n/z]$}''}=c[t/z]$.
-
 Coend types:
 \begin{mathpar}
+  % \inferrule{
+  %   \Delta,x:A,x':A \cb \Gamma \types t_m : M[\check x'/\check x]
+  % }{
+  %   \Delta,y:A \cb \Gamma[y/x'] \types \cpair{y}{t_m[y/x,y/x']} : \coend^{x:A} M[y/x']
+  % }\and
+  % (\clet x,m := \cpair{y}{t_m} in c) \jdeq c[y/x,t_m/m]\and
+  % (\clet x,m := t in c[\cpair{x}{m}/z]) \jdeq c[t/z] 
   \inferrule{
-    \Delta,x:A,x':A \cb \Gamma \types t_m : M[\check x'/\check x]
+    \Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types m: M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
   }{
-    \Delta,y:A \cb \Gamma[y/x'] \types \langle y,t_m[y/x,y/x']\rangle : \coend^{x:A} M[y/x']
+    \Delta, z : A \cb \Gamma \types (\mix x,y with z in m): \coend^{w:A} M
   }\and
-\end{mathpar}
-\begin{mathpar}
   \inferrule{
     \Psi_C \types C \type \\
-    \Delta, x:A \cb \Gamma, m:M \types c : C
+    \Delta, w:A \cb \Gamma, m:M \types c : C
     }{
-    \Delta \cb \Gamma, t:\coend^{x:A} M \types \text{``\texttt{let $\langle x,m\rangle$ = $t$ in c}''} : C
+    \Delta \cb \Gamma, t:\coend^{w:A} M \types (\clet w,m := t in c) : C
   }\and
 \end{mathpar}
-with $\text{``\texttt{let $\langle x,m\rangle$ = $\langle y,t_m\rangle$ in $c$}''}=c[y/x,t_m/m]$ and $\text{``\texttt{let $\langle x,m\rangle$ = $t$ in $c[\langle x,m\rangle/z]$}''}=c[t/z]$.
+Note that both the left rule and the right rule bind variables!
+The term $(\mix x,y with z in m)$  binds $x:A$ and $y:A$ in $m$, while the term $(\clet w,m := t in c)$ binds $w:A$ and $m:M$ in $c$.
+Also there is some sort of ``renaming in the context'' going on as we pass across the \textsf{mix}, since the $\Gamma$ above the line is also a substitution instance.
 
-Proof of co-Yoneda lemma:
+However, I (Mike) can't figure out what the computation rule should say, for reasons that make me wonder whether a term calculus is doomed to failure.
+Going back to the principal cut for the coend type, there are actually several different possible such cuts:
+\begin{mathpar}
+  \inferrule{\inferrule{
+		\Delta', x : A, y : A \cb \Gamma'[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	}{
+		\Delta', z : A \cb \Gamma' \types \coend^{w:A} M
+	} \\ \inferrule{
+    \Delta, w:A \cb \Gamma, M \types C
+    }{
+    \Delta \cb \Gamma, \coend^{w:A} M \types C
+  }}{\Delta,\Delta',(z:A)? \cb \Gamma,\Gamma' \types C}
+\end{mathpar}
+depending on how the occurrences of $\hat z$ and $\check z$ are distributed through $\Gamma'$ and $M$.
+\begin{itemize}
+\item If both are in $\Gamma'$, then $z\notin\Delta$, so $z:A$ remains in the context of the conclusion separate from $\Delta,\Delta'$.
+\item If both are in $M$, then we must have $z\in \Delta$, and the cut is disallowed because it forms a variable loop.
+\item If one is in $M$ and one in $\Gamma'$, then one must also be in $\Gamma$ and we have $z\in \Delta$, so $z:A$ doesn't need to appear separately in the context of the conclusion.
+\end{itemize}
+In each case I can see how to reduce the cut, namely to the obvious
+\begin{mathpar}
+  \inferrule{\Delta', x : A, y : A \cb \Gamma'[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	\\
+        \Delta, w:A \cb \Gamma, M \types C}
+      {\Delta,\Delta',(z:A)? \cb \Gamma,\Gamma' \types C}
+\end{mathpar}
+but this latter cut involves nontrivial category-variable manipulation because it's ``contracting a string'', and I can't figure out how to represent that by substitution.
+In particular, the category-variables $x,y$ appearing in one of the premises disappear in the conclusion and I don't see how to represent that disappearance in terms of ``substituting'' something for them.
+But possibly I'm just being dense.
+
+Proof of co-Yoneda lemma, starting with one direction:
 \begin{mathpar}
   \inferrule{
     \inferrule{
@@ -577,18 +620,19 @@ Proof of co-Yoneda lemma:
           x:A \cb n:N(\check x) \types n:N(\hat x)
         }
         }{
-        x:A,y:A \cb n:N(\check x), t:\hom_A(\hat x,\check y) \types J(x.y.N(x),x.n,x,y,f):N(\hat y)
+        x:A,y:A \cb n:N(\check x), t:\hom_A(\hat x,\check y) \types \hat J(n,y,f):N(\hat y)
       }
       }{
       x:A,y:A \cb t:N(\check x)\otimes\hom_A(\hat x,\check y) \types
-        \text{``\texttt{let $n\otimes f$ = $t$ in $J(x.y.N(x),x.n,x,y,f)$}''}:N(\hat y)
+        (\tlet n,f := t in \hat J(n,y,f)):N(\hat y)
       }
     }{
     y:A \cb q:\coend^{x:A} N(\check x)\otimes\hom_A(\hat x,\check y) \types
-      \text{``\texttt{let $\langle x,t\rangle$ = $q$ in \{let ...\}}''}:N(\hat y)
+      (\clet x,t := q in (\tlet n,f := t in \hat J(n,y,f))):N(\hat y)
     }
 \end{mathpar}
-and conversely
+I think that we have to use the covariant $J$ here, because when $n$ depends on a variable in the context we can't ``bind'' it with $x.n$ in the two-sided $J$.
+Now the other direction:
 \begin{mathpar}
   \inferrule{
     \inferrule{
@@ -599,18 +643,12 @@ and conversely
         x':A \cb \ec \types \id(x'):\hom_A(\check x',\hat x')
       }
       }{
-      x:A,x':A \cb n:N(\check x) \types n\otimes\id(x') : N(\hat x)\otimes\hom_A(\check x',\hat x')
+      x:A,x':A \cb n:N(\check x) \types \tpair{n}{\id(x')} : N(\hat x)\otimes\hom_A(\check x',\hat x')
     }
     }{
-    y:A \cb n:N(\check y) \types \langle y,n\otimes\id(y)\rangle : \coend^{x:A}N(\hat x)\otimes\hom_A(\check x,\hat y)
+    y:A \cb n:N(\check y) \types \left({\mix x,x' with y in \tpair{n}{\id(x')}}\right) : \coend^{w:A}N(\hat w)\otimes\hom_A(\check w,\hat y)
   }
 \end{mathpar}
-which we can check are inverse:
-\begin{align*}
-  &\text{``\texttt{let $\langle x,t\rangle$ = $\langle y,n'\otimes\id(y)\rangle$ in \{let $n\otimes f$ = $t$ in $J(x.y.N(x),x.n,x,y,f)$\}}''} \\
-  &= \text{``\texttt{let $n\otimes f$ = $n'\otimes\id(y)$ in $J(x.y.N(x),x.n,y,y,f)$}''} \\
-  &= J(x.y.N(x),x.n',y,y,\id(y)) \\
-  &= n'
-\end{align*}
-The other direction is tricky...
+It remains to check that they are inverse\dots
+
 \end{document}
