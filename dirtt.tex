@@ -198,23 +198,29 @@ Similarly, we have the functorial action of any judgment $x:A \types f(x):B$:
 
 We may also want to consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Morhing rule for identity types):
 \begin{mathpar}
-  \inferrule{\Delta_b \psplit \flip{\Psi_b},\Psi_b \\
-    \Delta,x:A \splits \flip{\Psi_\Gamma}, \Psi_M, \Psi_a \\ \hat x, \check x \notin \Psi_a \\\\
-    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
-    \Psi_a \types a:A \\ \Psi_b \types b:A \\
-    \Delta,x:A \cb \Gamma \types M}
-  {\Delta,\Delta_b\cb \Gamma[b/\hat x],\mor A(a,b) \types M[b/\hat x]}
-  \and
-  \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a\\
-    \Delta,x:A \splits \flip{\Psi_\Gamma}, \Psi_M, \flip{\Psi_b} \\ \hat x, \check x \notin \Psi_b \\\\
-    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
-    \Psi_a \types a:A \\ \Psi_b \types b:A \\
-    \Delta,x:A \cb \Gamma \types M}
-  {\Delta,\Delta_a\cb \Gamma[a/\check x],\mor A(a,b) \types M[a/\check x]}\and
+  \inferrule{\Delta\cb \Gamma[b/\check x] \types M[b/\check x]}{\Delta,x:A\cb \Gamma,\mor A(\hat x, b) \types M}\and
+  \inferrule{\Delta\cb \Gamma[a/\hat x] \types M[a/\hat x]}{\Delta,x:A\cb \Gamma,\mor A(a, \check x) \types M}\and
 \end{mathpar}
-Either of these should straightforwardly imply the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
+I'm not sure exactly how to write these with substitutions at the moment.
+% \begin{mathpar}
+%   \inferrule{\Delta_b \psplit \flip{\Psi_b},\Psi_b \\
+%     \Delta,x:A \splits \flip{\Psi_\Gamma}, \Psi_M, \Psi_a \\ \hat x, \check x \notin \Psi_a \\\\
+%     \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
+%     \Psi_a \types a:A \\ \Psi_b \types b:A \\
+%     \Delta,x:A \cb \Gamma \types M}
+%   {\Delta,\Delta_b\cb \Gamma[b/\hat x],\mor A(a,b) \types M[b/\hat x]}
+%   \and
+%   \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a\\
+%     \Delta,x:A \splits \flip{\Psi_\Gamma}, \Psi_M, \flip{\Psi_b} \\ \hat x, \check x \notin \Psi_b \\\\
+%     \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
+%     \Psi_a \types a:A \\ \Psi_b \types b:A \\
+%     \Delta,x:A \cb \Gamma \types M}
+%   {\Delta,\Delta_a\cb \Gamma[a/\check x],\mor A(a,b) \types M[a/\check x]}\and
+% \end{mathpar}
+
+Either of these straightforwardly implies the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
 The converse implication in full dependent type theory requires a universe, so we probably don't expect it to hold here.
-I think we will probably want the one-sided rules.
+I think we will probably want the one-sided rules (but there ought to be some compatibility between them, so that when they both apply they give the same result).
 Note that they can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
 
 With morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types b:B$, and the 2-cells from $b$ to $b'$ are the judgments $x:A \cb \ec \types \mor B(b,b')$.
