@@ -527,10 +527,10 @@ Suppose we have $x:A \types f(x):B$ and $y:B\types g(y):A$ and an adjunction in 
 \end{mathpar}
 satisfying the triangle identities which say that the composite
 \begin{equation}\label{eq:triangle}
-  \inferrule{\inferrule{\inferrule{\eta}{x:A \cb \ec\types \mor A(x,gf(x))}}
+  \scriptsize\inferrule{\inferrule{\inferrule{\eta}{x:A \cb \ec\types \mor A(x,gf(x))}}
     {x:A \cb \ec\types \mor B(f(x),fgf(x))} \textsc{fun}\\
   \inferrule{\inferrule{\varepsilon}{y:B \cb\ec\types \mor B(fg(y),y)}}{x:A \cb\ec\types \mor B(fgf(x),f(x))} \textsc{sub}\\\\\\
-  \inferrule{\text{(composition)}}{x:A \cb \mor B(fgf(x),f(x)), \mor B(f(x),fgf(x)) \types \mor B(f(x),f(x))}}
+  \inferrule{\text{(composition)}}{u:A,v:A,w:A \cb \mor B (f(\hat u),fgf(\check v)), \mor B (fgf(\hat v), f(\check w)) \types \mor B (f(\check u),f(\hat w))}}
 {x:A \cb \ec\types \mor B(f(x),f(x))} \textsc{cut}
 \end{equation}
 is equal to the identity
@@ -579,7 +579,18 @@ or, pushing the substitution past the mor-left rule,
   {x:A\cb \ec \types \mor B(f(x),f(x))} \textsc{cut}
 \end{mathpar}
 Our goal is to apply~\eqref{eq:triangle}, and now we have the substitution of $\varepsilon$ on the upper right.
-On the upper left we are hoping to get $f(\eta)$\dots
+On the upper left we are hoping to get $f(\eta)$, which is defined by cutting with functoriality~\eqref{eq:functor}:
+\begin{equation}\label{eq:f-eta}
+\scriptsize  \inferrule{
+    \inferrule{\eta}{x:A\cb\ec\types \mor A(x,gf(x))}\\
+    \inferrule{
+      \inferrule{\inferrule{x:A \types f(x):B}
+      {x:A \cb \ec \types \mor B(f(\check x),f(\hat x))}}
+    {x:A, y:A \cb \mor A(\hat x, \check y) \types \mor B(f(\check x),f(\hat y))}}
+  {x:A,z:A \cb \mor A(\hat x, gf(\check z)) \types \mor B(f(\check x),fgf(\hat z))}\textsc{sub}}
+  {x:A\cb \ec\types \mor B(f(x),fgf(x))}\textsc{cut}
+\end{equation}
+Aigh, I give up.
 
 
 \section{Category formers}
