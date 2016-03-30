@@ -59,12 +59,14 @@ In other words:
 \begin{center}
   $\Delta\cb\Gamma\types N$ requires as preconditions that
   $\begin{array}{c}
-    \Delta \splits \flip{\Psi_1},\Psi_2 \\
-    \Psi_1 \types \Gamma \ctx\\
+    \Delta \splits \Psi_1,\Psi_2 \\
+    \flip{\Psi_1} \types \Gamma \ctx\\
     \Psi_2 \types M \type
   \end{array}$
 \end{center}
-Here $\Delta\splits \flip{\Psi_1},\Psi_2$ means that each variable $x$ in the unsigned context $\Delta$ becomes a pair $\hat x, \check x$ of opposite variance in the signed context $\flip{\Psi_1},\Psi_2$, and that the variances of $\Psi_1$ are then flipped.
+Here $\Delta\splits \Psi_1,\Psi_2$ means that each variable $x$ in the unsigned context $\Delta$ becomes a pair $\hat x, \check x$ of opposite variance in the signed context $\Psi_1,\Psi_2$ (see the rules below), and that the variances of the variables in $\Psi_1$ are then flipped when judging $\Gamma$ to be well-formed.  For example,
+$x:A \splits \check x : \m A, \hat x :\p A$, and $\flip{(\check x :\m A)} = \check{x} :\p A$ so a well-formed judgement could have 
+$\check x :\p A \types \Gamma \ctx$ and $\hat x :\p A \types A \type$. This says that $\check{x}$ is allowed to occur covariantly in $\Gamma$, which counts as a negative occurrence overall, because $\Gamma$ is itself in a contravariant position.  
 
 The most intuitive version of this ``quadraticality'' rule is when $\hat{x}$ appears in $M$ and $\check{x}$ appears in $\Gamma$:
 \[ x:A \cb N(\check x) \types M(\hat x) \]
@@ -80,6 +82,40 @@ To express the \emph{composition} of such morphisms then requires an ``extranatu
 \[ x:A, y:A, z:A \cb \mor A(\hat x, \check y), \mor A(\hat y, \check z) \types \mor A(\check x, \hat z) \]
 The \emph{identity} morphism judgment is similarly extranatural on the other side:
 \[ x:A \cb \ec \types \mor A(\check x,\hat x) \]
+
+More formally, context splitting is defined by the following possibilities:
+\begin{mathpar}
+\inferrule{ }{\cdot \splits \cdot,\cdot}
+
+\inferrule{\Delta \splits \Psi_1,\Psi_2}
+          {\Delta, x:A \splits (\Psi_1,\check x :\m A,\hat x :\p A),\Psi_2}
+
+\inferrule{\Delta \splits \Psi_1,\Psi_2}
+          {\Delta, x:A \splits \Psi_1,(\Psi_2,\check x :\m A,\hat x :\p A)}
+
+\inferrule{\Delta \splits \Psi_1,\Psi_2}
+          {\Delta, x:A \splits (\Psi_1\check x :\m A),(\Psi_2,\hat x :\p A)}
+
+\inferrule{\Delta \splits \Psi_1,\Psi_2}
+          {\Delta, x:A \splits (\Psi_1,\hat x :\p A),(\Psi_2,\check x :\m A)}
+\end{mathpar}
+
+We will also need a splitting $\Delta \psplit \Psi_1,\Psi_2$ is of a
+special ``paired'' sort: of the two variables $\hat x$ and $\check x$
+arising from any variable $x$ in $\Delta$, one must be in $\Psi_1$ and
+one in $\Psi_2$:
+
+\begin{mathpar}
+\inferrule{ }{\cdot \psplit \cdot,\cdot}
+
+\inferrule{\Delta \psplit \Psi_1,\Psi_2}
+          {\Delta, x:A \psplit (\Psi_1\check x :\m A),(\Psi_2,\hat x :\p A)}
+
+\inferrule{\Delta \psplit \Psi_1,\Psi_2}
+          {\Delta, x:A \psplit (\Psi_1,\hat x :\p A),(\Psi_2,\check x :\m A)}
+\end{mathpar}
+
+Note that when $\Delta \psplit \Psi_1,\Psi_2$, $\flip{\Psi_1} \equiv_\alpha \Psi_2$.  
 
 \section{Basic rules and type formers}
 \label{sec:rules}
@@ -98,8 +134,10 @@ We postpone describing exactly what the cut rule will look like, since it is som
 \begin{mathpar}
   \inferrule{\Psi \types M \type \\ \Delta\psplit \Psi_1,\Psi_2}{\Delta \cb M[\Psi_1/\Psi] \types M[\Psi_2/\Psi]}
 \end{mathpar}
-Here the splitting $\Delta \psplit \Psi_1,\Psi_2$ is of a special ``paired'' sort: of the two variables $\hat x$ and $\check x$ arising from any variable $x$ in $\Delta$, one must be in $\Psi_1$ and one in $\Psi_2$.
-That is, we apply hats and checks in the $M$ in the conclusion to make the variances match up, and then use the ones that are left over for the $M$ in the context.
+To construct a paired splitting in this case, we apply hats and checks
+in the $M$ in the conclusion to make the variances match up, and then
+use the ones that are left over for the $M$ in the context.
+
 For example, we might have
 \begin{mathpar}
   \inferrule{x:\p A, y:\m B, z:\p C \types M(x,y,z)\type}{x:A, y:B, z:C \cb M(\check x, \hat y, \check z) \types M(\hat x, \check y, \hat z)}
