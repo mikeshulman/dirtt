@@ -18,8 +18,10 @@
 \let\splits\rightrightarrows
 \def\flip#1{#1^*} % reverse the variances of all variables
 \def\mor#1{\hom_{#1}}
+\def\id{\mathrm{id}}
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
+\def\iso{\cong}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
 \title{A directed type theory for formal category theory}
@@ -185,15 +187,12 @@ Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~
 \label{sec:tensor-types}
 
 The formation rule for the tensor type:
-
 \begin{mathpar}
   \inferrule{\Psi_M, \Psi \types M\type \\
     \Psi_N, \flip{\Psi} \types N\type}
   {\Psi_M, \Psi_N \types M \otimes_\Psi N\type}\and
 \end{mathpar}
-
 The left rule
-
 \begin{mathpar}
   \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
     \Delta' \psplit \flip{\Psi},\Psi \\\\
@@ -202,9 +201,7 @@ The left rule
     \Delta, \Delta' \cb \Gamma,M,N \types C}
   {\Delta \cb \Gamma, M\otimes_\Psi N \types C}\and
 \end{mathpar}
-
 and right rule
-
 \begin{mathpar}
   \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
     \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
@@ -215,6 +212,40 @@ and right rule
     \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
     \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
   {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
+\end{mathpar}
+
+\subsubsection{Non-binding tensor}
+With coends and non-binding tensor, the binding tensor rules become admissible.
+
+The non-binding tensor formation rule is
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+    }{
+    \Psi_M,\Psi_N \types M\otimes N\type
+  }
+\end{mathpar}
+with left rule
+\begin{mathpar}
+  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
+    \Psi_\Gamma \types \Gamma\ctx \\\\
+    \Psi_M \types M\type \\ \Psi_N \types N\type \\ \Psi_C \types C\type \\\\
+    \Delta \cb \Gamma,M,N \types C}
+  {\Delta \cb \Gamma, M\otimes N \types C}\and
+\end{mathpar}
+and right rule
+\begin{mathpar}
+  \inferrule{
+    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
+    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
+    \Psi_{\Gamma_M} \types \Gamma_M\ctx \\
+    \Psi_{\Gamma_N} \types \Gamma_N\ctx \\
+    \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
+    \Delta_M \cb \Gamma_M \types M \\
+    \Delta_N \cb \Gamma_N \types N
+  }{
+    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types M\otimes N
+  }\and
 \end{mathpar}
 
 \subsection{Co-end type}
@@ -241,14 +272,49 @@ Left rule:
 Right rule:
 \begin{mathpar}
   \inferrule{
-    \Delta_a \psplit \flip{\Psi_a},\Psi_a \\
-    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\\\
-    \Psi_a \types a:A \\ \Psi_{\Gamma_M},\flip{\Psi_a},\Psi'_a \types \Gamma_M\ctx \\
-    \Psi_M,\hat x:\p A, \check x:\m A \types M\type \\\\
-    \Delta_M,\Delta_a,\Delta'_a \cb \Gamma_M \types M[(a[\Psi'_a/\Psi_a])/\hat x,\flip{a}/\check x]
-    }{
-    \Delta_M,\Delta_a \cb \Gamma_M \types \coend^{x:A} M
+    \Delta_a \iso \Delta'_a \\
+    \Delta_a \psplit (\flip{\Psi_1},\Psi_2),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\flip{\Psi_2'}) \\
+    \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
+    \Psi_a \types a:A \\ \Psi_{\Gamma_M},\Psi_1,\Psi_1' \types \Gamma\ctx \\
+    \Psi_M,\Psi_2,\Psi'_2,\hat x:\p A,\check x:\m A \types M\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1] \types \coend^{x:A} M[\Psi_2/\Psi'_2]
   }\and
+\end{mathpar}
+Co-Yoneda lemma:
+\begin{mathpar}
+  \inferrule{
+    \inferrule*{
+      \inferrule*{
+        \vdots
+      }{
+        \Delta,\Delta_a \cb M(a) \types M(a)
+      } \\
+      \inferrule*{
+        \vdots
+      }{
+        \Delta'_a \cb \cdot \types \hom_A(a',a')
+      }
+    }{
+      \Delta,\Delta_a,\Delta'_a \cb M(a) \types M(a) \otimes \hom_A(a',a')
+    }
+  }{
+    \Delta,\Delta_a \cb M(a) \types \coend^{x:A} M(\hat x)\otimes \hom_A(\check x,a)
+  }\and
+\end{mathpar}
+and conversely
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \Delta,\Delta_a \cb M(a) \types M(a)
+    }{
+      \Delta,\Delta_a,x:A \cb M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+    }
+  }{
+    \Delta,\Delta_a \cb \coend^{x:A} M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+  }
 \end{mathpar}
 \subsubsection{Older stuff}
 %\begin{mathpar}
@@ -295,26 +361,43 @@ For instance, we can prove:
 
 I have not been able to make sense of a rule with built-in substitution.
 
-\subsection{End type?}
+\subsection{End type}
 Formation rule:
 \begin{mathpar}
-	\inferrule{
-		\Psi_A, x:\pm A \types M \type \\
-	}{
-		\Psi_A \types \coend_{x:A} M \type
-	}\and
+  \inferrule{
+    \Psi,\hat x:\p A,\check x:\m A \types M \type \\
+    }{
+    \Psi \types \coend_{x:A} M \type
+  }\and
 \end{mathpar}
 Right rule:
 \begin{mathpar}
-	\inferrule{
-		\Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\
-		\Psi_\Gamma \types \Gamma \ctx \\
-		\Psi_M, x:\pm A \types M \type \\
-		\Delta, x:A \cb \Gamma \types M
-	}{
-		\Delta \cb \Gamma \types \coend_{x:A} M
-	}\and
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\\\
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M,\hat x:\p A,\check x:\m A \types M \type \\
+    \Delta, x:A \cb \Gamma \types M
+    }{
+    \Delta \cb \Gamma \types \coend_{x:A} M
+  }\and
 \end{mathpar}
+Left rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \iso \Delta'_a \\\\
+    \Delta_a \psplit (\flip{\Psi_1},\flip{\Psi_2},\Psi_3),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\Psi_2',\flip{\Psi_3'}) \\
+    \Delta \splits \flip{\Psi_{\Gamma}},\flip{\Psi_M},\Psi_C \\\\
+    \Psi_a \types a:A \\ \Psi_{\Gamma},\Psi_1,\Psi_1' \types \Gamma\ctx \\
+    \Psi_M,\Psi_2,\Psi'_2,\hat x:\p A,\check x:\m A \types M\type \\
+    \Psi_C,\Psi_3,\Psi'_3 \types C\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma, M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x] \types C
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1], \coend_{x:A}M[\Psi_2/\Psi'_2] \types C[\Psi_3/\Psi'_3]
+  }\and
+\end{mathpar}
+
+\subsubsection{Older stuff}
 The left rule can based on the function
 \begin{equation*}
 	[\coend_x \coend_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \coend_{z}[(\coend_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
@@ -334,6 +417,37 @@ which should be in the end as we have only passed $z$ to ends. Then it becomes
 
 \subsection{Hom types}
 \label{sec:hom-types}
+
+The type former for the (non-binding) hom type is
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+  }{
+    \flip{\Psi_M},\Psi_N \types M\multimap N\type
+  }
+\end{mathpar}
+with right rule
+\begin{mathpar}
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\Psi_N \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
+    \Delta \cb \Gamma, M \types N
+  }{
+    \Delta \cb \Gamma \types M\multimap N
+  }
+\end{mathpar}
+and left rule
+\begin{mathpar}
+  \inferrule{
+    \Delta_1 \splits \flip{\Psi_{\Gamma_1}},\Psi_M \\
+    \Delta_2 \splits \flip{\Psi_{\Gamma_2}},\flip{\Psi_N},\Psi_C \\\\
+    \Psi_{\Gamma_1} \types \Gamma_1\ctx \\ \Psi_{\Gamma_2} \types \Gamma_2\ctx \\\\
+    \Psi_M \types M\type \\ \Psi_N \types N\type\\ \Psi_C \types C\type \\\\
+    \Delta_1 \cb \Gamma_1 \types M \\ \Delta_2 \cb \Gamma_2,N \types C
+  }{
+    \Delta_1,\Delta_2 \cb \Gamma_1,\Gamma_2,M\multimap N \types C
+  }
+\end{mathpar}
 
 \subsection{The type classifier}
 \label{sec:type-classifier}
@@ -356,4 +470,57 @@ which should be in the end as we have only passed $z$ to ends. Then it becomes
 
 
 
+\section{Terms}
+(Patrick: I would like to start working out forms of all the rules with a term level equational theory.
+I will just collect them here, unless somebody would rather they go somewhere else.
+Also, I don't really know what I'm doing---I just wanted to start experimenting.)
+
+Morphism types:
+\begin{mathpar}
+  \inferrule{ }{x:A \cb \ec \types \id(x):\mor A(\check x,\hat x)}\and
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \Delta,x:A \cb \Gamma[\hat x/\hat y] \types m:M[\hat x/\hat y]
+  }{
+    \Delta,x:A,y:A\cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.y.M, x.m, x, y, f):M
+  }\and
+\end{mathpar}
+with computation rule $J(x.y.M, x.m, x, x, \id(x))=m$
+
+Tensor types:
+\begin{mathpar}
+  \inferrule{
+    \Delta_M \cb \Gamma_M \types m:M \\
+    \Delta_N \cb \Gamma_N \types n:N
+  }{
+    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types m\otimes n : M\otimes N
+  }\and
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \Delta \cb \Gamma,m:M,n:N \types c:C
+  }{
+    \Delta \cb \Gamma,t:M\otimes N \types \text{``\texttt{let $m\otimes n$ = $t$ in $c$}''} : C
+  }\and
+\end{mathpar}
+with $\text{``\texttt{let $m\otimes n$ = $m\otimes n$ in $c$}''}=c$ and $\text{``\texttt{let $m\otimes n$ = $t$ in $m\otimes n$}''}=t$.
+
+Coend types:
+\begin{mathpar}
+  \inferrule{
+    \Delta,x:A,x':A \cb \Gamma \types m : M[\check x'/\check x]
+  }{
+    \Delta,y:A \cb \Gamma[y/x'] \types \langle y,m[y/x,y/x']\rangle : \coend^{x:A} M[y/x']
+  }\and
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \Psi_C \types C \type \\
+    \Delta, x:A \cb \Gamma, m:M \types c : C
+    }{
+    \Delta \cb \Gamma, t:\coend^{x:A} M \types \text{``\texttt{let $\langle x,m\rangle$ = $t$ in c}''} : C
+  }\and
+\end{mathpar}
+with $\text{``\texttt{let $\langle x,m\rangle$ = $\langle x,m\rangle$ in $c$}''}=c$ and $\text{``\texttt{let $\langle x,m\rangle$ = $t$ in $\langle x,m\rangle$}''}=t$.
 \end{document}
