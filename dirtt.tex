@@ -1,5 +1,5 @@
 \documentclass{amsart}
-\usepackage{amssymb,amsmath,latexsym,stmaryrd}
+\usepackage{amssymb,amsmath,latexsym,stmaryrd,mathrsfs}
 \usepackage{cleveref}
 \usepackage{mathpartir}
 \let\types\vdash % turnstile
@@ -22,6 +22,7 @@
 \def\ec{\cdot} % empty context
 \def\psplit{\overset{\mathsf{pair}}{\splits}}
 \def\iso{\cong}
+\def\deriv{\mathscr{D}}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
 \title{A directed type theory for formal category theory}
@@ -222,6 +223,22 @@ Either of these straightforwardly implies the two-sided rule, just as the Paulin
 The converse implication in full dependent type theory requires a universe, so we probably don't expect it to hold here.
 I think we will probably want the one-sided rules (but there ought to be some compatibility between them, so that when they both apply they give the same result).
 Note that they can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
+
+The ``computation rule'' is the corresponding clause in the proof of cut-elimination, which applies to
+\begin{equation}\label{eq:mor-comp}
+\inferrule{
+    \inferrule{\Psi \types a:A \\ \Delta \psplit \Psi,\Psi'}{\Delta \cb \ec\types \mor A(a,a)}\\
+    \inferrule{\inferrule{\inferrule{\deriv}{\Delta'\cb \Gamma[a/\hat x] \types M[a/\hat x]}}{\Delta',x:A\cb \Gamma,\mor A(a, \check x) \types M}}
+    { \Delta',\Delta \cb \Gamma[a/\hat x],\mor A(a,a) \types M[a/\hat x]}\textsc{sub}
+  }{\Delta'\cb \Gamma[a/\hat x] \types M[a/\hat x]}\textsc{cut}
+\end{equation}
+(I've included an explicit ``substitution'' rule here since I haven't figured out how to write the one-sided hom-left rule incorporating substitutions yet.)
+This clause for this principal cut reduces ite to the much simpler
+\[\inferrule{\deriv}{\Delta'\cb \Gamma[a/\hat x] \types M[a/\hat x]}\]
+Similarly, the ``uniqueness rule'' is the corresponding clause in the proof of admissibility of identity, which says that the identity judgment can be constructed as follows:
+\[ \inferrule{\inferrule{\inferrule{ }{\Delta_a \cb \ec \types \mor A (a,a)}}
+    {\Delta_a\cb \mor A(a,y)\types \mor A(a,y)}}
+  {\Delta_a,\Delta_b\cb \mor A(a,b) \types \mor A(a,b)} \textsc{sub} \]
 
 With morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types b:B$, and the 2-cells from $b$ to $b'$ are the judgments $x:A \cb \ec \types \mor B(b,b')$.
 The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) can be obtained from~\eqref{eq:composition} once we have a cut rule.
@@ -495,6 +512,74 @@ and left rule
 
 \subsection{The type classifier}
 \label{sec:type-classifier}
+
+
+\section{Some category theory}
+\label{sec:some-category-theory}
+
+\subsection{Adjunctions}
+\label{sec:adjunctions}
+
+Suppose we have $x:A \types f(x):B$ and $y:B\types g(y):A$ and an adjunction in diagrammatic form, given by a unit and counit
+\begin{mathpar}
+  \inferrule{\eta}{x:A \cb \ec\types \mor A(x,gf(x))} \and
+  \inferrule{\varepsilon}{y:B \cb\ec\types \mor B(fg(y),y)}
+\end{mathpar}
+satisfying the triangle identities which say that the composite
+\begin{equation}\label{eq:triangle}
+  \inferrule{\inferrule{\inferrule{\eta}{x:A \cb \ec\types \mor A(x,gf(x))}}
+    {x:A \cb \ec\types \mor B(f(x),fgf(x))} \textsc{fun}\\
+  \inferrule{\inferrule{\varepsilon}{y:B \cb\ec\types \mor B(fg(y),y)}}{x:A \cb\ec\types \mor B(fgf(x),f(x))} \textsc{sub}\\\\\\
+  \inferrule{\text{(composition)}}{x:A \cb \mor B(fgf(x),f(x)), \mor B(f(x),fgf(x)) \types \mor B(f(x),f(x))}}
+{x:A \cb \ec\types \mor B(f(x),f(x))} \textsc{cut}
+\end{equation}
+is equal to the identity
+\begin{mathpar}
+  \inferrule{ }{x:A \cb \ec \types \mor B(f(x),f(x))}
+\end{mathpar}
+and similarly on the other side.
+Then we can define an isomorphism of morphism types, consisting of maps back and forth using the one-sided left rules:
+\begin{mathpar}
+  \inferrule{\inferrule{\eta}{x:A \cb \ec\types \mor A(x,gf(x))}}{x:A,y:B\cb \mor B(f(x),y) \types \mor A(x,g(y))}\and
+  \inferrule{\inferrule{\varepsilon}{y:B \cb\ec\types \mor B(fg(y),y)}}{x:A,y:B\cb  \mor A(x,g(y)) \types \mor B(f(x),y)}
+\end{mathpar}
+We now need to consider their composite:
+\begin{equation}\label{eq:mor-adj-comp}
+\scriptsize  \inferrule{\inferrule{\inferrule{\eta}{x:A \cb \ec\types \mor A(x,gf(x))}}{x:A,y:B\cb \mor B(f(x),y) \types \mor A(x,g(y))}\\
+    \inferrule{\inferrule{\varepsilon}{y:B \cb\ec\types \mor B(fg(y),y)}}{x:A,y:B\cb  \mor A(x,g(y)) \types \mor B(f(x),y)}}
+  {x:A,y:B\cb \mor B(f(x),y) \types \mor B(f(x),y)} \textsc{cut}
+\end{equation}
+Now any derivation of
+\[ \inferrule{\deriv}{x:A,y:B\cb \mor B(f(x),y) \types \mor B(f(x),y)}\]
+should be equal to its own cut with the identity on the left, which (recall) is constructed using the right rule $\mor B$ followed by the left rule:
+\[\scriptsize \inferrule{\inferrule{\inferrule{ }{x:A \cb \ec \types \mor B (f(x),f(x))}}{x:A\cb \mor B(f(x),y)\types \mor B(f(x),y)} \\
+    \inferrule{\deriv}{x:A,y:B\cb \mor B(f(x),y) \types \mor B(f(x),y)}}
+  {x:A,y:B\cb \mor B(f(x),y) \types \mor B(f(x),y)} \textsc{cut}
+  \]
+Now the way we cut with a left-rule on the left is to push it down to the bottom, so this should be equal to
+\[\scriptsize \inferrule{\inferrule{\inferrule{ }{x:A \cb \ec \types \mor B (f(x),f(x))} \\
+    \inferrule{\inferrule{\deriv}{x:A,y:B\cb \mor B(f(x),y) \types \mor B(f(x),y)}}{x:A,z:A \cb \mor B(f(x),f(z))\types \mor B(f(x),f(z))} (\textsc{sub})}
+  {x:A\cb \ec \types \mor B(f(x),f(x))} \textsc{cut}}
+{x:A\cb \mor B(f(x),y)\types \mor B(f(x),y)}
+  \]
+Thus, to check whether two derivations of ${x:A,y:B\cb \mor B(f(x),y) \types \mor B(f(x),y)}$ are equal, it suffices to substitute $y=f(z)$ in both and then cut them on the left with ${x:A \cb \ec \types \mor B (f(x),f(x))}$.
+If we do this with~\eqref{eq:mor-adj-comp}, rearrange the cuts and apply the principal cut rule for morphism types~\eqref{eq:mor-comp}, we get
+\begin{mathpar}
+  \scriptsize  \inferrule{\inferrule{\eta}{x:A\cb \ec \types \mor A(x,gf(x))}\\
+    \inferrule{\inferrule{\inferrule{\varepsilon}{y:B \cb\ec\types \mor B(fg(y),y)}}{x:A,y:B\cb  \mor A(x,g(y)) \types \mor B(f(x),y)}}
+    {x:A,z:A\cb  \mor A(x,gf(z)) \types \mor B(f(x),f(z))}\textsc{sub}}
+  {x:A\cb \ec \types \mor B(f(x),f(x))} \textsc{cut}
+\end{mathpar}
+or, pushing the substitution past the mor-left rule,
+\begin{mathpar}
+  \scriptsize  \inferrule{\inferrule{\eta}{x:A\cb \ec \types \mor A(x,gf(x))}\\
+    \inferrule{\inferrule{\inferrule{\varepsilon}{y:B \cb\ec\types \mor B(fg(y),y)}}
+      {z:A \cb \ec\types \mor B(fgf(z),f(z))}\textsc{sub}}
+    {x:A,z:A\cb  \mor A(x,gf(z)) \types \mor B(f(x),f(z))}}
+  {x:A\cb \ec \types \mor B(f(x),f(x))} \textsc{cut}
+\end{mathpar}
+Our goal is to apply~\eqref{eq:triangle}, and now we have the substitution of $\varepsilon$ on the upper right.
+On the upper left we are hoping to get $f(\eta)$\dots
 
 
 \section{Category formers}
