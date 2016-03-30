@@ -611,13 +611,8 @@ but this latter cut involves nontrivial category-variable manipulation because i
 In particular, the category-variables $x,y$ appearing in one of the premises disappear in the conclusion and I don't see how to represent that disappearance in terms of ``substituting'' something for them.
 But possibly I'm just being dense.
 
-Part of the solution is probably recognizing that, as Patrick said, category-variables do \emph{not} generally occur linearly in type-terms.
-In fact, the splitting of $x:A$ into $\hat x:\p A$ and $\check x:\m A$ probably \emph{doesn't} happen in the terms, only in the types.
-So it might make sense to write something like:
-\begin{mathpar}
-  \left(\clet w,m := \left({\mix x,y with z in n}\right) in c\right) \jdeq c\Big[n[z/x,z/y]\Big/m\Big]
-\end{mathpar}
-But I'm still stuck on the co-Yoneda lemma, below.
+Perhaps the solution is that the notion of ``substitution'' has to involve a more careful ``matching up of variables'' according to a loop-free string picture.
+See the example below.
 
 Proof of co-Yoneda lemma, starting with one direction:
 \begin{mathpar}
@@ -648,23 +643,39 @@ Now the other direction:
         x:A \cb n:N(\check x) \types n:N(\hat x)
       } \\
       \inferrule{ }{
-        x':A \cb \ec \types \id(x'):\hom_A(\check x',\hat x')
+        z:A \cb \ec \types \id(z):\hom_A(\check z,\hat z)
       }
       }{
-      x:A,x':A \cb n:N(\check x) \types \tpair{n}{\id(x')} : N(\hat x)\otimes\hom_A(\check x',\hat x')
+      x:A,z:A \cb n:N(\check x) \types \tpair{n}{\id(z)} : N(\hat x)\otimes\hom_A(\check z,\hat z)
     }
     }{
-    y:A \cb n:N(\check y) \types \left({\mix x,x' with y in \tpair{n}{\id(x')}}\right) : \coend^{w:A}N(\hat w)\otimes\hom_A(\check w,\hat y)
+    y:A \cb n:N(\check y) \types \left({\mix x,z with y in \tpair{n}{\id(z)}}\right) : \coend^{w:A}N(\hat w)\otimes\hom_A(\check w,\hat y)
   }
 \end{mathpar}
 It remains to check that they are inverse.
-Given $n':N(\check x)$, we have
+Supposing the obvious reduction rule
+ \[ \left(\clet w,m := \left({\mix x,y with z in n}\right) in c\right) \jdeq c[m/n], \]
+and given $n':N(\check x)$, we have
 \begin{align*}
-  &\left(\clet x,t := \left({\mix x,x' with y in \tpair{n'}{\id(x')}}\right) in (\tlet n,f := t in \hat J(n,y,f))\right)\\
-  &\jdeq (\tlet n,f := \tpair{n'}{\id(y)} in \hat J(n,y,f))\\
-  &\jdeq \hat J(n',y,\id(y))\\
-  &\jdeq 
+  &\left(\clet x,t := \left({\mix x,z with y in \tpair{n'}{\id(z)}}\right) in (\tlet n,f := t in \hat J(n,y,f))\right)\\
+  &\jdeq (\tlet n,f := \tpair{n'}{\id(z)} in \hat J(n,y,f))\\
+  &\jdeq \hat J(n',x,\id(x))\\
+  &\jdeq n'
 \end{align*}
-This looks good superficially, but what does it actually mean?  What is $\tpair{n'}{\id(y)}$?
+This looks good superficially, but let's think about what it actually means.
+In the second line, the types are something like
+\begin{mathpar}
+  n : N(\check w)\and
+  f : \mor A(\hat w, \check y)\and
+  n':N(\check x)\and
+  \id(z) : \mor A(\check z, \hat z) \\
+  \tpair{n}{f} : N(\check w) \otimes \mor A(\hat w, \check y) \and
+  \tpair{n'}{\id(z)} : N(\check x) \otimes \mor A(\check z, \hat z)
+\end{mathpar}
+So the ``$\tlet n,f := \tpair{n'}{\id(z)} in$'', which represents a principal cut of tensor-right against tensor-left, actually involves a nontrivial stringy variable matchup, with only one string even though there are 4 variables.
+Thus when it reduces, the variables $w$ and $z$ disappear.
+
+Similarly, the third term $\hat J(n',x,\id(x))$ also represents a stringy cut, in which the variable $y$ is getting identified with an $x$ and reducing away.
+Right now it's hard for me to believe in the term calculus with so much variable manipulation being hidden.
 
 \end{document}
