@@ -2,6 +2,7 @@
 \usepackage{amssymb,amsmath,latexsym,stmaryrd,mathtools}
 \usepackage{cleveref}
 \usepackage{mathpartir}
+\usepackage{xcolor}
 \let\types\vdash % turnstile
 \def\cb{\mid} % context break
 \def\op{^{\mathrm{op}}}
@@ -29,6 +30,9 @@
 \def\mix#1,#2 with #3 in{\mathsf{mix} {\scriptsize \begin{array}{c} \check{#1} \coloneqq \check{#3} \\ \hat{#2} \coloneqq \hat{#3} \end{array}  }\mathsf{in}\;}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
+\newcommand{\erasevar}[1]{#1^\circ}
+\newcommand{\joinvar}[1]{\left[#1\right]}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
 \begin{document}
@@ -137,7 +141,13 @@ The basic structural rules for context formation are unsurprising, given our lin
 For the moment, we are hoping to describe a cut-free sequent calculus with an admissible cut rule, and also admissible substitution for category-variables.
 We postpone describing exactly what the cut rule will look like, since it is somewhat complicated, but we can state the intended identity rule at this point:
 \begin{mathpar}
-  \inferrule{\Psi \types M \type \\ \Delta\psplit \Psi_1,\Psi_2}{\Delta \cb M[\Psi_1/\Psi] \types M[\Psi_2/\Psi]}
+\red{
+  \inferrule{
+  	\Psi \types M \type \\
+  }{
+  	\erasevar{\Psi} \cb M[\flip{\Psi}/\Psi] \types M
+  }
+}
 \end{mathpar}
 To construct a paired splitting in this case, we apply hats and checks
 in the $M$ in the conclusion to make the variances match up, and then
@@ -145,13 +155,27 @@ use the ones that are left over for the $M$ in the context.
 
 For example, we might have
 \begin{mathpar}
-  \inferrule{x:\p A, y:\m B, z:\p C \types M(x,y,z)\type}{x:A, y:B, z:C \cb M(\check x, \hat y, \check z) \types M(\hat x, \check y, \hat z)}
+  \inferrule{
+  	x:\p A, y:\m B, z:\p C \types M(x,y,z)\type
+  }{
+  	x:A, y:B, z:C \cb M(\check x, \hat y, \check z) \types M(\hat x, \check y, \hat z)
+  }
 \end{mathpar}
 
 The substitution rule for category-variables will be
 \begin{mathpar}
   \inferrule{\Psi \types a:A \\ \Delta',x:A \cb \Gamma \types M \\ \Delta\psplit \Psi,\Psi'}{\Delta',\Delta \cb \Gamma[a/x] \types M[a/x]}
 \end{mathpar}
+\red{
+\begin{mathpar}
+  \inferrule{
+  	\Psi \types a:A \\
+  	\Delta',x:A \cb \Gamma \types M \\
+  }{
+  	\Delta',\erasevar\Psi \cb \Gamma[a/x] \types M[a/x]
+  }
+\end{mathpar}
+}
 Once again we have a paired splitting, which essentially expresses that the term $a:A$ depends on the variables in $\Delta$ with some variances.
 Recalling that a variable $x$ in the category-context of a term-judgment actually appears as two different variables $\hat x$ and $\check x$ in the type context and conclusion, the substitution notation $[a/x]$ should be regarded as a shorthand for $[\hat a/\hat x, \check a/\check x]$.
 More precisely, given the term $a:A$ in the signed context $\Psi$, we can make a new term $\hat a$ out of it by putting hats on all the covariant variables and checks on all the contravariant ones, and dually we can make $\check a$; we then substitute these for $\hat x$ and $\check x$ in both $\Gamma$ and $M$.
@@ -168,10 +192,18 @@ The right rule involves another paired splitting because it also incorporates a 
   \inferrule{A\cat \\ \Psi_1\types a:A \\ \Psi_2 \types b:A}{\flip{\Psi_1},\Psi_2 \types \mor A(a,b) \type}\and
   \inferrule{\Psi \types a:A \\ \Delta\psplit \Psi,\Psi'}{\Delta \cb \ec \types \mor A(a,a)}\and
 \end{mathpar}
+\begin{mathpar}
+  \inferrule{A\cat \\ \Psi_1\types a:A \\ \Psi_2 \types b:A}{\flip{\Psi_1},\Psi_2 \types \mor A(a,b) \type}\and
+  \red{
+  \inferrule{
+  	\Psi \types a:A \\
+  }{
+  	\erasevar\Psi \cb \ec \types \mor A(a,a)
+  }}\and
+\end{mathpar}
 The left rule is significantly easier to state if we do not incorporate a substitution; it is an evident ``directed'' analogue of the elimination rule for equality due to Lawvere and Martin-L\"of.
 \begin{mathpar}
   \inferrule{\Delta,x:A \cb \Gamma[\hat x/\hat y] \types M[\hat x/\hat y]}{\Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M}\and
-  % \inferrule{\Delta \cb \Gamma[\check y/\check x] \types M[\check y/\check x]}{\Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M}\and
 \end{mathpar}
 When we incorporate substitutions for $x$ and $y$, this becomes
 \begin{mathpar}
@@ -182,6 +214,18 @@ When we incorporate substitutions for $x$ and $y$, this becomes
     \Delta,x:A \cb \Gamma \types M}
   {\Delta,\Delta_a,\Delta_b\cb \Gamma[a/\check x,b/\hat x],\mor A(a,b) \types M[a/\check x,b/\hat x]}\and
 \end{mathpar}
+\red{
+\begin{mathpar}
+  \inferrule{
+    (x:A) \in \joinvar{\flip{\Psi_\Gamma}, \Psi_M} \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\\\
+    \Psi_a \types a:A \\ \Psi_b \types b:A \\
+    \joinvar{\flip{\Psi_\Gamma}, \Psi_M} \cb \Gamma \types M
+  }{
+  	\joinvar{\flip{\Psi_\Gamma}, \Psi_M}\setminus\{x : A\},\erasevar\Psi_a,\erasevar\Psi_b \cb \Gamma[a/\check x,b/\hat x],\mor A(a,b) \types M[a/\check x,b/\hat x]
+  }\and
+\end{mathpar}
+}
 For instance, we can use this rule to define composition of morphisms:
 \begin{equation}
   \inferrule{\inferrule{\inferrule
@@ -318,20 +362,47 @@ Left rule:
     \Delta \cb \Gamma, \coend^{x:A} M \types C
   }\and
 \end{mathpar}
+\red{
+\begin{mathpar}
+  \inferrule{
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M, \hat x:\p A, \check x:\m A \types M \type \\
+    \Psi_C \types C \type \\
+    \joinvar{\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C}, x:A \cb \Gamma, M \types C
+    }{
+    \joinvar{\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C} \cb \Gamma, \coend^{x:A} M \types C
+  }\and
+\end{mathpar}
+}
 Right rule:
 \begin{mathpar}
   \inferrule{
     \Delta_a \iso \Delta'_a \\
-    \Delta_a \psplit (\flip{\Psi_1},\Psi_2),\Psi_a \\
-    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\flip{\Psi_2'}) \\
+    \Delta_a \psplit (\flip{\Phi_\Gamma},\Phi_M),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Phi_\Gamma',\flip{\Phi_M'}) \\
     \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
-    \Psi_a \types a:A \\ \Psi_{\Gamma_M},\Psi_1,\Psi_1' \types \Gamma\ctx \\
-    \Psi_M,\Psi_2,\Psi'_2,\hat x:\p A,\check x:\m A \types M\type \\\\
+    \Psi_a \types a:A \\
+    \Psi_{\Gamma},\Phi_\Gamma,\Phi_\Gamma' \types \Gamma\ctx \\
+    \Psi_M,\Phi_M,\Phi_M',\hat x:\p A,\check x:\m A \types M\type \\\\
     \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
   }{
-    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1] \types \coend^{x:A} M[\Psi_2/\Psi'_2]
+    \Delta,\Delta_a \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
   }\and
 \end{mathpar}
+\red{
+\begin{mathpar}
+  \inferrule{
+    \Phi_\Gamma \iso \Phi_\Gamma' \\
+    \Phi_M \iso \Phi_M' \\
+    \Phi_\Gamma, \flip{\Phi_M} \types a:A \\\\
+    \Psi_{\Gamma},\Phi_\Gamma,\flip{{\Phi_\Gamma'}} \types \Gamma\ctx \\\\
+    \Psi_M,\Phi_M,\flip{{\Phi_M'}},\hat x:\p A,\check x:\m A \types M\type \\\\
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\erasevar{\Phi_\Gamma}, \erasevar{\Phi_M},\erasevar{{\Phi_\Gamma'}}, \erasevar{{\Phi_M'}} \cb \Gamma \types M[a/\hat x,a[\Phi_\Gamma'/\Phi_\Gamma, \Phi_M'/\Phi_M]/\check x]
+  }{
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\erasevar{\Phi_\Gamma}, \erasevar{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+  }\and
+\end{mathpar}
+}
 Co-Yoneda lemma:
 \begin{mathpar}
   \inferrule{
