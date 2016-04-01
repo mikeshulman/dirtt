@@ -87,7 +87,6 @@ TODO extend with enriched/equipment terms).
 \item A context $\Phi$ represents a product category, or a bunch of
   categories if we have multicategories in mind, where $x \pcol A$ means
   $A$, $x \mcol A$ means $A\op$, $x \pmcol A$ means $A\op \times A$.
-  and $x \mpcol A$ means $A \times A\op$.
 
 \item $\Phi \types \theta : \Phi'$ means a functor from $\Phi$ to
   $\Phi'$.  Warning for multicategories: not every thing will be
@@ -109,20 +108,20 @@ TODO extend with enriched/equipment terms).
   stands for two assumptions $A\op,A$).
 \end{itemize}
 
+We enforce the invariant that all variables in a context are distinct,
+and we treat contexts and substitutions up to
+associativity/commutativity.  We write $\Psi_*$ and $N_*$ etc. for
+$\alpha$-renaming all variables in a consistent way (e.g. replacing $x$
+with $x^*$).  This is used when we union contexts $(\Psi_1,\Psi_2)$ and
+$\Psi_1$ and $\Psi_2$ share variables.  In de Bruijn form this wouldn't
+be necessary because an index into the combined context would include a
+left/right bit.  
+
 \subsection*{Category Terms}
 
 \begin{mathpar}
-\inferrule{x \pcol A \in \Psi_1}
-          {x \pcol A \in (\Psi_1,\Psi_2)}
-\and
-\inferrule{x \pcol A \in \Psi_2}
-          {x \pcol A \in (\Psi_1,\Psi_2)}
-\and
 \inferrule{ }
-          {x \pcol A \in x \pcol A}
-
-\inferrule{ x \pcol A \in \Psi }
-          {\Psi \vdash x : A}
+          {\Psi,x \pcol A \vdash x : A}
 \\ 
 \end{mathpar}
 
@@ -150,16 +149,29 @@ TODO extend with enriched/equipment terms).
 \inferrule{ \Psi \types a : A }
           { \Psi\pm \types a/x\pm : (x \pmcol A) }
 \and
-\inferrule{ \Psi\m \types a : A }
+\inferrule{ \Psi\m \types a : A \\ (\text{is this necessary?})}
           { \Psi\pm \types a/x\mp : (x \pmcol A) }
 
 \inferrule{ }
-          {\Psi\pm \types \Psi\pm \csplit (\Psi\m,\Psi) : (\Psi\m,\Psi)}
+          { (x \pmcol A) \types (x \csplit y,z) : (y \mcol A , z \pcol A)}
 \\
 \end{mathpar}
 
-%% \inferrule{ }
-%%           { (x \pmcol A) \types (x \csplit y,z) : (y \mcol A , z \pcol A)}
+There will then be lots of equations on substitutions.  For example, when $\Psi \types a : A$ we have 
+\[
+\Psi\pm \types ((a/x\pm);(x \csplit \hat x, \check x)) : (\check x :\m A, \hat x:\p A)
+\] which is like the $(\hat a/\hat x, \check a /
+\check x)$ substitution.  This should be equal to first splitting
+$\Psi$.  
+
+It should be admissible from these that 
+\[
+\inferrule{ }
+          {\Psi\pm \types \Psi\pm \csplit (\Psi_*\m,\Psi) : (\Psi_*\m,\Psi)}
+\]
+by comma-ing together an $x \csplit x^*,x$ or $x \csplit x,x^*$ for each
+assumption in $\Psi$ (depending on its variance in $\Psi$), and then
+(silently) exchanging variables.
 
 \subsection*{Type Contexts}
 
@@ -178,14 +190,14 @@ TODO extend with enriched/equipment terms).
 \\
 \end{mathpar}
 
-\subsection*{Judgement Well-formedness}
+\subsection*{Sequent Well-formedness}
 
 \begin{mathpar}
   \inferrule{
-    \Psi_1 \types \Gamma \ok\\
+    \Psi_1 \types \Gamma \ctx\\
     \Psi_2 \types M \type\\
   }{
-    \Psi_1\m,\Psi_2 \types (\Gamma \vdash M) \ctx
+    \Psi_1\m,\Psi_2 \types (\Gamma \vdash M) \ok
   }
   \and
   \inferrule{
@@ -194,19 +206,20 @@ TODO extend with enriched/equipment terms).
   }{
     \Phi \types J[\theta] \ok
   }
+\\
 \end{mathpar}
 
 \subsection*{Sequent Structural Rules}
 
 \begin{mathpar}
 \inferrule{\Psi \types N \type }
-          {\Psi\pm \cb (N \types N) [ \Psi\pm \csplit (\Psi\m,\Psi)]}
+          {\Psi\pm \cb (N_* \types N) [ \Psi\pm \csplit (\Psi_*\m,\Psi)]}
 
 \inferrule{\Delta' \cb J \\
            \Delta \vdash \theta : \Delta'
           }
           {\Delta \cb J [ \theta ]}
-
+\\
 \end{mathpar}
 
 \subsection*{Morphism types}
@@ -215,14 +228,36 @@ TODO extend with enriched/equipment terms).
 \inferrule{ }{x\mcol A, y\pcol A \types \mor A(x,y) \type}\and
 
 \inferrule{ }
-          {x \pmcol A \cb \ec \types \mor{A}(\check x,\hat x) [ x \csplit \check x, \hat x ] }
+          {x \pmcol A \cb (\ec \types \mor{A}(\check x,\hat x)) [ x \csplit \check x, \hat x ] }
 
-\inferrule{\Delta' \cb J \\
-           \Delta \vdash \theta : \Delta'
-          }
-          {\Delta \cb J [ \theta ]}
+\inferrule{\Delta,x \pmcol A \cb (\Gamma \vdash M) [ \theta, x \csplit (\check x,\hat y) ]}
+          {\Delta,x \pmcol A,y \pmcol{A} \cb (\Gamma, \mor{A} (\hat x,\check y) \vdash M)
+            [\theta,x \csplit (\check x , \hat x), y \csplit (\check y, \hat y)]}
 
+%% \inferrule{\Delta \cb (\Gamma \vdash M) [ \theta, a/\hat{x} ] \\ (\hat{x} \# a)}
+%%           {\Delta,x \pmcol A \cb (\Gamma, \mor{A}(a,\check x) \vdash M)[\theta,x \csplit \check x , \hat x]}
+\\
 \end{mathpar}
+
+Need to think more about based path induction.  
+
+%% For the morphism induction rule, in the conclusion, we have 
+%% \[
+%% \Delta, x \pmcol A \vdash (\theta,x \csplit
+%%   \check x , \hat x) : (\Phi,\check{x} :\m A, \hat{x} :\p A)
+%% \]
+%% and 
+%% \[
+%% (\Phi,\check{x} :\m A, \hat{x} :\p A) \types (\Gamma,\mor{A}(a,\check{x}) \vdash M) \ok
+%% \]
+%% so $\Phi$ should be $\Psi\m_\Gamma,\Psi_a,\Psi_M$
+%% \begin{mathpar}
+%% \Psi_\Gamma \types \Gamma \ctx
+
+%% \Psi_a \types a : A
+
+%% \Psi_M \types M \type
+%% \end{mathpar}
 
 \end{document}
 
