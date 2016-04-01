@@ -1,0 +1,953 @@
+\documentclass{amsart}
+\usepackage{amssymb,amsmath,latexsym,stmaryrd,mathtools}
+\usepackage{cleveref}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\let\types\vdash % turnstile
+\def\cb{\mid} % context break
+\def\op{^{\mathrm{op}}}
+\def\p{^+} % variances on variables
+\def\m{^-}
+\let\mypm\pm
+\let\mymp\mp
+\def\pm{^\mypm}
+\def\mp{^\mymp}
+\def\jdeq{\equiv}
+\def\cat{\;\mathsf{cat}}
+\def\type{\;\mathsf{type}}
+\def\ok{\;\mathsf{ok}}
+\def\ctx{\;\mathsf{ctx}}
+\let\splits\rightrightarrows
+\def\flip#1{#1^*} % reverse the variances of all variables
+\def\dual#1{#1^\vee} % reverse variances *and* interchange \hat and \check
+\def\mor#1{\hom_{#1}}
+\def\id{\mathrm{id}}
+\def\ec{\cdot} % empty context
+\def\psplit{\overset{\mathsf{pair}}{\splits}}
+\def\csplit{{\splits}}
+\def\iso{\cong}
+\def\tpair#1#2{#1\otimes #2}
+\def\cpair#1#2{\langle #1,#2\rangle}
+\def\tlet#1,#2:=#3in{\mathsf{let}\; \tpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\clet#1,#2:=#3in{\mathsf{let}\; \cpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\mix#1,#2 with #3 in{\mathsf{mix} {\scriptsize \begin{array}{c} \check{#1} \coloneqq \check{#3} \\ \hat{#2} \coloneqq \hat{#3} \end{array}  }\mathsf{in}\;}
+\def\pcol{\overset{\scriptscriptstyle +}{:}}
+\def\mcol{\overset{\scriptscriptstyle -}{:}}
+\def\pmcol{\overset{\scriptscriptstyle \pm}{:}}
+\def\mpcol{\overset{\scriptscriptstyle \mp}{:}}
+\def\lr{\leftrightarrow}
+\newcommand{\coend}{\begingroup\textstyle\int\endgroup}
+\newcommand{\Set}{\mathrm{Set}}
+\newcommand{\unsigned}[1]{#1^0}
+\newcommand{\joinvar}[1]{\left[#1\right]}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+
+
+\title{A directed type theory for formal category theory --- explicit substitution rules}
+\author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
+\begin{document}
+\maketitle
+
+Syntax: 
+
+\begin{mathpar}
+\begin{array}{l}
+\Psi ::= \cdot \mid \Psi_1,\Psi_2 \mid x \pcol A \mid x \mcol A \\
+\Delta ::= \cdot \mid \Delta_1,\Delta_2 \mid x \pmcol A \\
+\Phi ::= \cdot \mid \Phi_1,\Phi_2 \mid x \pcol A \mid x \mcol A \mid x \pmcol A  \\
+\\ 
+\Gamma ::= \cdot \mid \Gamma, M\\
+J ::= \Gamma \types N \mid J[\theta]
+\end{array}
+\end{mathpar}
+
+We silently coerce a $\Psi$ or a $\Delta$ to a $\Phi$.  
+
+For every $\Psi$, there is another $\Psi$-context $\Psi\m$ defined by mapping the function 
+\[
+\begin{array}{lll}
+\pcol  & \mapsto & \mcol \\
+\mcol  & \mapsto & \pcol \\
+\end{array}
+\]
+
+For every $\Psi$, there is a $\Delta$-context $\Psi\pm$ defined by mapping the function 
+\[
+\begin{array}{lll}
+\pcol  & \mapsto & \pmcol \\
+\mcol  & \mapsto & \pmcol \\
+\end{array}
+\]
+
+Judgements and their meaning (described as if it's normal categories;
+TODO extend with enriched/equipment terms).  
+
+\begin{itemize}
+
+\item A context $\Phi$ represents a product category, or a bunch of
+  categories if we have multicategories in mind, where $x \pcol A$ means
+  $A$, $x \mcol A$ means $A\op$, $x \pmcol A$ means $A\op \times A$.
+  and $x \mpcol A$ means $A \times A\op$.
+
+\item $\Phi \types \theta : \Phi'$ means a functor from $\Phi$ to
+  $\Phi'$.  Warning for multicategories: not every thing will be
+  literally a list arrows, but maybe everything could normalize to one?
+
+\item $\Psi \types a : A$ means a functor from $\Psi$ to $A$ (note that
+  only signed variables are allowed here).  
+
+\item $\Phi \types J \ok$ means $J$ is a functor from $\Phi \to \Set$
+
+\item $\Psi \types \Gamma \ctx$ means $\Gamma$ is a functor from $\Psi$
+  to $\Set$ (note that only signed variables are allowed here)
+
+\item $\Psi \types M \type$ means $M$ is a functor from $\Phi$ to $\Set$
+  (note that only signed variables are allowed here)
+
+\item $\Delta \cb J$, where $\Delta \types J \ok$, means an element of
+  the end of $J$ (which makes sense because a $x \pmcol A$ assumptions
+  stands for two assumptions $A\op,A$).
+\end{itemize}
+
+\subsection*{Category Terms}
+
+\begin{mathpar}
+\inferrule{x \pcol A \in \Psi_1}
+          {x \pcol A \in (\Psi_1,\Psi_2)}
+\and
+\inferrule{x \pcol A \in \Psi_2}
+          {x \pcol A \in (\Psi_1,\Psi_2)}
+\and
+\inferrule{ }
+          {x \pcol A \in x \pcol A}
+
+\inferrule{ x \pcol A \in \Psi }
+          {\Psi \vdash x : A}
+\\ 
+\end{mathpar}
+
+\subsection*{Substitutions}
+
+\begin{mathpar}
+\inferrule{ }
+          { \Phi \types 1_\Phi : \Phi}
+\and
+\inferrule{ \Phi \types \theta : \Phi' \\
+            \Phi' \types \theta' : \Phi''}
+          { \Phi \types \theta;\theta' : \Phi'' }
+\and
+\inferrule{ \Phi_1 \types \theta_1 : \Phi_1' \\
+            \Phi_2 \types \theta_2 : \Phi_2' 
+          }
+          { \Phi_1,\Phi_2 \types (\theta_1,\theta_2) : \Phi_1',\Phi_2' }
+\and
+\inferrule{ \Psi \types a : A }
+          { \Psi \types a/x\p : (x \pcol A) }
+\and
+\inferrule{ \Psi\m \types a : A }
+          { \Psi \types a/x\m : (x \mcol A) }
+\\ 
+\inferrule{ \Psi \types a : A }
+          { \Psi\pm \types a/x\pm : (x \pmcol A) }
+\and
+\inferrule{ \Psi\m \types a : A }
+          { \Psi\pm \types a/x\mp : (x \pmcol A) }
+
+\inferrule{ }
+          {\Psi\pm \types \Psi\pm \csplit (\Psi\m,\Psi) : (\Psi\m,\Psi)}
+\\
+\end{mathpar}
+
+%% \inferrule{ }
+%%           { (x \pmcol A) \types (x \csplit y,z) : (y \mcol A , z \pcol A)}
+
+\subsection*{Type Contexts}
+
+\begin{mathpar}
+  \inferrule{
+  }{
+    \ec \types \ec \ctx
+  }
+  \and
+  \inferrule{
+    \Psi_1 \types \Gamma \ctx\\
+    \Psi_2 \types M \type\\
+  }{
+    \Psi_1,\Psi_2 \types \Gamma,M \ctx
+  }
+\\
+\end{mathpar}
+
+\subsection*{Judgement Well-formedness}
+
+\begin{mathpar}
+  \inferrule{
+    \Psi_1 \types \Gamma \ok\\
+    \Psi_2 \types M \type\\
+  }{
+    \Psi_1\m,\Psi_2 \types (\Gamma \vdash M) \ctx
+  }
+  \and
+  \inferrule{
+    \Phi' \types J \ok \\
+    \Phi \types \theta : \Phi'
+  }{
+    \Phi \types J[\theta] \ok
+  }
+\end{mathpar}
+
+\subsection*{Sequent Structural Rules}
+
+\begin{mathpar}
+\inferrule{\Psi \types N \type }
+          {\Psi\pm \cb (N \types N) [ \Psi\pm \csplit (\Psi\m,\Psi)]}
+
+\inferrule{\Delta' \cb J \\
+           \Delta \vdash \theta : \Delta'
+          }
+          {\Delta \cb J [ \theta ]}
+
+\end{mathpar}
+
+\subsection*{Morphism types}
+
+\begin{mathpar}
+\inferrule{ }{x\mcol A, y\pcol A \types \mor A(x,y) \type}\and
+
+\inferrule{ }
+          {x \pmcol A \cb \ec \types \mor{A}(\check x,\hat x) [ x \csplit \check x, \hat x ] }
+
+\inferrule{\Delta' \cb J \\
+           \Delta \vdash \theta : \Delta'
+          }
+          {\Delta \cb J [ \theta ]}
+
+\end{mathpar}
+
+\end{document}
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+We describe a two-level theory with two kinds of contexts and types.
+The first level, whose types we call \textbf{categories}, is a simple linear type theory with an involutive modality, represented judgmentally by assigning variances to variables in the context.
+Thus, for instance, a typical term judgment would look like
+\[ x \pcol A, y\mcol B, z \pcol C \types t:D \]
+As usual, linearity means that all the rules maintain the invariant that each variable in the context is used exactly once in the conclusion.
+In particular, there are no contraction and weakening rules; but we do allow an unrestricted (and usually implicit) exchange rule.
+We often write $\Psi$ for contexts of category-variables marked with variances (``\textbf{psi}gned contexts''), and we write $\flip\Psi$ for the analogous context with all variances reversed; thus $\flip{(x\pcol A, y\mcol B)} = (x\mcol A, y\pcol B)$.
+
+Substitution into a variable of variance ``$-$'' (a ``contravariant variable'') reverses variances.
+For instance, we have
+\begin{mathpar}
+  \inferrule{x\pcol A, y \mcol B \types f(x,y):C \\ z\mcol C \types g(z):D}{x\mcol A, y\pcol B \types g(f(x,y)):D}
+\end{mathpar}
+If necessary, we may write $\flip{f(x,y)}$ to denote the term $f(x,y)$ with all the variances of its variables reversed; of course this is not by itself a valid term, but only something that can be substituted for a contravariant variable.
+
+The second level is a more complicated sort of linear type theory, whose types we call \textbf{types} (or sometimes \textbf{sets} or \textbf{modules}), and that depends ``quadratically'' on the first level (in a sense made precise below).
+Its basic type judgment is
+\[ \Psi \types M \type \]
+That is, each type depends on some collection of category-variables, with variance.
+
+The basic term judgment for types is
+\[ \Delta \cb \Gamma \types M \]
+Here $\Gamma$ is a context of type-variables and $M$ is a type.
+Unlike the first level, we formulate this second level as a sequent calculus, and instead of including terms in the judgments we regard the derivations themselves as the (normal-form) terms.
+Later on we may introduce an equational theory, a term calculus, a third layer of logic with equality, or other techniques.
+This sequent calculus is also structurally linear, with no contraction or weakening, but with unrestricted exchange.
+
+The interesting thing happens in the context $\Delta$, which is a list of category-variables \emph{without} variances on which the types in $\Gamma$ and $M$ can depend.
+This dependence is ``quadratic'' in the following sense: all the rules maintain the invariant that each variable in $\Delta$ appears \emph{twice} in $\Gamma$ and $M$, and that the two occurrences have opposite variance (where the variance of $\Gamma$ is flipped relative to $M$).
+In fact, to be more precise, the actual dependence of $\Gamma$ and $M$ is on a category-context \emph{with} variances that is obtained from $\Delta$ by splitting each variable into two with opposite variance.
+The implementation will, of course, use de Brujin indices; when writing judgments with named variables, if $x:A$ is a variable in $\Delta$ we write $\hat{x}\pcol A$ and $\check{x}\mcol A$ for the two corresponding signed variables that must appear in $\Gamma$ and $M$ (exactly once each).
+
+If $\Psi$ is a signed context, we write $\unsigned{\Psi}$ for the unsigned context obtained by discarding the variances, and also any hats or checks on the variables.
+And if the variables in $\Psi$ have hats and checks (which technically means that it was obtained as part of a splitting an unsigned context), we write $\dual\Psi$ for the signed context obtained by reversing the variances \emph{and} interchanging hats and checks.
+In particular, we always have $\unsigned{\Psi} = \unsigned{(\dual\Psi)}$. % and $\unsigned{\Psi} \splits \Psi,\dual\Psi$.
+
+With this notation, we can express the variable dependence conditions as follows:
+\begin{center}
+  $\Delta\cb\Gamma\types N$ requires as preconditions that
+  $\begin{array}{c}
+     \Delta = \unsigned{\Psi}\\
+     \Psi, \dual\Psi \cong \Psi_1,\Psi_2\\
+     \flip{\Psi_1} \types \Gamma \ctx\\
+     \Psi_2 \types M \type
+  \end{array}$
+\end{center}
+As above, the notation $\flip{\Psi_1}$ means that we reverse the variances of the variables in $\Psi_1$ (without changing the hats and checks).
+%and $\Delta\splits \Psi_1,\Psi_2$ means that each variable $x$ in the unsigned context $\Delta$ becomes a pair $\hat x, \check x$ of opposite variance in the signed context $\Psi_1,\Psi_2$.
+For example, if $\Delta = (x:A)$ then we could have $\Psi = (\hat x\pcol A)$, so that $\dual\Psi = (\check x\mcol A)$; we could then take $\Psi_1 = (\check x\mcol A)$ and $\Psi_2=(\hat x\pcol A)$, so that $\flip\Psi_1 = (\check x\pcol A)$ and so a well-formed judgement could have $\check x \pcol A \types \Gamma \ctx$ and $\hat x \pcol A \types A \type$.
+Note that that $\check{x}$ is allowed to occur covariantly in $\Gamma$, which counts as a negative occurrence overall, because $\Gamma$ is itself in a contravariant position.
+
+To express rules more readably, we introduce the following combined judgment
+\[ \inferrule{\flip{\Psi_1} \types \Gamma\ctx \\ \Psi_2 \types N\type}{\Psi_1,\Psi_2 \types \Gamma\ctx, N\type} \]
+As always, concatenation of contexts is implicitly done up to permutation of variables.
+Thus, the preconditions for $\Delta\cb\Gamma\types N$ to make sense can alternatively be written as $\Delta = \unsigned{\Psi}$ where $\Psi,\dual{\Psi} \types \Gamma\ctx, N\type$.
+
+If $\hat{x}$ appears in $M$ and $\check{x}$ appears in $\Gamma$, as above, then our judgment might look like this:
+\[ x:A \cb N(\check x) \types M(\hat x) \]
+In this case we are simply talking about a morphism of types ``over the category $A$'' --- in semantic terms, a natural transformation.
+The dual case when $\check{x}$ appears in $M$ and $\hat{x}$ appears in $\Gamma$ simply represents a natural transformation between \emph{contravariant} functors rather than between covariant ones.
+With this case in mind, one might say that we resolve the problem of ``dependent linear type theory'' by stipulating that both the context and the conclusion of a ``linearly dependent judgment'' must \emph{separately} depend ``linearly'' on the same variables.
+
+However, it is the additional freedom to allow $\hat{x}$ and $\check{x}$ to \emph{both} appear in $M$ and neither in $\Gamma$, or vice versa, that gives us the ability to express formal versions of nontrivial facts about category theory.
+Semantically, these judgments correspond to what are sometimes called \emph{extraordinary natural transformations}, or simply \emph{extranatural transformations}.
+For example, each category $A$ will have a type of morphisms that is contravariant in its first variable and covariant in its second:
+\[ x\mcol A, y\pcol A \types \mor A(x,y) \type \]
+To express the \emph{composition} of such morphisms then requires an ``extranaturality judgment'':
+\[ x:A, y:A, z:A \cb \mor A(\hat x, \check y), \mor A(\hat y, \check z) \types \mor A(\check x, \hat z) \]
+The \emph{identity} morphism judgment is similarly extranatural on the other side:
+\[ x:A \cb \ec \types \mor A(\check x,\hat x) \]
+
+% More formally, context splitting is defined by the following possibilities:
+% \begin{mathpar}
+% \inferrule{ }{\cdot \splits \cdot,\cdot}\\
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\check x \mcol A,\hat x \pcol A),\Psi_2}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits \Psi_1,(\Psi_2,\check x \mcol A,\hat x \pcol A)}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
+% \end{mathpar}
+
+% Frequently our rules have a $\unsigned{\Psi}$ in the conclusion where $\Psi$ and/or $\dual{\Psi}$ occur in the premises; when read upwards this means that part of the unsigned context $\Delta$ in the conclusion is identified with $\unsigned{\Psi}$ and hence gets split into $\Psi$ and $\flip{\Psi}$; but this is a special ``paired'' sort of splitting, where of the two variables $\hat x$ and $\check x$ arising from any variable $x$ in $\Delta$, one must be in $\Psi_1$ and one in $\Psi_2$:
+
+% \begin{mathpar}
+% \inferrule{ }{\ec \psplit \ec,\ec}\\
+% \inferrule{\Delta \psplit \Psi_1,\Psi_2}
+%           {\Delta, x:A \psplit (\Psi_1\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
+% \inferrule{\Delta \psplit \Psi_1,\Psi_2}
+%           {\Delta, x:A \psplit (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
+% \end{mathpar}
+
+% Note that when $\Delta \psplit \Psi_1,\Psi_2$, we have $\dual{\Psi_1} = \Psi_2$ and $\Delta = \unsigned{\Psi_1} = \unsigned{\Psi_2}$.
+
+If $a$ is a category-term in context $\Psi$, we will write $\dual{a}$ for the result of interchanging hats and checks in $a$.
+This is ``in context $\dual{\Psi}$'' but of course it is not well-typed on its own; like $\flip{a}, $its purpose is to be substituted into a contravariant variable.
+See, for instance, the substitution rule below.
+
+
+\section{Basic rules and type formers}
+\label{sec:rules}
+
+\subsection{Structural rules}
+\label{sec:structural-rules}
+
+The basic structural rules for context formation are unsurprising, given our linearity restriction:
+\begin{mathpar}
+  \inferrule{
+  }{
+    \ec \types \ec \ctx
+  }
+  \and
+  \inferrule{
+    \Psi_1 \types \Gamma \ctx\\
+    \Psi_2 \types M \type\\
+  }{
+    \Psi_1,\Psi_2 \types \Gamma,M \ctx
+  }
+\end{mathpar}
+
+For the moment, we are hoping to describe a cut-free sequent calculus with an admissible cut rule, and also admissible substitution for category-variables.
+We postpone describing exactly what the cut rule will look like, since it is somewhat complicated, but we can state the intended identity rule at this point:
+\begin{mathpar}
+  \inferrule{
+    \Psi \types M \type\\
+  }{
+    \unsigned{\Psi} \cb M[\dual{\Psi}/\Psi] \types M
+  }
+\end{mathpar}
+For example, we might have
+\begin{mathpar}
+  \inferrule{
+    x\pcol A, y\mcol B, z\pcol C \types M(x,y,z)\type\\
+  }{
+    x:A, y:B, z:C \cb M(\check x, \hat y, \check z) \types M(\hat x, \check y, \hat z)
+  }
+\end{mathpar}
+The substitution rule for category-variables (which we also intend to be admissible) will be
+\begin{mathpar}
+  \inferrule{
+    \Psi \types a:A \\
+    \Delta,x:A \cb \Gamma \types M \\
+  }{
+    \Delta,\unsigned\Psi \cb \Gamma[a/\hat x,\dual{a}/\check x] \types M[a/\hat x,\dual{a}/\check x]
+  }
+\end{mathpar}
+Of course, by quadraticality, each of $\hat x$ and $\check x$ appears exactly once in $\Gamma$ and $M$ combined. 
+We may abbreviate a substitution $M[a/\hat x,\dual{a}/\check x]$ by $M[a/x]$.
+
+Now we are ready to start giving the rules for some type formers.
+Since we want substitution into category-variables to be admissible, many rules must incorporate a substitution; but they are easier to understand before that substitution has been incorporated.
+Thus, we often give both versions.
+Note that the version with substitutions included can usually be derived fairly automatically from the other.
+
+
+\subsection{Morphism types}
+\label{sec:morphism-types}
+
+We begin with the morphism types.
+The formation and right rules are straightforward given the expected variance:
+\begin{mathpar}
+  \inferrule{A\cat}{x\mcol A, y\pcol A \types \mor A(x,y) \type}\and
+  \inferrule{A\cat}{x: A \cb \ec \types \mor A(\check x,\hat x)}\and
+\end{mathpar}
+When we incorporate substitutions, these become:
+\begin{mathpar}
+  \inferrule{A\cat \\ \Psi_1\types a:A \\ \Psi_2 \types b:A}{\flip{\Psi_1},\Psi_2 \types \mor A(a,b) \type}\and
+  % \inferrule{\Psi \types a:A \\ \Delta\psplit \Psi,\Psi'}{\Delta \cb \ec \types \mor A(a,a)}\and
+  \inferrule{
+  	\Psi \types a:A \\
+  }{
+  	\unsigned\Psi \cb \ec \types \mor A(\dual a,a)
+  }
+\end{mathpar}
+There are three versions of the left rule.
+The first ``two-sided'' one is a ``directed'' analogue of the elimination rule for equality due to Lawvere and Martin-L\"of:
+\begin{mathpar}
+  \inferrule{
+    \Delta,x:A \cb \Gamma[\hat x/\hat y] \types M[\hat x/\hat y]
+  }{
+    \Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi,\hat x\pcol A,\check x \mcol A \types \Gamma\ctx, M\type\\
+    \Psi_a \types a:A \\
+    \Psi_b \types b:B \\
+    \unsigned\Psi,x:A \cb \Gamma \types M
+  }{
+    \unsigned{\Psi},\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x,\dual{b}/\hat{x}],\mor A(a,b)
+    \types M[\dual{a}/\check x,\dual{b}/\hat{x}]
+  }\and
+\end{mathpar}
+Note that although we write substitutions in both $\Gamma$ and $M$, the linearity means that each variable such as $\hat x$ or $\check x$ can only occur in one of the two.
+
+For instance, we can use this rule to define composition of morphisms:
+\begin{equation}
+  \inferrule{\inferrule{\inferrule{x\pcol A\types x:A}{x:A\cb \ec \types \mor A(\check x, \hat x)}}
+    {x:A,y:A \cb \mor A(\hat x, \check y) \types \mor A(\check x, \hat y)}}
+  {x:A, y:A, z:A \cb \mor A(\hat x, \check y), \mor A(\hat y, \check z) \types \mor A(\check x, \hat z)}\label{eq:composition}
+\end{equation}
+Starting from the bottom we have the left rule on $y,z$, then the left rule again on $x,y$, then the right rule on $x$.
+Note that ${x:A,y:A \cb \mor A(\hat x, \check y) \types \mor A(\check x, \hat y)}$ is an instance of the identity rule, so if we had that rule postulated we could stop there; but if identity is to be admissible then it would reduce to the above complete derivation.
+
+Similarly, we have the functorial action of any judgment $x\pcol A \types f(x):B$:
+\begin{equation}
+  \label{eq:functor}
+  \inferrule{\inferrule{x\pcol A \types f(x):B}
+    {x:A \cb \ec \types \mor B(f(\check x),f(\hat x))}}
+  {x:A, y:A \cb \mor A(\hat x, \check y) \types \mor B(f(\check x),f(\hat y))}
+\end{equation}
+
+We also consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Morhing rule for identity types):
+\begin{mathpar}
+  \inferrule{\Delta\cb \Gamma[\dual b/\check x] \types M[\dual b/\check x]}{\Delta,x:A\cb \Gamma,\mor A(\hat x, \dual b) \types M}\and
+  \inferrule{\Delta\cb \Gamma[a/\hat x] \types M[a/\hat x]}{\Delta,x:A\cb \Gamma,\mor A(a, \check x) \types M}\and
+\end{mathpar}
+And with substitutions:
+\begin{mathpar}
+  \inferrule{
+    \Psi,\dual\Psi,\Psi_b,u\mcol A \types \Gamma\ctx, M\type\\
+    \Psi_a \types a:A\\
+    \unsigned\Psi, \unsigned{\Psi_b} \cb \Gamma[\dual b/ u] \types M[\dual b/ u]
+  }{
+    \unsigned{\Psi},\unsigned{\Psi_b},\unsigned{\Psi_a}\cb \Gamma[\dual a/ u],\mor A(a, \dual b) \types M[\dual a/ u]
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi,\dual{\Psi_a},v\pcol A \types \Gamma\ctx, M\type\\
+    \Psi_b \types b:B\\
+    \unsigned\Psi, \unsigned{\Psi_a}\cb \Gamma[a/v] \types M[a/v]
+  }{
+    \unsigned\Psi,\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[b/v],\mor A(a, \dual b) \types M[b/v]
+  }\and
+\end{mathpar}
+
+Either of these implies the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
+The converse implication in full dependent type theory requires a universe, so we probably don't expect it to hold here.
+I think we will probably want the one-sided rules (but there ought to be some compatibility between them, so that when they both apply they give the same result).
+Note that they can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
+
+With morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types b:B$, and the 2-cells from $b$ to $b'$ are the judgments $x:A \cb \ec \types \mor B(b,b')$.
+The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) can be obtained from~\eqref{eq:composition} once we have a cut rule.
+Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~\eqref{eq:functor}.
+
+\red{Left off updating to $\unsigned{\Psi}$ and $\Delta \types \Gamma\ctx, M\type$ here.}
+
+\subsection{Tensor types}
+\label{sec:tensor-types}
+
+The formation rule for the tensor type:
+\begin{mathpar}
+  \inferrule{\Psi_M, \Psi \types M\type \\
+    \Psi_N, \flip{\Psi} \types N\type}
+  {\Psi_M, \Psi_N \types M \otimes_\Psi N\type}\and
+\end{mathpar}
+The left rule
+\begin{mathpar}
+  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
+    \Delta' \psplit \flip{\Psi},\Psi \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M,\Psi \types M\type \\
+    \Psi_N,\flip{\Psi} \types N\type \\ \Psi_C \types C\type \\\\
+    \Delta, \Delta' \cb \Gamma,M,N \types C}
+  {\Delta \cb \Gamma, M\otimes_\Psi N \types C}\and
+\end{mathpar}
+and right rule
+\begin{mathpar}
+  \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
+    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
+    \Psi_a \types a:A \\
+    \Psi_{\Gamma_M},\Psi_a^{\pm} \types \Gamma_M\ctx \\
+    \Psi_{\Gamma_N},\Psi_a^{\mp} \types \Gamma_N\ctx \\\\
+    \Psi_M,x\pmcol A \types M\type \\ \Psi_N,x\mpcol A \types N\type \\\\
+    \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
+    \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
+  {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
+\end{mathpar}
+
+\subsubsection{Non-binding tensor}
+With coends and non-binding tensor, the binding tensor rules become admissible.
+
+The non-binding tensor formation rule is
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+    }{
+    \Psi_M,\Psi_N \types M\otimes N\type
+  }
+\end{mathpar}
+with left rule
+\begin{mathpar}
+  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
+    \Psi_\Gamma \types \Gamma\ctx \\\\
+    \Psi_M \types M\type \\ \Psi_N \types N\type \\ \Psi_C \types C\type \\\\
+    \Delta \cb \Gamma,M,N \types C}
+  {\Delta \cb \Gamma, M\otimes N \types C}\and
+\end{mathpar}
+and right rule
+\begin{mathpar}
+  \inferrule{
+    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
+    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
+    \Psi_{\Gamma_M} \types \Gamma_M\ctx \\
+    \Psi_{\Gamma_N} \types \Gamma_N\ctx \\
+    \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
+    \Delta_M \cb \Gamma_M \types M \\
+    \Delta_N \cb \Gamma_N \types N
+  }{
+    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types M\otimes N
+  }\and
+\end{mathpar}
+
+\subsection{Co-end type}
+Formation rule:
+\begin{mathpar}
+  \inferrule{
+    \Psi, \hat x\pcol A, \check x\mcol A \types M \type \\
+    }{
+    \Psi \types \coend^{x:A} M \type
+  }\and
+\end{mathpar}
+Left rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C \\
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M, \hat x\pcol A, \check x\mcol A \types M \type \\
+    \Psi_C \types C \type \\
+    \Delta, x:A \cb \Gamma, M \types C
+    }{
+    \Delta \cb \Gamma, \coend^{x:A} M \types C
+  }\and
+\end{mathpar}
+\red{
+\begin{mathpar}
+  \inferrule{
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M, \hat x\pcol A, \check x\mcol A \types M \type \\
+    \Psi_C \types C \type \\
+    \joinvar{\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C}, x:A \cb \Gamma, M \types C
+    }{
+    \joinvar{\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C} \cb \Gamma, \coend^{x:A} M \types C
+  }\and
+\end{mathpar}
+}
+Right rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \iso \Delta'_a \\
+    \Delta_a \psplit (\flip{\Phi_\Gamma},\Phi_M),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Phi_\Gamma',\flip{\Phi_M'}) \\
+    \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
+    \Psi_a \types a:A \\
+    \Psi_{\Gamma},\Phi_\Gamma,\Phi_\Gamma' \types \Gamma\ctx \\
+    \Psi_M,\Phi_M,\Phi_M',\hat x\pcol A,\check x\mcol A \types M\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+  }\and
+\end{mathpar}
+\red{
+\begin{mathpar}
+  \inferrule{
+    \Phi_\Gamma \iso \Phi_\Gamma' \\
+    \Phi_M \iso \Phi_M' \\
+    \Phi_\Gamma, \flip{\Phi_M} \types a:A \\\\
+    \Psi_{\Gamma},\Phi_\Gamma,\flip{{\Phi_\Gamma'}} \types \Gamma\ctx \\\\
+    \Psi_M,\Phi_M,\flip{{\Phi_M'}},\hat x\pcol A,\check x\mcol A \types M\type \\\\
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M},\unsigned{{\Phi_\Gamma'}}, \unsigned{{\Phi_M'}} \cb \Gamma \types M[a/\hat x,a[\Phi_\Gamma'/\Phi_\Gamma, \Phi_M'/\Phi_M]/\check x]
+  }{
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+  }\and
+\end{mathpar}
+}
+Co-Yoneda lemma:
+\begin{mathpar}
+  \inferrule{
+    \inferrule*{
+      \inferrule*{
+        \vdots
+      }{
+        \Delta,\Delta_a \cb M(a) \types M(a)
+      } \\
+      \inferrule*{
+        \vdots
+      }{
+        \Delta'_a \cb \cdot \types \hom_A(a',a')
+      }
+    }{
+      \Delta,\Delta_a,\Delta'_a \cb M(a) \types M(a) \otimes \hom_A(a',a')
+    }
+  }{
+    \Delta,\Delta_a \cb M(a) \types \coend^{x:A} M(\hat x)\otimes \hom_A(\check x,a)
+  }\and
+\end{mathpar}
+and conversely
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \Delta,\Delta_a \cb M(a) \types M(a)
+    }{
+      \Delta,\Delta_a,x:A \cb M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+    }
+  }{
+    \Delta,\Delta_a \cb \coend^{x:A} M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
+  }
+\end{mathpar}
+\subsubsection{Older stuff}
+%\begin{mathpar}
+%	\inferrule{
+%		r
+%	}{
+%		\Delta, \Delta_a, \Delta_b \cb \Gamma \types \coend_{}
+%	}
+%\end{mathpar}
+We should probably base the right rule on the following function:
+\begin{equation}
+	\lambda f.\lambda z.(z, fzz) : [\coend_x \coend_y G(x^-, x^+, y^-, y^+)] \to [\coend_z \coend^w G(z^-, w^+, w^-, z^+)]
+\end{equation}
+Without built-in substitution, that principle becomes (thinking $G = \Gamma \to M$, where only $M$ depends on $w$):
+\begin{mathpar}
+	\inferrule{
+		\Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	}{
+		\Delta, z : A \cb \Gamma \types \coend^{w:A} M
+	}\and
+\end{mathpar}
+For instance, we can prove:
+\begin{equation}
+	\inferrule{
+		\inferrule{
+			\inferrule{
+				x \pcol A \types F(x) \type
+			}{
+				x : A \cb F(\check x) \types F(\hat x)
+			}
+			\qquad
+			\inferrule{
+				y \pcol A \types y \pcol A
+			}{
+				y : A \cb \ec \types \hom_A(\check y, \hat y)
+			}
+		}{
+			x : A, y : A \cb F(\check x) \types F(\hat x) \otimes \hom_A(\check y, \hat y)
+		}
+	}{
+		z : A \cb F(\check z) \types \coend^{w:A} F(\hat w) \otimes \hom_A(\check w, \hat z)
+	}
+\end{equation}
+
+I have not been able to make sense of a rule with built-in substitution.
+
+\subsection{End type}
+Formation rule:
+\begin{mathpar}
+  \inferrule{
+    \Psi,\hat x\pcol A,\check x\mcol A \types M \type \\
+    }{
+    \Psi \types \coend_{x:A} M \type
+  }\and
+\end{mathpar}
+Right rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\\\
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M,\hat x\pcol A,\check x\mcol A \types M \type \\
+    \Delta, x:A \cb \Gamma \types M
+    }{
+    \Delta \cb \Gamma \types \coend_{x:A} M
+  }\and
+\end{mathpar}
+Left rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \iso \Delta'_a \\\\
+    \Delta_a \psplit (\flip{\Psi_1},\flip{\Psi_2},\Psi_3),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\Psi_2',\flip{\Psi_3'}) \\
+    \Delta \splits \flip{\Psi_{\Gamma}},\flip{\Psi_M},\Psi_C \\\\
+    \Psi_a \types a:A \\ \Psi_{\Gamma},\Psi_1,\Psi_1' \types \Gamma\ctx \\
+    \Psi_M,\Psi_2,\Psi'_2,\hat x\pcol A,\check x\mcol A \types M\type \\
+    \Psi_C,\Psi_3,\Psi'_3 \types C\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma, M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x] \types C
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1], \coend_{x:A}M[\Psi_2/\Psi'_2] \types C[\Psi_3/\Psi'_3]
+  }\and
+\end{mathpar}
+
+\subsubsection{Older stuff}
+The left rule can based on the function
+\begin{equation*}
+	[\coend_x \coend_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \coend_{z}[(\coend_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
+\end{equation*}
+where $F: A \times A\op \times A \times A\op \to \Set$ and $G : A\op \times A \to \Set$, defined by
+\begin{equation}
+	\lambda h.\lambda z.\lambda k.h(z, z, k(z))
+\end{equation}
+which should be in the end as we have only passed $z$ to ends. Then it becomes
+\begin{mathpar}
+	\inferrule{
+		\Delta, x : A, y : A \cb \Gamma[\check x / \check z , \hat y / \hat z], M[\check x / \check z , \hat x / \hat w , \check x / \check w , \hat y / \hat z] \types C[\check x / \check z , \hat y / \hat z]
+	}{
+		\Delta, z : A \cb \Gamma, \coend_{w : A} M \types C
+	}
+\end{mathpar}
+
+\subsection{Hom types}
+\label{sec:hom-types}
+
+The type former for the (non-binding) hom type is
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+  }{
+    \flip{\Psi_M},\Psi_N \types M\multimap N\type
+  }
+\end{mathpar}
+with right rule
+\begin{mathpar}
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\Psi_N \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
+    \Delta \cb \Gamma, M \types N
+  }{
+    \Delta \cb \Gamma \types M\multimap N
+  }
+\end{mathpar}
+and left rule
+\begin{mathpar}
+  \inferrule{
+    \Delta_1 \splits \flip{\Psi_{\Gamma_1}},\Psi_M \\
+    \Delta_2 \splits \flip{\Psi_{\Gamma_2}},\flip{\Psi_N},\Psi_C \\\\
+    \Psi_{\Gamma_1} \types \Gamma_1\ctx \\ \Psi_{\Gamma_2} \types \Gamma_2\ctx \\\\
+    \Psi_M \types M\type \\ \Psi_N \types N\type\\ \Psi_C \types C\type \\\\
+    \Delta_1 \cb \Gamma_1 \types M \\ \Delta_2 \cb \Gamma_2,N \types C
+  }{
+    \Delta_1,\Delta_2 \cb \Gamma_1,\Gamma_2,M\multimap N \types C
+  }
+\end{mathpar}
+
+\subsection{The type classifier}
+\label{sec:type-classifier}
+
+
+\section{Category formers}
+\label{sec:category-formers}
+
+\subsection{Opposites}
+\label{sec:opposites}
+
+\subsection{Tensor products}
+\label{sec:tensor-products}
+
+\subsection{Exponentials}
+\label{sec:exponentials}
+
+\subsection{Collages}
+\label{sec:collages}
+
+
+
+\section{Terms}
+
+For now, the rules for terms are written without substitutions incorporated.
+We just take care that for variables mentioned explicitly in the contexts of the conclusion, it would make sense to substitute any reasonable term for them wherever they occur in the term being defined.
+
+Morphism types:
+\begin{mathpar}
+  \inferrule{ }{x:A \cb \ec \types \id(x):\mor A(\check x,\hat x)}\and
+  \inferrule{
+    \Delta,x:A \cb \Gamma[\hat x/\hat y] \types m:M[\hat x/\hat y]
+  }{
+    \Delta,x:A,y:A\cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.m, x, y, f):M
+  }\textsc{(2-sided)}\and
+  \inferrule{\Delta\cb \Gamma[a/\hat x] \types m:M[a/\hat x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(a, \check x) \types \hat J(m,x,f) :M}\textsc{(covariant)}\and
+  \inferrule{\Delta\cb \Gamma[b/\check x] \types m:M[b/\check x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(\hat x, b) \types \check J(m,x,f):M}\textsc{(contravariant)}\\
+  J(x.y.M, x.m, x, x, \id(x))\jdeq m\and
+  \hat J(m,x,\id(x)) \jdeq m\and
+  \check J(m,x,\id(x)) \jdeq m
+\end{mathpar}
+Tensor types:
+\begin{mathpar}
+  \inferrule{
+    \Delta_M \cb \Gamma_M \types t_m:M \\
+    \Delta_N \cb \Gamma_N \types t_n:N
+  }{
+    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types \tpair{t_m}{t_n} : M\otimes N
+  }\and
+  \inferrule{
+    \Delta \cb \Gamma,m:M,n:N \types c:C
+  }{
+    \Delta \cb \Gamma,t:M\otimes N \types (\tlet m,n := t in c) : C
+  }\and
+  (\tlet m,n := \tpair{t_m}{t_n} in c) \jdeq c[t_m/m,t_n/n]\and
+  (\tlet m,n := t in c[\tpair{m}{n}/z])\jdeq c[t/z]
+\end{mathpar}
+Coend types:
+\begin{mathpar}
+  % \inferrule{
+  %   \Delta,x:A,x':A \cb \Gamma \types t_m : M[\check x'/\check x]
+  % }{
+  %   \Delta,y:A \cb \Gamma[y/x'] \types \cpair{y}{t_m[y/x,y/x']} : \coend^{x:A} M[y/x']
+  % }\and
+  % (\clet x,m := \cpair{y}{t_m} in c) \jdeq c[y/x,t_m/m]\and
+  % (\clet x,m := t in c[\cpair{x}{m}/z]) \jdeq c[t/z] 
+  \inferrule{
+    \Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types m: M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+  }{
+    \Delta, z : A \cb \Gamma \types (\mix x,y with z in m): \coend^{w:A} M
+  }\and
+  \inferrule{
+    \Psi_C \types C \type \\
+    \Delta, w:A \cb \Gamma, m:M \types c : C
+    }{
+    \Delta \cb \Gamma, t:\coend^{w:A} M \types (\clet w,m := t in c) : C
+  }\and
+\end{mathpar}
+Note that both the left rule and the right rule bind variables!
+The term $(\mix x,y with z in m)$  binds $x:A$ and $y:A$ in $m$, while the term $(\clet w,m := t in c)$ binds $w:A$ and $m:M$ in $c$.
+Also there is some sort of ``renaming in the context'' going on as we pass across the \textsf{mix}, since the $\Gamma$ above the line is also a substitution instance.
+
+However, I (Mike) can't figure out what the computation rule should say, for reasons that make me wonder whether a term calculus is doomed to failure.
+Going back to the principal cut for the coend type, there are actually several different possible such cuts:
+\begin{mathpar}
+  \inferrule{\inferrule{
+		\Delta', x : A, y : A \cb \Gamma'[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	}{
+		\Delta', z : A \cb \Gamma' \types \coend^{w:A} M
+	} \\ \inferrule{
+    \Delta, w:A \cb \Gamma, M \types C
+    }{
+    \Delta \cb \Gamma, \coend^{w:A} M \types C
+  }}{\Delta,\Delta',(z:A)? \cb \Gamma,\Gamma' \types C}
+\end{mathpar}
+depending on how the occurrences of $\hat z$ and $\check z$ are distributed through $\Gamma'$ and $M$.
+\begin{itemize}
+\item If both are in $\Gamma'$, then $z\notin\Delta$, so $z:A$ remains in the context of the conclusion separate from $\Delta,\Delta'$.
+\item If both are in $M$, then we must have $z\in \Delta$, and the cut is disallowed because it forms a variable loop.
+\item If one is in $M$ and one in $\Gamma'$, then one must also be in $\Gamma$ and we have $z\in \Delta$, so $z:A$ doesn't need to appear separately in the context of the conclusion.
+\end{itemize}
+In each case I can see how to reduce the cut, namely to the obvious
+\begin{mathpar}
+  \inferrule{\Delta', x : A, y : A \cb \Gamma'[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	\\
+        \Delta, w:A \cb \Gamma, M \types C}
+      {\Delta,\Delta',(z:A)? \cb \Gamma,\Gamma' \types C}
+\end{mathpar}
+but this latter cut involves nontrivial category-variable manipulation because it's ``contracting a string'', and I can't figure out how to represent that by substitution.
+In particular, the category-variables $x,y$ appearing in one of the premises disappear in the conclusion and I don't see how to represent that disappearance in terms of ``substituting'' something for them.
+But possibly I'm just being dense.
+
+Perhaps the solution is that the notion of ``substitution'' has to involve a more careful ``matching up of variables'' according to a loop-free string picture.
+See the example below.
+
+Proof of co-Yoneda lemma, starting with one direction:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \inferrule{
+        \inferrule{ }{
+          x:A \cb n:N(\check x) \types n:N(\hat x)
+        }
+        }{
+        x:A,y:A \cb n:N(\check x), t:\hom_A(\hat x,\check y) \types \hat J(n,y,f):N(\hat y)
+      }
+      }{
+      x:A,y:A \cb t:N(\check x)\otimes\hom_A(\hat x,\check y) \types
+        (\tlet n,f := t in \hat J(n,y,f)):N(\hat y)
+      }
+    }{
+    y:A \cb q:\coend^{x:A} N(\check x)\otimes\hom_A(\hat x,\check y) \types
+      (\clet x,t := q in (\tlet n,f := t in \hat J(n,y,f))):N(\hat y)
+    }
+\end{mathpar}
+I think that we have to use the covariant $J$ here, because when $n$ depends on a variable in the context we can't ``bind'' it with $x.n$ in the two-sided $J$.
+Now the other direction:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \inferrule{ }{
+        x:A \cb n:N(\check x) \types n:N(\hat x)
+      } \\
+      \inferrule{ }{
+        z:A \cb \ec \types \id(z):\hom_A(\check z,\hat z)
+      }
+      }{
+      x:A,z:A \cb n:N(\check x) \types \tpair{n}{\id(z)} : N(\hat x)\otimes\hom_A(\check z,\hat z)
+    }
+    }{
+    y:A \cb n:N(\check y) \types \left({\mix x,z with y in \tpair{n}{\id(z)}}\right) : \coend^{w:A}N(\hat w)\otimes\hom_A(\check w,\hat y)
+  }
+\end{mathpar}
+It remains to check that they are inverse.
+Supposing the obvious reduction rule
+ \[ \left(\clet w,m := \left({\mix x,y with z in n}\right) in c\right) \jdeq c[m/n], \]
+and given $n':N(\check x)$, we have
+\begin{align*}
+  &\left(\clet x,t := \left({\mix x,z with y in \tpair{n'}{\id(z)}}\right) in (\tlet n,f := t in \hat J(n,y,f))\right)\\
+  &\jdeq (\tlet n,f := \tpair{n'}{\id(z)} in \hat J(n,y,f))\\
+  &\jdeq \hat J(n',x,\id(x))\\
+  &\jdeq n'
+\end{align*}
+This looks good superficially, but let's think about what it actually means.
+In the second line, the types are something like
+\begin{mathpar}
+  n : N(\check w)\and
+  f : \mor A(\hat w, \check y)\and
+  n':N(\check x)\and
+  \id(z) : \mor A(\check z, \hat z) \\
+  \tpair{n}{f} : N(\check w) \otimes \mor A(\hat w, \check y) \and
+  \tpair{n'}{\id(z)} : N(\check x) \otimes \mor A(\check z, \hat z)
+\end{mathpar}
+So the ``$\tlet n,f := \tpair{n'}{\id(z)} in$'', which represents a principal cut of tensor-right against tensor-left, actually involves a nontrivial stringy variable matchup, with only one string even though there are 4 variables.
+Thus when it reduces, the variables $w$ and $z$ disappear.
+
+Similarly, the third term $\hat J(n',x,\id(x))$ also represents a stringy cut, in which the variable $y$ is getting identified with an $x$ and reducing away.
+Right now it's hard for me to believe in the term calculus with so much variable manipulation being hidden.
+
+\end{document}
