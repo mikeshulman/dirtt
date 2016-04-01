@@ -1,0 +1,112 @@
+
+\documentclass{amsart}
+\usepackage{amssymb,amsmath,latexsym,stmaryrd,mathtools}
+\usepackage{cleveref}
+\usepackage{mathpartir}
+\let\types\vdash % turnstile
+\def\cb{\mid} % context break
+\def\op{^{\mathrm{op}}}
+\def\p{^+} % variances on variables
+\def\m{^-}
+\let\mypm\pm
+\let\mymp\mp
+\def\pm{^\mypm}
+\def\mp{^\mymp}
+\def\jdeq{\equiv}
+\def\cat{\;\mathsf{cat}}
+\def\type{\;\mathsf{type}}
+\def\ctx{\;\mathsf{ctx}}
+\let\splits\rightrightarrows
+\def\flip#1{#1^*} % reverse the variances of all variables
+\def\mor#1{\hom_{#1}}
+\def\id{\mathrm{id}}
+\def\ec{\cdot} % empty context
+\def\psplit{\overset{\mathsf{pair}}{\splits}}
+\def\iso{\cong}
+\def\tpair#1#2{#1\otimes #2}
+\def\cpair#1#2{\langle #1,#2\rangle}
+\def\tlet#1,#2:=#3in{\mathsf{let}\; \tpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\clet#1,#2:=#3in{\mathsf{let}\; \cpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\mix#1,#2 with #3 in{\mathsf{mix} {\scriptsize \begin{array}{c} \check{#1} \coloneqq \check{#3} \\ \hat{#2} \coloneqq \hat{#3} \end{array}  }\mathsf{in}\;}
+\newcommand{\coend}{\begingroup\textstyle\int\endgroup}
+\newcommand{\Set}{\mathrm{Set}}
+\def\yielding{\mid}
+\def\unif{\doteq}
+
+\begin{document}
+
+This is for a cartesian language.  I'm not sure how quadraticality plays
+into the unification algorithm.
+
+First-order terms consist of variables and constants applied to lists of
+terms.  A list of terms is either empty ($\cdot$) or a cons.  
+
+\begin{mathpar}
+\inferrule{x \in \Gamma}
+          {\Gamma \types x}
+
+\inferrule{\Gamma \types \vec{M}}
+          {\Gamma \types F(\vec{M})}
+
+\inferrule{ }
+          {\Gamma \types \cdot}
+
+\inferrule{\Gamma \types M \\ \Gamma \types \vec{M}}
+          {\Gamma \types M,\vec{M}}
+\end{mathpar}
+
+A context is $\cdot$ or $\Gamma,x$.  A substitution is 
+\begin{mathpar}
+\inferrule{ }
+          {\Gamma \vdash \cdot : \cdot}
+
+\inferrule{\Gamma \types \theta : \Gamma' \\ 
+            \Gamma \types M }
+          {\Gamma \types \theta,M/x : \Gamma',x}
+\end{mathpar}
+
+Identity and composition are admissible:
+\begin{mathpar}
+\inferrule{ }
+          {\Gamma \vdash 1_\Gamma : \Gamma}
+
+\inferrule{\Gamma \types \theta : \Gamma' \\ 
+            \Gamma' \types \theta'' : \Gamma'' }
+          {\Gamma \types \theta'' [ \theta' ] : \Gamma''}
+\end{mathpar}
+
+
+The unification judgements have the form 
+\begin{itemize}
+\item $M \unif N \yielding \theta$ where $\Gamma \types M$ and $\Gamma
+  \types N$ and $\Gamma' \types \theta : \Gamma$.  Operationally, we
+  think of $M$ and $N$ and $\Gamma$ as inputs and $\Gamma'$ and $\theta$
+  as outputs, so unification produces a new context and a substitution
+  for the original variables from it.  
+
+\item $\vec{M} \unif \vec{N} \yielding \theta$ where $\Gamma \types
+  \vec{M}$ and $\Gamma \types \vec{N}$ and $\Gamma' \types \theta :
+  \Gamma$.  
+\end{itemize}
+
+Here are the rules (I put in some type annotations that might be helpful):
+\begin{mathpar}
+
+\inferrule{ }
+           {\cdot \unif \cdot \yielding 1_\Gamma}
+
+\inferrule{ M \unif N \yielding (\Gamma' \types \theta : \Gamma) \\
+             \vec{M}[\theta] \unif \vec{N}[\theta] \yielding (\Gamma'' \types \theta' : \Gamma') \\
+           }
+           {M,\vec{M} \unif N,\vec{N} \yielding \theta[\theta']}
+
+\inferrule{\Gamma \vdash M}
+          {x \unif M \yielding (\Gamma \vdash (1_\Gamma,M/x) : \Gamma,x)}
+
+
+\inferrule{\vec{M} \unif \vec{N} \yielding \theta}
+          {F(\vec{M}) \unif F(\vec{N}) \yielding \theta}
+\end{mathpar}
+
+
+\end{document}
