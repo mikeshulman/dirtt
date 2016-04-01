@@ -168,9 +168,11 @@ Right rule:
 		(\flip{\Psi_\Gamma}, \Psi_M) = (\Psi, w :\m A, z :\p A) \\
 		\Psi, \strs s, w \strto x : A, y \strto z : A \cb \Gamma \vdash m : M
 	}{
-		\Psi, \strs s, w \strto z : A \cb \Gamma \vdash \introcoend(m) : \coend^{x \strto y : A} M
+		\Psi, \strs s, w \strto z : A \cb \Gamma \vdash (x \strto y, m) : \coend^{x \strto y : A} M
 	}\and
 \end{mathpar}
+Note that $m$ does not refer to either $x$ or $y$, so we could as well use a notation such as $\introcoend(m)$. However, this notation looks more pair-like and is possibly more practical from a programming perspective, as it allows the programmer to introduce variable names to keep hole types and contexts readable. We consider $(x \strto y, m)$ and $(x' \strto y', m)$ as equal terms, i.e. syntactic sugar for $\introcoend(m)$.
+
 Left rule:
 \begin{mathpar}
 	\inferrule{
@@ -179,10 +181,10 @@ Left rule:
 		\Psi_N \vdash N \type \\
 		\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s, y \strto x : A \cb \Gamma, m : M \vdash n : N
 	}{
-		\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s \cb \Gamma, q : \coend^{x \strto y:A} M \vdash \letexp{\introcoend (m)}{q}{n} : N
+		\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s \cb \Gamma, q : \coend^{x \strto y:A} M \vdash \letexp{(x \strto y, m)}{q}{n} : N
 	}\and
 \end{mathpar}
-Computation: $\letexp{\introcoend(m)}{\introcoend(m')}{n} \jdeq n[m'/m]$
+Computation: $\letexp{(x \strto y, m)}{(x \strto y, m')}{n} \jdeq n[m'/m]$
 
 \section{End type}
 Formation rule:
@@ -200,9 +202,11 @@ Right rule:
 		\Psi_M, x :\m A, y :\p A \vdash M \type \\
 		\flip{\Psi_\Gamma}, \Psi_M, \strs s, x \strto y : A \cb \Gamma \vdash m : M
 	}{
-		\flip{\Psi_\Gamma}, \Psi_M, \strs s \cb \Gamma \vdash \introend(m) : \coend_{x \strto y : A} M
+		\flip{\Psi_\Gamma}, \Psi_M, \strs s \cb \Gamma \vdash \lambda(x \strto y).m : \coend_{x \strto y : A} M
 	}\and
 \end{mathpar}
+An identical remark as for the coend applies here: we might as well use a notation such as $\introend(m)$.
+
 Left rule:
 \begin{mathpar}
 	\inferrule{
@@ -212,7 +216,7 @@ Left rule:
 		(\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N) = (\Psi, w :\p A, z :\m A) \\
 		\Psi, \strs s, z \strto y : A, x \strto w : A \cb \Gamma, m : M \vdash n : N
 	}{
-		\Psi, \strs s, z \strto w : A \cb \Gamma, f : \coend_{x \strto y : A} M \vdash \letexp{\introend(m)}{f}{n} : N
+		\Psi, \strs s, z \strto w : A \cb \Gamma, f : \coend_{x \strto y : A} M \vdash \letexp{\lambda(x \strto y).m}{f}{n} : N
 	}\and
 \end{mathpar}
 Computation: $\letexp{\introend(m)}{\introend(m')}{n} \jdeq n[m'/m]$.
