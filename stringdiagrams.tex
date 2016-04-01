@@ -1,0 +1,220 @@
+\documentclass{amsart}
+\usepackage{amssymb,amsmath,latexsym,stmaryrd,mathtools}
+\usepackage{cleveref}
+\usepackage{mathpartir}
+\let\types\vdash % turnstile
+\def\cb{\mid} % context break
+\def\op{^{\mathrm{op}}}
+\def\p{^+} % variances on variables
+\def\m{^-}
+\let\mypm\pm
+\let\mymp\mp
+\def\pm{^\mypm}
+\def\mp{^\mymp}
+\def\jdeq{\equiv}
+\def\cat{\;\mathsf{cat}}
+\def\type{\;\mathsf{type}}
+\def\ctx{\;\mathsf{ctx}}
+\let\splits\rightrightarrows
+\def\flip#1{#1^*} % reverse the variances of all variables
+\def\mor#1{\hom_{#1}}
+\def\id{\mathrm{id}}
+\def\ec{\cdot} % empty context
+\def\psplit{\overset{\mathsf{pair}}{\splits}}
+\def\iso{\cong}
+\def\tpair#1#2{#1\otimes #2}
+\def\cpair#1#2{\langle #1,#2\rangle}
+\def\tlet#1,#2:=#3in{\mathsf{let}\; \tpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\clet#1,#2:=#3in{\mathsf{let}\; \cpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\mix#1,#2 with #3 in{\mathsf{mix} {\scriptsize \begin{array}{c} \check{#1} \coloneqq \check{#3} \\ \hat{#2} \coloneqq \hat{#3} \end{array}  }\mathsf{in}\;}
+\newcommand{\coend}{\begingroup\textstyle\int\endgroup}
+\newcommand{\Set}{\mathrm{Set}}
+
+\newcommand{\catctx}{\;\mathsf{catctx}}
+\newcommand{\sdiag}{\;\mathsf{sdiag}}
+\newcommand{\strs}[1]{\mathfrak{#1}}
+\newcommand{\strto}{\curvearrowright}
+\newcommand{\introcoend}{\mathsf{incoend}}
+\newcommand{\introend}{\mathsf{inend}}
+\newcommand{\letexp}[3]{\left(#1\mathrel{\reflectbox{$\mapsto$}}#2\right).#3}
+
+\title{A directed type theory for formal category theory}
+\author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
+\begin{document}
+\maketitle
+
+\section{Category contexts and string diagrams}
+\begin{mathpar}
+	\inferrule{
+	}{
+		\cdot \catctx
+	}\and
+	\inferrule{
+		\Psi \catctx \\
+		A \cat
+	}{
+		\Psi, x :\p A \catctx
+	}\and
+	\inferrule{
+		\Psi \catctx \\
+		A \cat
+	}{
+		\Psi, x :\m A \catctx
+	}\and
+\end{mathpar}
+\begin{mathpar}
+	\inferrule{
+	}{
+		\cdot \sdiag
+	}\and
+	\inferrule{
+		\strs S \sdiag \\
+		A \cat
+	}{
+		\strs S, x :\m A, y:\p A, x \strto y \sdiag
+	}\and
+\end{mathpar}
+We consider both category contexts and string diagrams as sets, rather than lists. We use letters such as $\Upsilon, \Psi, \Phi, \Omega$ for category contexts; $\Gamma, \Delta, \Theta$ for type contexts; Gothic capital letters such as $\strs S$ for string diagrams, and Gothic lower case letters such as $\strs s$ for sets of strings.
+
+
+We may abbreviate $(\strs S, x :\m A, y \p A, x \strto y)$ as $(\strs S, x \strto y : A)$. If $\Psi' \cong \Psi$, we write $\Psi' \strto \Psi$ to mean $(\flip{{\Psi'}}, \Psi, \strs s)$ where $\strs s$ couples every variable from $\Psi'$ to the corresponding one from $\Psi$.
+
+\section{Structural rules}
+\begin{mathpar}
+	\inferrule{
+		\Psi_\Gamma \vdash \Gamma \ctx \\
+		\Psi_M \vdash M \type
+	}{
+		\Psi_\Gamma, \Psi_M \vdash \Gamma, m : M \ctx
+	}\and
+	\inferrule{
+		\Psi \vdash M \type \\
+		\rho : \Psi' \cong \Psi
+	}{
+		\Psi' \strto \Psi \cb m : M[\rho] \vdash m : M
+	}\and
+\end{mathpar}
+The substitution rule for category variables will be:
+\begin{mathpar}
+	\inferrule{
+		\Psi \vdash a : A \\
+		\strs S, x \strto y : A \cb \Gamma \vdash m : M \\
+		\rho : \Psi' \cong \Psi
+	}{
+		\strs S, \Psi' \strto \Psi \cb \Gamma[a[\rho]/x, a/y] \vdash m[a[\rho]/x, a/y] : M[a[\rho]/x, a/y]
+	}\and
+\end{mathpar}
+The substitution rule for type variables will be:
+\begin{mathpar}
+	\inferrule{
+		\Psi_\Gamma \vdash \Gamma \ctx \\
+		\Psi_\Delta \vdash \Delta \ctx \\
+		\Psi_M \vdash M \type \\
+		\Psi_N \vdash N \type \\
+		\flip{\Psi_\Gamma}, \Psi_M, \strs s \cb \Gamma \vdash m_0 : M \\
+		\flip{\Psi_\Delta}, \flip{\Psi_M}, \Psi_N, \strs t \cb \Delta, m : M \vdash n_0 : N \\
+		\text{$\strs s$ and $\strs t$ compose loop-freely at $\Psi_M$}
+	}{
+		\flip{\Psi_\Gamma}, \flip{\Psi_\Delta}, \Psi_N, \strs s \circ_{\Psi_M} \strs t \cb \Gamma, \Delta \vdash n_0[m_0/m] : N
+	}\and
+\end{mathpar}
+Note that variables have disappeared here. For that reason, I (Andreas) think it may be best (and feasible) to have terms not referring to category variables.
+
+\section{Morphism types}
+Formation rule:
+\begin{mathpar}
+	\inferrule{
+		A \cat \\
+		\Phi \vdash a : A \\
+		\Psi \vdash b : A
+	}{
+		\flip\Phi, \Psi \vdash \mor A(a, b) \type
+	}\and
+\end{mathpar}
+Right rule:
+\begin{mathpar}
+	\inferrule{
+		A \cat \\
+		\Psi, \strs s \sdiag \\
+		\flip\Psi \vdash \Gamma \ctx
+	}{
+		\Psi, \strs s, x \strto y : A \cb \Gamma \vdash \id : \mor A(x, y)
+	}\and
+\end{mathpar}
+Left rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi, \strs s, w \strto z : A \cb \Gamma \vdash m : M
+	}{
+		\Psi, \strs s, w \strto x : A, y \strto z : A \cb \Gamma, f : \mor A(x, y) \vdash J(f, m) : M
+	}\and
+\end{mathpar}
+Computation: $J(\id, m) \jdeq m$.
+
+\section{Co-end type}
+Formation rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi, x :\m A, y :\p A \vdash M \type
+	}{
+		\Psi \vdash \coend^{x \strto y : A} M \type
+	}\and
+\end{mathpar}
+Right rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi_\Gamma \vdash \Gamma \ctx \\
+		\Psi_M, x :\p A, y :\m A \vdash M \type \\
+		(\flip{\Psi_\Gamma}, \Psi_M) = (\Psi, w :\m A, z :\p A) \\
+		\Psi, \strs s, w \strto x : A, y \strto z : A \cb \Gamma \vdash m : M
+	}{
+		\Psi, \strs s, w \strto z : A \cb \Gamma \vdash \introcoend(m) : \coend^{x \strto y : A} M
+	}\and
+\end{mathpar}
+Left rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi_\Gamma \vdash \Gamma \ctx \\
+		\Psi_M, x :\m A, y :\p A \vdash M \type \\
+		\Psi_N \vdash N \type \\
+		\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s, y \strto x : A \cb \Gamma, m : M \vdash n : N
+	}{
+		\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s \cb \Gamma, q : \coend^{x \strto y:A} M \vdash \letexp{\introcoend (m)}{q}{n} : N
+	}\and
+\end{mathpar}
+Computation: $\letexp{\introcoend(m)}{\introcoend(m')}{n} \jdeq n[m'/m]$
+
+\section{End type}
+Formation rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi, x :\m A, y :\p A \vdash M \type
+	}{
+		\Psi \vdash \coend_{x \strto y : A} M \type
+	}\and
+\end{mathpar}
+Right rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi_\Gamma \vdash \Gamma \ctx \\
+		\Psi_M, x :\m A, y :\p A \vdash M \type \\
+		\flip{\Psi_\Gamma}, \Psi_M, \strs s, x \strto y : A \cb \Gamma \vdash m : M
+	}{
+		\flip{\Psi_\Gamma}, \Psi_M, \strs s \cb \Gamma \vdash \introend(m) : \coend_{x \strto y : A} M
+	}\and
+\end{mathpar}
+Left rule:
+\begin{mathpar}
+	\inferrule{
+		\Psi_\Gamma \vdash \Gamma \ctx \\
+		\Psi_M, x :\p A, y :\m A \vdash M \type \\
+		\Psi_N \vdash N \type \\
+		(\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N) = (\Psi, w :\p A, z :\m A) \\
+		\Psi, \strs s, z \strto y : A, x \strto w : A \cb \Gamma, m : M \vdash n : N
+	}{
+		\Psi, \strs s, z \strto w : A \cb \Gamma, f : \coend_{x \strto y : A} M \vdash \letexp{\introend(m)}{f}{n} : N
+	}\and
+\end{mathpar}
+Computation: $\letexp{\introend(m)}{\introend(m')}{n} \jdeq n[m'/m]$.
+
+\end{document}
