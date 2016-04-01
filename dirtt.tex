@@ -77,33 +77,34 @@ The interesting thing happens in the context $\Delta$, which is a list of catego
 This dependence is ``quadratic'' in the following sense: all the rules maintain the invariant that each variable in $\Delta$ appears \emph{twice} in $\Gamma$ and $M$, and that the two occurrences have opposite variance (where the variance of $\Gamma$ is flipped relative to $M$).
 In fact, to be more precise, the actual dependence of $\Gamma$ and $M$ is on a category-context \emph{with} variances that is obtained from $\Delta$ by splitting each variable into two with opposite variance.
 The implementation will, of course, use de Brujin indices; when writing judgments with named variables, if $x:A$ is a variable in $\Delta$ we write $\hat{x}\pcol A$ and $\check{x}\mcol A$ for the two corresponding signed variables that must appear in $\Gamma$ and $M$ (exactly once each).
-In other words:
+
+If $\Psi$ is a signed context, we write $\unsigned{\Psi}$ for the unsigned context obtained by discarding the variances, and also any hats or checks on the variables.
+And if the variables in $\Psi$ have hats and checks (which technically means that it was obtained as part of a splitting an unsigned context), we write $\dual\Psi$ for the signed context obtained by reversing the variances \emph{and} interchanging hats and checks.
+In particular, we always have $\unsigned{\Psi} = \unsigned{(\dual\Psi)}$. % and $\unsigned{\Psi} \splits \Psi,\dual\Psi$.
+
+With this notation, we can express the variable dependence conditions as follows:
 \begin{center}
   $\Delta\cb\Gamma\types N$ requires as preconditions that
   $\begin{array}{c}
-    \Delta \splits \Psi_1,\Psi_2 \\
-    \flip{\Psi_1} \types \Gamma \ctx\\
-    \Psi_2 \types M \type
+     \Delta = \unsigned{\Psi}\\
+     \Psi, \dual\Psi \cong \Psi_1,\Psi_2\\
+     \flip{\Psi_1} \types \Gamma \ctx\\
+     \Psi_2 \types M \type
   \end{array}$
 \end{center}
-Here $\Delta\splits \Psi_1,\Psi_2$ means that each variable $x$ in the unsigned context $\Delta$ becomes a pair $\hat x, \check x$ of opposite variance in the signed context $\Psi_1,\Psi_2$ (see the rules below).
-And as above, the notation $\flip{\Psi_1}$ means that we reverse the variances of the variables in $\Psi_1$.
-For example,
-$x:A \splits \check x : \m A, \hat x \pcol A$, and $\flip{(\check x \mcol A)} = \check{x} \pcol A$, so a well-formed judgement could have 
-$\check x \pcol A \types \Gamma \ctx$ and $\hat x \pcol A \types A \type$. This says that $\check{x}$ is allowed to occur covariantly in $\Gamma$, which counts as a negative occurrence overall, because $\Gamma$ is itself in a contravariant position.
+As above, the notation $\flip{\Psi_1}$ means that we reverse the variances of the variables in $\Psi_1$ (without changing the hats and checks).
+%and $\Delta\splits \Psi_1,\Psi_2$ means that each variable $x$ in the unsigned context $\Delta$ becomes a pair $\hat x, \check x$ of opposite variance in the signed context $\Psi_1,\Psi_2$.
+For example, if $\Delta = (x:A)$ then we could have $\Psi = (\hat x\pcol A)$, so that $\dual\Psi = (\check x\mcol A)$; we could then take $\Psi_1 = (\check x\mcol A)$ and $\Psi_2=(\hat x\pcol A)$, so that $\flip\Psi_1 = (\check x\pcol A)$ and so a well-formed judgement could have $\check x \pcol A \types \Gamma \ctx$ and $\hat x \pcol A \types A \type$.
+Note that that $\check{x}$ is allowed to occur covariantly in $\Gamma$, which counts as a negative occurrence overall, because $\Gamma$ is itself in a contravariant position.
 
-We will write
-\[ \Delta \types \Gamma\ctx, N\type \]
-to mean the conjunction of the preconditions for $\Delta\cb\Gamma\types N$ to make sense:
-\begin{mathpar}
-  \Delta \splits \Psi_1,\Psi_2 \and
-  \flip{\Psi_1} \types \Gamma \ctx\and
-  \Psi_2 \types M \type
-\end{mathpar}
+To express rules more readably, we introduce the following combined judgment
+\[ \inferrule{\flip{\Psi_1} \types \Gamma\ctx \\ \Psi_2 \types N\type}{\Psi_1,\Psi_2 \types \Gamma\ctx, N\type} \]
+As always, concatenation of contexts is implicitly done up to permutation of variables.
+Thus, the preconditions for $\Delta\cb\Gamma\types N$ to make sense can alternatively be written as $\Delta = \unsigned{\Psi}$ where $\Psi,\dual{\Psi} \types \Gamma\ctx, N\type$.
 
-The most intuitive version of this ``quadraticality'' rule is when $\hat{x}$ appears in $M$ and $\check{x}$ appears in $\Gamma$:
+If $\hat{x}$ appears in $M$ and $\check{x}$ appears in $\Gamma$, as above, then our judgment might look like this:
 \[ x:A \cb N(\check x) \types M(\hat x) \]
-Then we are simply talking about a morphism of types ``over the category $A$'' --- in semantic terms, a natural transformation.
+In this case we are simply talking about a morphism of types ``over the category $A$'' --- in semantic terms, a natural transformation.
 The dual case when $\check{x}$ appears in $M$ and $\hat{x}$ appears in $\Gamma$ simply represents a natural transformation between \emph{contravariant} functors rather than between covariant ones.
 With this case in mind, one might say that we resolve the problem of ``dependent linear type theory'' by stipulating that both the context and the conclusion of a ``linearly dependent judgment'' must \emph{separately} depend ``linearly'' on the same variables.
 
@@ -116,35 +117,32 @@ To express the \emph{composition} of such morphisms then requires an ``extranatu
 The \emph{identity} morphism judgment is similarly extranatural on the other side:
 \[ x:A \cb \ec \types \mor A(\check x,\hat x) \]
 
-More formally, context splitting is defined by the following possibilities:
-\begin{mathpar}
-\inferrule{ }{\cdot \splits \cdot,\cdot}\\
-\inferrule{\Delta \splits \Psi_1,\Psi_2}
-          {\Delta, x:A \splits (\Psi_1,\check x \mcol A,\hat x \pcol A),\Psi_2}\and
-\inferrule{\Delta \splits \Psi_1,\Psi_2}
-          {\Delta, x:A \splits \Psi_1,(\Psi_2,\check x \mcol A,\hat x \pcol A)}\and
-\inferrule{\Delta \splits \Psi_1,\Psi_2}
-          {\Delta, x:A \splits (\Psi_1,\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
-\inferrule{\Delta \splits \Psi_1,\Psi_2}
-          {\Delta, x:A \splits (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
-\end{mathpar}
+% More formally, context splitting is defined by the following possibilities:
+% \begin{mathpar}
+% \inferrule{ }{\cdot \splits \cdot,\cdot}\\
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\check x \mcol A,\hat x \pcol A),\Psi_2}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits \Psi_1,(\Psi_2,\check x \mcol A,\hat x \pcol A)}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
+% \end{mathpar}
 
-If $\Psi$ is a signed context, we write $\unsigned{\Psi}$ for the unsigned context obtained by discarding the variances, and also any hats or checks on the variables.
-And if the variables in $\Psi$ have hats and checks (which technically means that it was obtained as part of a splitting an unsigned context), we write $\dual\Psi$ for the signed context obtained by reversing the variances \emph{and} interchanging hats and checks.
-Thus we always have $\unsigned{\Psi} = \unsigned{(\dual\Psi)}$ and $\unsigned{\Psi} \splits \Psi,\dual\Psi$.
-Frequently our rules have a $\unsigned{\Psi}$ in the conclusion where $\Psi$ and/or $\dual{\Psi}$ occur in the premises; when read upwards this means that part of the unsigned context $\Delta$ in the conclusion is identified with $\unsigned{\Psi}$ and hence gets split into $\Psi$ and $\flip{\Psi}$; but this is a special ``paired'' sort of splitting, where of the two variables $\hat x$ and $\check x$ arising from any variable $x$ in $\Delta$, one must be in $\Psi_1$ and one in $\Psi_2$:
+% Frequently our rules have a $\unsigned{\Psi}$ in the conclusion where $\Psi$ and/or $\dual{\Psi}$ occur in the premises; when read upwards this means that part of the unsigned context $\Delta$ in the conclusion is identified with $\unsigned{\Psi}$ and hence gets split into $\Psi$ and $\flip{\Psi}$; but this is a special ``paired'' sort of splitting, where of the two variables $\hat x$ and $\check x$ arising from any variable $x$ in $\Delta$, one must be in $\Psi_1$ and one in $\Psi_2$:
 
-\begin{mathpar}
-\inferrule{ }{\ec \psplit \ec,\ec}\\
-\inferrule{\Delta \psplit \Psi_1,\Psi_2}
-          {\Delta, x:A \psplit (\Psi_1\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
-\inferrule{\Delta \psplit \Psi_1,\Psi_2}
-          {\Delta, x:A \psplit (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
-\end{mathpar}
+% \begin{mathpar}
+% \inferrule{ }{\ec \psplit \ec,\ec}\\
+% \inferrule{\Delta \psplit \Psi_1,\Psi_2}
+%           {\Delta, x:A \psplit (\Psi_1\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
+% \inferrule{\Delta \psplit \Psi_1,\Psi_2}
+%           {\Delta, x:A \psplit (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
+% \end{mathpar}
 
-Note that when $\Delta \psplit \Psi_1,\Psi_2$, we have $\dual{\Psi_1} = \Psi_2$ and $\Delta = \unsigned{\Psi_1} = \unsigned{\Psi_2}$.
+% Note that when $\Delta \psplit \Psi_1,\Psi_2$, we have $\dual{\Psi_1} = \Psi_2$ and $\Delta = \unsigned{\Psi_1} = \unsigned{\Psi_2}$.
 
-If $a$ is a category-term in context $\Psi$, we will also write $\dual{a}$ for the result of interchanging hats and checks in $a$.
+If $a$ is a category-term in context $\Psi$, we will write $\dual{a}$ for the result of interchanging hats and checks in $a$.
 This is ``in context $\dual{\Psi}$'' but of course it is not well-typed on its own; like $\flip{a}, $its purpose is to be substituted into a contravariant variable.
 See, for instance, the substitution rule below.
 
@@ -227,9 +225,23 @@ When we incorporate substitutions, these become:
 There are three versions of the left rule.
 The first ``two-sided'' one is a ``directed'' analogue of the elimination rule for equality due to Lawvere and Martin-L\"of:
 \begin{mathpar}
-  \inferrule{\Delta,x:A \cb \Gamma[\hat x/\hat y] \types M[\hat x/\hat y]}{\Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M}\and
-  \inferrule{\Delta,x:A \types \Gamma\ctx, M\type\\ \Psi_a \types a:A \\ \Psi_b \types b:B \\ \Delta,x:A \cb \Gamma \types M}{\Delta,\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x,\dual{b}/\hat{x}],\mor A(a,b) \types M[\dual{a}/\check x,\dual{b}/\hat{x}]}\and
+  \inferrule{
+    \Delta,x:A \cb \Gamma[\hat x/\hat y] \types M[\hat x/\hat y]
+  }{
+    \Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi,\hat x\pcol A,\check x \mcol A \types \Gamma\ctx, M\type\\
+    \Psi_a \types a:A \\
+    \Psi_b \types b:B \\
+    \unsigned\Psi,x:A \cb \Gamma \types M
+  }{
+    \unsigned{\Psi},\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x,\dual{b}/\hat{x}],\mor A(a,b)
+    \types M[\dual{a}/\check x,\dual{b}/\hat{x}]
+  }\and
 \end{mathpar}
+Note that although we write substitutions in both $\Gamma$ and $M$, the linearity means that each variable such as $\hat x$ or $\check x$ can only occur in one of the two.
+
 For instance, we can use this rule to define composition of morphisms:
 \begin{equation}
   \inferrule{\inferrule{\inferrule{x\pcol A\types x:A}{x:A\cb \ec \types \mor A(\check x, \hat x)}}
@@ -247,30 +259,30 @@ Similarly, we have the functorial action of any judgment $x\pcol A \types f(x):B
   {x:A, y:A \cb \mor A(\hat x, \check y) \types \mor B(f(\check x),f(\hat y))}
 \end{equation}
 
-We may also want to consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Morhing rule for identity types):
+We also consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Morhing rule for identity types):
 \begin{mathpar}
-  \inferrule{\Delta\cb \Gamma[b/\check x] \types M[b/\check x]}{\Delta,x:A\cb \Gamma,\mor A(\hat x, b) \types M}\and
+  \inferrule{\Delta\cb \Gamma[\dual b/\check x] \types M[\dual b/\check x]}{\Delta,x:A\cb \Gamma,\mor A(\hat x, \dual b) \types M}\and
   \inferrule{\Delta\cb \Gamma[a/\hat x] \types M[a/\hat x]}{\Delta,x:A\cb \Gamma,\mor A(a, \check x) \types M}\and
 \end{mathpar}
 And with substitutions:
 \begin{mathpar}
   \inferrule{
-    \Delta,x:A \types \Gamma\ctx, M\type\\
-    \Phi_a \types a:A\\
-    \Delta\cb \Gamma[\dual b/\check x,b/\hat x] \types M[\dual b/\check x,b/\hat x]
+    \Psi,\dual\Psi,\Psi_b,u\mcol A \types \Gamma\ctx, M\type\\
+    \Psi_a \types a:A\\
+    \unsigned\Psi, \unsigned{\Psi_b} \cb \Gamma[\dual b/ u] \types M[\dual b/ u]
   }{
-    \Delta,\unsigned{\Phi_a}\cb \Gamma[\dual a/\check x,b/\hat x],\mor A(a, \dual b) \types M[\dual a/\check x,b/\hat x]
+    \unsigned{\Psi},\unsigned{\Psi_b},\unsigned{\Psi_a}\cb \Gamma[\dual a/ u],\mor A(a, \dual b) \types M[\dual a/ u]
   }\and
   \inferrule{
-    \Delta,x:A \types \Gamma\ctx, M\type\\
-    \Phi_b \types b:B\\
-    \Delta\cb \Gamma[\dual a/\check x,a/\hat x] \types M[\dual a/\check x,a/\hat x]
+    \Psi,\dual\Psi,\dual{\Psi_a},v\pcol A \types \Gamma\ctx, M\type\\
+    \Psi_b \types b:B\\
+    \unsigned\Psi, \unsigned{\Psi_a}\cb \Gamma[a/v] \types M[a/v]
   }{
-    \Delta,\unsigned{\Phi_b}\cb \Gamma[\dual a/\check x, b/\hat x],\mor A(a, \dual b) \types M[\dual a/\check x, b/\hat x]
+    \unsigned\Psi,\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[b/v],\mor A(a, \dual b) \types M[b/v]
   }\and
 \end{mathpar}
 
-Either of these straightforwardly implies the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
+Either of these implies the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
 The converse implication in full dependent type theory requires a universe, so we probably don't expect it to hold here.
 I think we will probably want the one-sided rules (but there ought to be some compatibility between them, so that when they both apply they give the same result).
 Note that they can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
