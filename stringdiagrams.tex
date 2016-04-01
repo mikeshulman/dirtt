@@ -173,6 +173,8 @@ Right rule:
 \end{mathpar}
 Note that $m$ does not refer to either $x$ or $y$, so we could as well use a notation such as $\introcoend(m)$. However, this notation looks more pair-like and is possibly more practical from a programming perspective, as it allows the programmer to introduce variable names to keep hole types and contexts readable. We consider $(x \strto y, m)$ and $(x' \strto y', m)$ as equal terms, i.e. syntactic sugar for $\introcoend(m)$.
 
+\textbf{Edit:} This rule probably does not admit substitution. We probably need a rule where you can pair with category terms, rather than category variables, in which case it may become more interesting to use a pairing notation.
+
 Left rule:
 \begin{mathpar}
 	\inferrule{
