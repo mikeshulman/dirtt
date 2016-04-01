@@ -38,6 +38,7 @@
 \newcommand{\unsigned}[1]{#1^0}
 \newcommand{\joinvar}[1]{\left[#1\right]}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
 \begin{document}
@@ -98,7 +99,10 @@ For example, if $\Delta = (x:A)$ then we could have $\Psi = (\hat x\pcol A)$, so
 Note that that $\check{x}$ is allowed to occur covariantly in $\Gamma$, which counts as a negative occurrence overall, because $\Gamma$ is itself in a contravariant position.
 
 To express rules more readably, we introduce the following combined judgment
-\[ \inferrule{\flip{\Psi_1} \types \Gamma\ctx \\ \Psi_2 \types N\type}{\Psi_1,\Psi_2 \types \Gamma\ctx, N\type} \]
+\begin{equation}
+  \inferrule{\flip{\Psi_1} \types \Gamma\ctx \\ \Psi_2 \types N\type}{\Psi_1,\Psi_2 \types \Gamma\ctx, N\type}\label{eq:ctx-type}
+\end{equation}
+
 As always, concatenation of contexts is implicitly done up to permutation of variables.
 Thus, the preconditions for $\Delta\cb\Gamma\types N$ to make sense can alternatively be written as $\Delta = \unsigned{\Psi}$ where $\Psi,\dual{\Psi} \types \Gamma\ctx, N\type$.
 
@@ -200,6 +204,7 @@ We may abbreviate a substitution $M[a/\hat x,\dual{a}/\check x]$ by $M[a/x]$.
 Now we are ready to start giving the rules for some type formers.
 Since we want substitution into category-variables to be admissible, many rules must incorporate a substitution; but they are easier to understand before that substitution has been incorporated.
 Thus, we often give both versions.
+In the version without substitutions, we also generally omit the judgments of well-formedness of the types and contexts.
 Note that the version with substitutions included can usually be derived fairly automatically from the other.
 
 
@@ -291,10 +296,167 @@ With morphism types, we can make the categories into a 2-category: the morphisms
 The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) can be obtained from~\eqref{eq:composition} once we have a cut rule.
 Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~\eqref{eq:functor}.
 
-\red{Left off updating to $\unsigned{\Psi}$ and $\Delta \types \Gamma\ctx, M\type$ here.}
+\subsection{Tensor}
+\label{sec:tensor}
 
-\subsection{Tensor types}
+The rules for the plain (or ``non-binding'') tensor are very similar to those in ordinary linear logic.
+
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+  }{
+    \Psi_M,\Psi_N \types M\otimes N\type
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi \types (\Gamma,M,N)\ctx, C\type \\
+    \unsigned\Psi \cb \Gamma,M,N \types C
+  }{
+    \unsigned\Psi \cb \Gamma, M\otimes N \types C
+  }\and
+  \inferrule{
+    \Psi_M,\dual{\Psi_M} \types \Gamma_M\ctx, M\type \\
+    \Psi_N,\dual{\Psi_N} \types \Gamma_N\ctx, N\type \\\\
+    \unsigned{\Psi_M} \cb \Gamma_M \types M \\
+    \unsigned{\Psi_N} \cb \Gamma_N \types N
+  }{
+    \unsigned{\Psi_M},\unsigned{\Psi_N} \cb \Gamma_M,\Gamma_N \types M\otimes N
+  }\and
+\end{mathpar}
+
+\subsection{Coend type}
+\label{sec:coend}
+
+The coend type is significantly trickier than either of the examples we've considered so far.
+It can be thought of as a sort of ``quadratic $\Sigma$-type'' that binds a category-variable $x$ in both covariant and contravariant positions at the same time.
+This intuition is sufficient for the formation and left rules.
+
+\begin{mathpar}
+  \inferrule{
+    \Psi, \hat x\pcol A, \check x\mcol A \types M \type \\
+    }{
+    \Psi \types \coend^{x:A} M \type
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi,\hat x\pcol A,\check x\mcol A \types (\Gamma,M) \ctx, C\type\\
+    \unsigned\Psi, x:A \cb \Gamma, M \types C
+    }{
+    \unsigned\Psi \cb \Gamma, \coend^{x:A} M \types C
+  }\and
+\end{mathpar}
+However, the right rule is trickier to state correctly.
+In order to get the necessary generality, we need to allow the right rule to ``decouple'' the two occurrences of $x$ that are bound in the coend.
+Without substitutions included, it looks like this:
+\begin{equation}\label{eq:coend-right-nosub}
+  \inferrule{
+    \Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+  }{
+    \Delta, z : A \cb \Gamma \types \coend^{w:A} M
+  }
+\end{equation}
+That is, to construct an element of $\coend^{w:A} M$, we choose some other variable $z$ that may appear in $M$ or in the context, and we alter the pairings
+\[
+  \begin{array}{ccc}
+    \hat w &\leftrightarrow& \check w\\\\
+    \check z &\leftrightarrow& \hat z
+  \end{array}
+  \quad\text{to become instead}\quad
+  \begin{array}{ccc}
+    \hat x && \check y\\
+    \updownarrow && \updownarrow \\
+    \check x && \hat y
+  \end{array}
+\]
+The simplest case of this is when $\hat z$ and $\check z$ both occur in the context $\Gamma$.
+In this case, it can be used to derive the functoriality of coends:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      x:A,y:A \cb M(\hat y, \check x) \types N(\check y, \hat x)
+    }{
+      z:A \cb M(\hat z, \check z) \types \coend^{w:A} N(\check w, \hat w)
+    }}{
+    \ec \cb \coend^{z:A} M(\hat z, \check z) \types \coend^{w:A} N(\check w, \hat w)
+  }
+\end{mathpar}
+(Hmm, should the \emph{bound} occurrences of $z$ on the final line still have their variances reversed because of being in contravariant position in the context?  That seems wrong\dots)
+The case when $\hat z$ or $\check z$ appears in $M$ instead is required, for instance, to derive the backwards direction of the co-Yoneda lemma.
+The forwards direction is easy using the left rules for tensor and coend:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \inferrule{ }{x:A \cb M(\check x) \types M(\hat x)}
+    }{
+      x:A,y:A \cb M(\check y) \otimes \hom_A(\hat y,\check x) \types M(\hat x)
+    }
+  }{
+    x:A \cb \coend^{y:A} M(\check y) \otimes \hom_A(\hat y,\check x) \types M(\hat x)
+  }
+\end{mathpar}
+But the backwards direction requires the right rule for both, and in the case of the coend we have $\hat z$ appearing in the type being coended rather than in the context:
+\begin{mathpar}
+  \inferrule{
+    \inferrule*{
+      \inferrule{ }{x:A \cb M(\check x) \types M(\hat x)}\\
+      \inferrule{ }{y:A\cb \cdot \types \hom_A(\check y,\hat y)}
+    }{
+      x:A,y:A \cb M(\check x) \types M(\hat x) \otimes \hom_A(\check y,\hat y)
+    }
+  }{
+     z:A \cb M(\check z) \types \coend^{w:A} M(\hat w)\otimes \hom_A(\check w,\hat z)
+  }\and
+\end{mathpar}
+To prove that these are inverses requires either extensive manipulation of cut-eliminations or a term calculus, so we postpone it until later.
+
+Finally, here is the version of the right rule with substitutions included:
+\begin{mathpar}
+  \inferrule{
+    \Psi,\dual\Psi,\check x \mcol A, \hat y\pcol A \cong \Psi_\Gamma,\Psi_M\\
+    \Psi_\Gamma \types \Gamma\ctx \\
+    \Psi_M, \hat x\pcol A, \check y\mcol A \types M \type\\
+    \Psi_a \types a:A \\
+    \unsigned\Psi, x : A, y : A \cb \Gamma \types M
+  }{
+    \unsigned\Psi, \unsigned{\Psi_a} \cb \Gamma[a/\hat y,\dual a/\check x] \types \coend^{w:A} M[a/\hat y,\dual a/\check x,\hat w/\hat x, \check w/\check y]
+  }  
+\end{mathpar}
+(We are unable to use the single-judgment version~\eqref{eq:ctx-type} of the preconditions, since we need to ensure that $\hat x$ and $\check y$ appear in $M$ rather than in $\Gamma$.)
+
+\gray{Here is what was written as the right rule before.  I'm still unable to make much sense of it, in either form; the above version seems like what we would get by straightforwardly adding a substitution to~\eqref{eq:coend-right-nosub}.)
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \iso \Delta'_a \\
+    \Delta_a \psplit (\flip{\Phi_\Gamma},\Phi_M),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Phi_\Gamma',\flip{\Phi_M'}) \\
+    \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
+    \Psi_a \types a:A \\
+    \Psi_{\Gamma},\Phi_\Gamma,\Phi_\Gamma' \types \Gamma\ctx \\
+    \Psi_M,\Phi_M,\Phi_M',\hat x\pcol A,\check x\mcol A \types M\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+  }\and
+  \inferrule{
+    \Phi_\Gamma \iso \Phi_\Gamma' \\
+    \Phi_M \iso \Phi_M' \\
+    \Phi_\Gamma, \flip{\Phi_M} \types a:A \\\\
+    \Psi_{\Gamma},\Phi_\Gamma,\flip{{\Phi_\Gamma'}} \types \Gamma\ctx \\\\
+    \Psi_M,\Phi_M,\flip{{\Phi_M'}},\hat x\pcol A,\check x\mcol A \types M\type \\\\
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M},\unsigned{{\Phi_\Gamma'}}, \unsigned{{\Phi_M'}} \cb \Gamma \types M[a/\hat x,a[\Phi_\Gamma'/\Phi_\Gamma, \Phi_M'/\Phi_M]/\check x]
+  }{
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+  }\and
+\end{mathpar}
+}
+
+\subsection{Binding tensor types}
 \label{sec:tensor-types}
+
+The binding tensor $M\otimes_{x:A} N$ can be defined as $\coend^{x:A} M\otimes N$.
+More generally, for a context $\Psi=(x_1:A_1,\dots,x_n:A_n)$ we can write $M\otimes_{\Psi} N$ for $\coend^{x_1:A_1} \cdots \coend^{x_n:A_n} M\otimes N$.
+The following rules for this derived type former should then be admissible.
+On the other hand, the non-binding tensor should be derivable from the binding one by tensoring over the empty context, and the coend should be derivable by tensoring over $(\hat x\pcol A,\check x\mcol A)$ with $\mor A$.
+
+\red{Left off updating to $\unsigned{\Psi}$ and $\Psi,\dual\Psi \types \Gamma\ctx, M\type$ here.}
 
 The formation rule for the tensor type:
 \begin{mathpar}
@@ -324,179 +486,6 @@ and right rule
   {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
 \end{mathpar}
 
-\subsubsection{Non-binding tensor}
-With coends and non-binding tensor, the binding tensor rules become admissible.
-
-The non-binding tensor formation rule is
-\begin{mathpar}
-  \inferrule{
-    \Psi_M \types M\type \\ \Psi_N \types N\type
-    }{
-    \Psi_M,\Psi_N \types M\otimes N\type
-  }
-\end{mathpar}
-with left rule
-\begin{mathpar}
-  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
-    \Psi_\Gamma \types \Gamma\ctx \\\\
-    \Psi_M \types M\type \\ \Psi_N \types N\type \\ \Psi_C \types C\type \\\\
-    \Delta \cb \Gamma,M,N \types C}
-  {\Delta \cb \Gamma, M\otimes N \types C}\and
-\end{mathpar}
-and right rule
-\begin{mathpar}
-  \inferrule{
-    \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
-    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
-    \Psi_{\Gamma_M} \types \Gamma_M\ctx \\
-    \Psi_{\Gamma_N} \types \Gamma_N\ctx \\
-    \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
-    \Delta_M \cb \Gamma_M \types M \\
-    \Delta_N \cb \Gamma_N \types N
-  }{
-    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types M\otimes N
-  }\and
-\end{mathpar}
-
-\subsection{Co-end type}
-Formation rule:
-\begin{mathpar}
-  \inferrule{
-    \Psi, \hat x\pcol A, \check x\mcol A \types M \type \\
-    }{
-    \Psi \types \coend^{x:A} M \type
-  }\and
-\end{mathpar}
-Left rule:
-\begin{mathpar}
-  \inferrule{
-    \Delta \splits \flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C \\
-    \Psi_\Gamma \types \Gamma \ctx \\
-    \Psi_M, \hat x\pcol A, \check x\mcol A \types M \type \\
-    \Psi_C \types C \type \\
-    \Delta, x:A \cb \Gamma, M \types C
-    }{
-    \Delta \cb \Gamma, \coend^{x:A} M \types C
-  }\and
-\end{mathpar}
-\red{
-\begin{mathpar}
-  \inferrule{
-    \Psi_\Gamma \types \Gamma \ctx \\
-    \Psi_M, \hat x\pcol A, \check x\mcol A \types M \type \\
-    \Psi_C \types C \type \\
-    \joinvar{\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C}, x:A \cb \Gamma, M \types C
-    }{
-    \joinvar{\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_C} \cb \Gamma, \coend^{x:A} M \types C
-  }\and
-\end{mathpar}
-}
-Right rule:
-\begin{mathpar}
-  \inferrule{
-    \Delta_a \iso \Delta'_a \\
-    \Delta_a \psplit (\flip{\Phi_\Gamma},\Phi_M),\Psi_a \\
-    \Delta'_a \psplit \flip{\Psi_a'},(\Phi_\Gamma',\flip{\Phi_M'}) \\
-    \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
-    \Psi_a \types a:A \\
-    \Psi_{\Gamma},\Phi_\Gamma,\Phi_\Gamma' \types \Gamma\ctx \\
-    \Psi_M,\Phi_M,\Phi_M',\hat x\pcol A,\check x\mcol A \types M\type \\\\
-    \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
-  }{
-    \Delta,\Delta_a \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
-  }\and
-\end{mathpar}
-\red{
-\begin{mathpar}
-  \inferrule{
-    \Phi_\Gamma \iso \Phi_\Gamma' \\
-    \Phi_M \iso \Phi_M' \\
-    \Phi_\Gamma, \flip{\Phi_M} \types a:A \\\\
-    \Psi_{\Gamma},\Phi_\Gamma,\flip{{\Phi_\Gamma'}} \types \Gamma\ctx \\\\
-    \Psi_M,\Phi_M,\flip{{\Phi_M'}},\hat x\pcol A,\check x\mcol A \types M\type \\\\
-    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M},\unsigned{{\Phi_\Gamma'}}, \unsigned{{\Phi_M'}} \cb \Gamma \types M[a/\hat x,a[\Phi_\Gamma'/\Phi_\Gamma, \Phi_M'/\Phi_M]/\check x]
-  }{
-    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
-  }\and
-\end{mathpar}
-}
-Co-Yoneda lemma:
-\begin{mathpar}
-  \inferrule{
-    \inferrule*{
-      \inferrule*{
-        \vdots
-      }{
-        \Delta,\Delta_a \cb M(a) \types M(a)
-      } \\
-      \inferrule*{
-        \vdots
-      }{
-        \Delta'_a \cb \cdot \types \hom_A(a',a')
-      }
-    }{
-      \Delta,\Delta_a,\Delta'_a \cb M(a) \types M(a) \otimes \hom_A(a',a')
-    }
-  }{
-    \Delta,\Delta_a \cb M(a) \types \coend^{x:A} M(\hat x)\otimes \hom_A(\check x,a)
-  }\and
-\end{mathpar}
-and conversely
-\begin{mathpar}
-  \inferrule{
-    \inferrule{
-      \Delta,\Delta_a \cb M(a) \types M(a)
-    }{
-      \Delta,\Delta_a,x:A \cb M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
-    }
-  }{
-    \Delta,\Delta_a \cb \coend^{x:A} M(\hat x) \otimes \hom_A(\check x,a) \types M(a)
-  }
-\end{mathpar}
-\subsubsection{Older stuff}
-%\begin{mathpar}
-%	\inferrule{
-%		r
-%	}{
-%		\Delta, \Delta_a, \Delta_b \cb \Gamma \types \coend_{}
-%	}
-%\end{mathpar}
-We should probably base the right rule on the following function:
-\begin{equation}
-	\lambda f.\lambda z.(z, fzz) : [\coend_x \coend_y G(x^-, x^+, y^-, y^+)] \to [\coend_z \coend^w G(z^-, w^+, w^-, z^+)]
-\end{equation}
-Without built-in substitution, that principle becomes (thinking $G = \Gamma \to M$, where only $M$ depends on $w$):
-\begin{mathpar}
-	\inferrule{
-		\Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
-	}{
-		\Delta, z : A \cb \Gamma \types \coend^{w:A} M
-	}\and
-\end{mathpar}
-For instance, we can prove:
-\begin{equation}
-	\inferrule{
-		\inferrule{
-			\inferrule{
-				x \pcol A \types F(x) \type
-			}{
-				x : A \cb F(\check x) \types F(\hat x)
-			}
-			\qquad
-			\inferrule{
-				y \pcol A \types y \pcol A
-			}{
-				y : A \cb \ec \types \hom_A(\check y, \hat y)
-			}
-		}{
-			x : A, y : A \cb F(\check x) \types F(\hat x) \otimes \hom_A(\check y, \hat y)
-		}
-	}{
-		z : A \cb F(\check z) \types \coend^{w:A} F(\hat w) \otimes \hom_A(\check w, \hat z)
-	}
-\end{equation}
-
-I have not been able to make sense of a rule with built-in substitution.
 
 \subsection{End type}
 Formation rule:
