@@ -635,22 +635,46 @@ and left rule
 For now, the rules for terms are written without substitutions incorporated.
 We just take care that for variables mentioned explicitly in the contexts of the conclusion, it would make sense to substitute any reasonable term for them wherever they occur in the term being defined.
 
-Morphism types:
+\subsection{Morphism types}
 \begin{mathpar}
   \inferrule{ }{x:A \cb \ec \types \id(x):\mor A(\check x,\hat x)}\and
   \inferrule{
-    \Delta,x:A \cb \Gamma[\hat x/\hat y] \types m:M[\hat x/\hat y]
+    \Delta,z:A \cb \Gamma[\hat z/\hat y,\check z/\check x] \types m:M[\hat z/\hat y,\check z/\check x]
   }{
-    \Delta,x:A,y:A\cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.m, x, y, f):M
+    \Delta,x:A,y:A \cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.y.M,z,m; x, y, f):M
   }\textsc{(2-sided)}\and
-  \inferrule{\Delta\cb \Gamma[a/\hat x] \types m:M[a/\hat x]}
-  {\Delta,x:A\cb \Gamma,f:\mor A(a, \check x) \types \hat J(m,x,f) :M}\textsc{(covariant)}\and
-  \inferrule{\Delta\cb \Gamma[b/\check x] \types m:M[b/\check x]}
-  {\Delta,x:A\cb \Gamma,f:\mor A(\hat x, b) \types \check J(m,x,f):M}\textsc{(contravariant)}\\
-  J(x.y.M, x.m, x, x, \id(x))\jdeq m\and
-  \hat J(m,x,\id(x)) \jdeq m\and
-  \check J(m,x,\id(x)) \jdeq m
+  J(x.y.M,z,m;x,x,\id(x))\jdeq m\and
+  J(x.y.M,z,m[z/x,z/y,\id(z)/f];x,y,f)\jdeq m
 \end{mathpar}
+
+We will show that the following one-sided elimination rules are actually admissable.
+\begin{mathpar}
+  \inferrule{\Delta\cb \Gamma \types m:M[a/\hat x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(a, \check x) \types \hat J(m;x,f) :M}\textsc{(covariant)}\and
+  \inferrule{\Delta\cb \Gamma \types m:M[b/\check x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(\hat x, b) \types \check J(m;x,f):M}\textsc{(contravariant)}\\
+  \hat J(m;a,\id(a)) \jdeq m\and
+  \hat J(m[a/x,\id(a)/f];x,f) \jdeq m \\
+  \check J(m;b,\id(b)) \jdeq m \and
+  \check J(m[b/x,\id(b)/f];x,f) \jdeq m
+\end{mathpar}
+
+The derivation of the covariant rule is as follows:
+\begin{mathpar}
+  \inferrule{
+    \Delta \cb \Gamma \types t : M[a/\hat x] \and
+    \inferrule*{
+      x:A \cb m:M \types m:M
+    }{
+      x:A,y:A \cb m:M, f:\hom A(\hat x,\check y) \types J(x.y.M,x,m;x,y,f) : M[\hat y/\hat x]
+    }
+  }{
+    \Delta,y:A \cb \Gamma, f:\mor A(a,\check y) \types J(x.y.M,a,t;a,y,f) : M[\hat y/\hat x]
+  }
+\end{mathpar}
+Thus we define $\hat J(m;x,f) \jdeq J(x.y.M,a,m;a,x,f)$. The computation rules are easy to check.
+
+\subsection{The rest}
 Tensor types:
 \begin{mathpar}
   \inferrule{
