@@ -345,14 +345,22 @@ This intuition is sufficient for the formation and left rules.
 \end{mathpar}
 However, the right rule is trickier to state correctly.
 In order to get the necessary generality, we need to allow the right rule to ``decouple'' the two occurrences of $x$ that are bound in the coend.
-Without substitutions included, it looks like this:
-\begin{equation}\label{eq:coend-right-nosub}
+Our first approximation to the rule might therefore be:
+\begin{equation}\label{eq:coend-right-firsttry}
   \inferrule{
     \Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
   }{
     \Delta, z : A \cb \Gamma \types \coend^{w:A} M
   }
 \end{equation}
+% or equivalently
+% \begin{equation}
+%   \inferrule{
+%     \Delta, x : A, y : A \cb \Gamma \types M
+%   }{
+%     \Delta, z : A \cb \Gamma[\check z / \check x, \hat z / \hat y] \types \coend^{w:A} M[\check z / \check x , \hat w / \hat x, \check w / \check y , \hat z / \hat y]
+%   }
+% \end{equation}
 That is, to construct an element of $\coend^{w:A} M$, we choose some other variable $z$ that may appear in $M$ or in the context, and we alter the pairings
 \[
   \begin{array}{ccc}
@@ -367,7 +375,7 @@ That is, to construct an element of $\coend^{w:A} M$, we choose some other varia
   \end{array}
 \]
 The simplest case of this is when $\hat z$ and $\check z$ both occur in the context $\Gamma$.
-In this case, it can be used to derive the functoriality of coends:
+In this case, it can be used to derive a functoriality result for coends:
 \begin{mathpar}
   \inferrule{
     \inferrule{
@@ -407,21 +415,47 @@ But the backwards direction requires the right rule for both, and in the case of
 \end{mathpar}
 To prove that these are inverses requires either extensive manipulation of cut-eliminations or a term calculus, so we postpone it until later.
 
-Finally, here is the version of the right rule with substitutions included:
+However,~\eqref{eq:coend-right-firsttry} is insufficient (even before we worry about adding substitutions).
+For one thing, it doesn't seem to suffice to prove a more general functoriality of coends in which the category also varies along a functor $f:C\to A$; we would like to argue as follows:
 \begin{mathpar}
   \inferrule{
-    \Psi,\dual\Psi,\check x \mcol A, \hat y\pcol A \cong \Psi_\Gamma,\Psi_M\\
-    \Psi_\Gamma \types \Gamma\ctx \\
-    \Psi_M, \hat x\pcol A, \check y\mcol A \types M \type\\
-    \Psi_a \types a:A \\
-    \unsigned\Psi, x : A, y : A \cb \Gamma \types M
+    \inferrule{
+      x:C,y:C \cb M(\hat y, \check x) \types N(f(\check y), f(\hat x))
+    }{
+      z:C \types M(\hat z, \check z) \types  \coend^{w:A} N(\check w, \hat w)
+    }
   }{
-    \unsigned\Psi, \unsigned{\Psi_a} \cb \Gamma[a/\hat y,\dual a/\check x] \types \coend^{w:A} M[a/\hat y,\dual a/\check x,\hat w/\hat x, \check w/\check y]
-  }  
+    \ec \types \coend^{z:C} M(\hat z, \check z) \types \coend^{w:A} N(\check w, \hat w)
+  }
 \end{mathpar}
-(We are unable to use the single-judgment version~\eqref{eq:ctx-type} of the preconditions, since we need to ensure that $\hat x$ and $\check y$ appear in $M$ rather than in $\Gamma$.)
+but the first step is not justified by the right rule we have now, since $\check w$ and $\hat w$ have been replaced not by $\check y$ and $\hat x$ but by functions of them.
+A rule that allows this is
+\begin{equation}\label{eq:coend-right-secondtry}
+  \inferrule{
+    u\pcol C \types a:A\\\\
+    \Delta, x : C, y : C \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , a[\hat x/u] / \hat w, a[\check y/u] / \check w , \hat y / \hat z]
+  }{
+    \Delta, z : C \cb \Gamma \types \coend^{w:A} M
+  }
+\end{equation}
+Of course, in general we want to allow $a$ to depend on more than one variable, in which case $C$ needs to be replaced everywhere by a whole context.
+\begin{equation}\label{eq:coend-right}
+  \inferrule{
+    \Psi_1,\dual{\Psi_1},\Psi_2,\dual{\Psi_2} \cong \Psi_\Gamma, \Psi_M\\
+    \Psi_\Gamma \types \Gamma \ctx\\
+    \Psi_M, \hat w\pcol A, \check w \mcol A \types M \type \\\\
+    \Psi_2 \types a:A\\
+    \Psi_x\cong \Psi_y\cong\Psi_2\\\\
+    \unsigned{\Psi_1}, \unsigned\Psi_x, \unsigned{\Psi_y} \cb \Gamma[\dual\Psi_x / \dual{\Psi_2}, \Psi_y / \Psi_2] \types M[\dual{\Psi_x} / \dual{\Psi_2} , a[\Psi_x/\Psi_2] / \hat w, \dual{a[\Psi_y/\Psi_2]} / \check w , \Psi_y / \Psi_2]
+  }{
+    \unsigned{\Psi_1}, \unsigned{\Psi_2} \cb \Gamma \types \coend^{w:A} M
+  }
+\end{equation}
+(We are unable to use the single-judgment version~\eqref{eq:ctx-type} of the preconditions, since we need to ensure that $\hat w$ and $\check w$ appear in $M$ rather than in $\Gamma$.)
+Note that an extra generalization has also happened automatically: unlike $\hat z$ and $\check z$, each of which can appear in only one of $\Gamma$ and $M$, the variables in $\Psi_2$ and $\dual{\Psi_2}$ could each be distributed with some in $\Gamma$ and some in $M$.
+Furthermore, this rule now seems to include substitions already, so we don't need to incorporate them by a further step.
 
-\gray{Here is what was written as the right rule before.  I'm still unable to make much sense of it, in either form; the above version seems like what we would get by straightforwardly adding a substitution to~\eqref{eq:coend-right-nosub}.)
+It seems to me that this rule~\eqref{eq:coend-right} is basically equivalent to Patrick's rule, below, if we (1) identify $\Psi_2$ with $\Psi_x$, so that only half of the substitutions need to happen, (2) make the substitutions not involving $a$ happen in the conclusion rather than the premises, and (3) break up the contexts by where the variables appear so that we aren't writing no-op substitutions.
 \begin{mathpar}
   \inferrule{
     \Delta_a \iso \Delta'_a \\
@@ -446,7 +480,7 @@ Finally, here is the version of the right rule with substitutions included:
     \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
   }\and
 \end{mathpar}
-}
+
 
 \subsection{Binding tensor types}
 \label{sec:tensor-types}
