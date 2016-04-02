@@ -93,9 +93,9 @@ r & = & \uns \combine r \\
 
 We write $\Psi^{v}$ to indicate that ${v}$ is the vector of variances on
 the assumptions in $\Psi$, and write $v_1 \combine v_2$ for combining
-variances pointwise.  When $x,y,\ldots$ come from a context $\Psi$, we
-write $(x^v,y^{v'},\ldots)$ for the vector whose $x$ component is $v$
-and whose $y$ component is $v'$, and so on, and is $\times$ otherwise.
+variances pointwise.  When $x$ comes from a context $\Psi$, we write
+$x^v$ for the vector whose $x$ component is $v$ and is $\uns$
+otherwise.  
 
 When we write an $r$ in place of a vector, that means repeat $r$ the
 appropriate number of times.  
@@ -136,21 +136,26 @@ with different resources, because we can weaken.
 Judgements with $\Psi$ on the left are supposed to respect the following
 renamings:
 \begin{mathpar}
-\inferrule*{\Psi \vdash \rho : \Psi' }
-           {\Psi \vdash (\rho,\triv/x) : (\Psi', x \uncol A)}
-\and 
 \inferrule*{ }
            {\Psi^{\uns} \vdash \cdot : \cdot}
 \and
-\inferrule*{\Psi^{v_2} \vdash \rho : \Psi'  \\
-             v_1 = {v_2} \combine (y^v) 
+\inferrule*{\Psi \vdash \rho : \Psi' }
+           {\Psi \vdash (\rho,\triv/x) : (\Psi', x \uncol A)}
+\and 
+\inferrule*{\Psi^{v'} \vdash \rho : \Psi' \and 
+             v = v' \combine y\p
            }
-           {\Psi^{v_1} \vdash (\rho,y/x) : (\Psi',x \vcol r A)}
+           {\Psi^{v} \vdash (\rho,y/x) : (\Psi', x \pcol A)}
 \and
-\inferrule*{\Psi^{v_2} \vdash \rho : \Psi'  \\
-             v_1 = {v_2} \combine (y\m,z\p) 
+\inferrule*{\Psi^{v'} \vdash \rho : \Psi' \and 
+             v = v' \combine y\m
            }
-           {\Psi^{v_1} \vdash (\rho,(y,z)/x) : (\Psi',x \pmcol A)}
+           {\Psi^{v} \vdash (\rho,y/x) : (\Psi', x \mcol A)}
+\and 
+\inferrule*{\Psi^{v'} \vdash \rho : \Psi'  \\
+             v = {v'} \combine y\m \combine z\p 
+           }
+           {\Psi^{v} \vdash (\rho,(y,z)/x) : (\Psi',x \pmcol A)}
 \and
 \inferrule*[right=admissible?]
            {\Psi \vdash \rho : \Psi' }
@@ -166,29 +171,45 @@ renamings:
            {\Psi \vdash \rho[\rho'] : \Psi'' }
 \end{mathpar}
 
-The first rule gives \emph{strengthening} for $x \uncol A$ --- we can
-supply nothing for it, because it can never be used.  Dually, the
-renaming that gives weakening when applied to a judgement should be
-admissible for the rest of the rules.  The renaming for the empty
-context is well-formed if all of the assumptions have already been
-spent.  The renaming for a context extension with $x \vcol r A$ says
-that you need to spend $v$ from an assumption $y$ in the context, with
-whatever is left over being used in the rest of the renaming.  For
-example, we have
+The renaming for the empty context is well-formed if all of the
+assumptions have already been spent.
+
+The renmaing for extension by a $\uns$ variable gives
+\emph{strengthening} for $x \uncol A$ --- we can supply nothing for it,
+because it can never be used.  Dually, the renaming that gives weakening
+when applied to a judgement should be admissible for the rest of the
+rules.  
+
+The renaming for a context extension with $x \pcol A$ says that you need
+to spend a $\ps$ use of an assumption $y$ in the context, with whatever
+is left over being used in the rest of the renaming.  Similarly for
+$\ms$ variables.  For example, we have
 \[
 \inferrule*{ \inferrule*{x \uncol A \vdash \cdot \\
                          + = \times \combine +}
-                        { x \pcol A \vdash (\cdot,x/y) \pcol A
-                         } \\
+                        { x \pcol A \vdash (\cdot,x/y) \pcol A} \\
              {\mypm = + \combine -} \\ 
            }
            { x \pmcol A \vdash (\cdot, x / y, x / z) : (y \pcol A , z \mcol A)}
 \]
+
 The final rule allows ``unpairing'' an $x \pmcol A$ variable,
-substituting two different variables for its contravariant and covariant
-aspects.  In all of the judgements $\Psi \vdash J$, $x \pmcol A$ is
+substituting two variables for its contravariant and covariant aspects.
+As a special case these might be two uses of the same $\pms$ variable.
+Thus, in all of the judgements $\Psi \vdash J$, $x \pmcol A$ is
 equivalent to $y \mcol A, z \pcol A$, but the former keeps track of
-which assumptions will be correlated by the term judgement.  
+which assumptions will be correlated by the term judgement.
+
+The following more compact version for context extension should be
+derivable, if we allow writing $y$ for $(y,y)$ in the $\pms$ case (note
+that not every renaming for a $\pms$-assumption is of this form):
+\[
+\inferrule*[right=derivable?]
+           {\Psi^{v_2} \vdash \rho : \Psi'  \\
+             v_1 = {v_2} \combine (y^v) 
+           }
+           {\Psi^{v_1} \vdash (\rho,y/x) : (\Psi',x \vcol r A)}
+\]
 
 \subsection*{Substitutions}
 
@@ -234,14 +255,6 @@ splitting $v = v_1 \combine v_2$, and some operation applying $*$
 functorially to substitutions, which probably switches $(a_1,a_2)$ to
 $(a_2,a_1)$?
 
-\subsection*{Category Terms}
-
-\begin{mathpar}
-\inferrule{ }
-          {\Psi_1\un,x \pcol A,\Psi_2\un \vdash x : A}
-\\ 
-\end{mathpar}
-
 \subsection*{Type Contexts}
 
 \begin{mathpar}
@@ -276,6 +289,9 @@ $(a_2,a_1)$?
 \subsection*{Structural Rules}
 
 \begin{mathpar}
+\inferrule{ }
+          {\Psi_1\un,x \pcol A,\Psi_2\un \vdash x : A}
+
 \inferrule{\Psi^{p} \types N \type }
           {\Psi^{(\flip{p} \combine p)} \cb N \types N}
 \\
@@ -312,7 +328,7 @@ or $(\Gamma \vdash M) \ok$.
           {\Psi^{v} \types \mor A(a,b) \type}
 
 \inferrule{\Psi^{p} \types a : A }
-          {\Psi^{\pm} \cb \ec \types \mor{A}(a,a) }
+          {\Psi^{(\flip{p} \combine p)} \cb \ec \types \mor{A}(a,a) }
 
 \inferrule*{v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
             \Psi^{(v_1 \combine \flip{p_1})},x \pcol A \cb (\Gamma \vdash M) \ok \\\\
@@ -320,6 +336,13 @@ or $(\Gamma \vdash M) \ok$.
             \Psi^{p_2} \vdash {a_2} : A \\\\
             \Psi^{(v_1 \combine \flip{p_1} \combine {p_1})} \cb (\Gamma \vdash M)[a_1/x] }
           {\Psi^{v} \cb (\Gamma, \mor{A} (a_1,x) \vdash M)[a_2/x]}
+
+\inferrule*{v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
+            \Psi^{(v_1 \combine \flip{p_2})},x \mcol A \cb (\Gamma \vdash M) \ok \\\\
+            \Psi^{p_1} \vdash {a_1} : A \\\\
+            \Psi^{p_2} \vdash {a_2} : A \\\\
+            \Psi^{(v_1 \combine \flip{p_2} \combine {p_2})} \cb (\Gamma \vdash M)[a_2/x] }
+          {\Psi^{v} \cb (\Gamma, \mor{A} (x,a_2) \vdash M)[a_1/x]}
 
 %% \inferrule{\Delta \cb (\Gamma \vdash M) [ \theta, a/\hat{x} ] \\ (\hat{x} \# a)}
 %%           {\Delta,x \pmcol A \cb (\Gamma, \mor{A}(a,\check x) \vdash M)[\theta,x \csplit \check x , \hat x]}
