@@ -624,42 +624,77 @@ Furthermore, this rule now includes substitutions already, so we don't need to i
 \label{sec:tensor-types}
 
 The binding tensor $M\otimes_{x:A} N$ can be defined as $\coend^{x:A} M\otimes N$.
-More generally, for a context $\Psi=(x_1:A_1,\dots,x_n:A_n)$ we can write $M\otimes_{\Psi} N$ for $\coend^{x_1:A_1} \cdots \coend^{x_n:A_n} M\otimes N$.
-The following rules for this derived type former should then be admissible.
-On the other hand, the non-binding tensor should be derivable from the binding one by tensoring over the empty context, and the coend should be derivable by tensoring over $(\hat x\pcol A,\check x\mcol A)$ with $\mor A$.
+Its derived rules, with their derivations, are:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \Psi_M, \hat x\pcol A \types M\type\\
+      \Psi_N, \check x\mcol A \types N\type
+    }{
+      \Psi_M, \Psi_N, \hat x\pcol A, \check x \mcol A \types M \otimes N \type
+    }
+  }{
+    \Psi_M, \Psi_N \types \coend^{x:A} M\otimes N \type
+  }\and
+  \inferrule{
+    \inferrule{
+      \unsigned{\Psi}, x:A \cb \Gamma, M, N \types C
+    }{
+      \unsigned{\Psi}, x:A \cb \Gamma, M\otimes N \types C
+    }
+  }{
+    \unsigned{\Psi} \cb \Gamma, \coend^{x:A} M\otimes N \types C
+  }\and
+  \scriptsize
+  \inferrule{
+    % \Psi_1,\dual{\Psi_1},\Psi_2,\dual{\Psi_2} \cong \Psi_\Gamma, \Psi_{MN}\\
+    % \flip{\Psi_\Gamma} \types \Gamma \ctx\\
+    % \Psi_{MN}, \hat w\pcol A, \check w \mcol A \types M\otimes N \type \\\\
+    % \Psi_2 \types a:A\\
+    % \Psi_x\cong \Psi_y\cong\Psi_2\\\\
+    \inferrule{
+      \unsigned{\Psi_M}, \unsigned{\Psi_2} \cb \Gamma_M \types M[a / \hat w]\\
+      \unsigned{\Psi_N}, \unsigned{\Psi_2} \cb \Gamma_N \types N[\dual a / \check w]
+    }{
+      \unsigned{\Psi_M}, \unsigned{\Psi_N}, \unsigned{\Psi_x}, \unsigned{\Psi_y} \cb \Gamma_M[\dual\Psi_x / \dual{\Psi_2}], \Gamma_N[\Psi_y / \Psi_2] \types (M\otimes N)[\dual{\Psi_x} / \dual{\Psi_2} , a[\Psi_x/\Psi_2] / \hat w, \dual{a[\Psi_y/\Psi_2]} / \check w , \Psi_y / \Psi_2]
+    }
+  }{
+    \unsigned{\Psi_M}, \unsigned{\Psi_N}, \unsigned{\Psi_2} \cb \Gamma_M, \Gamma_N \types \coend^{w:A} M\otimes N
+  }
+\end{mathpar}
+(In the right rule, we have renamed $\Psi_x$ and $\Psi_y$ back to $\Psi_2$ on the top line, for readability.)
 
-\red{Left off updating to $\unsigned{\Psi}$ and $\Psi,\dual\Psi \types \Gamma\ctx, M\type$ here.}
-
-The formation rule for the tensor type:
+More generally, for a context $\Phi=(x_1:A_1,\dots,x_n:A_n)$ we can write $M\otimes_{\Phi} N$ for $\coend^{x_1:A_1} \cdots \coend^{x_n:A_n} M\otimes N$.
+Its derived rules should be the following:
 \begin{mathpar}
-  \inferrule{\Psi_M, \Psi \types M\type \\
-    \Psi_N, \flip{\Psi} \types N\type}
-  {\Psi_M, \Psi_N \types M \otimes_\Psi N\type}\and
+  \inferrule{
+    \Psi_M, \Phi \types M\type \\
+    \Psi_N, \dual{\Phi} \types N\type
+  }{
+    \Psi_M, \Psi_N \types M \otimes_\Phi N\type
+  }\and
+  \inferrule{
+    \unsigned{\Psi}, \unsigned{\Phi} \cb \Gamma, M, N \types C
+  }{
+    \unsigned{\Psi} \cb \Gamma, M\otimes_\Phi N \types C
+  }\and
+  \inferrule{
+    \Psi_2 \types \alpha : \Phi\\
+    \unsigned{\Psi_M}, \unsigned{\Psi_2} \cb \Gamma_M \types M[\alpha/\Phi]\\
+    \unsigned{\Psi_N}, \unsigned{\Psi_2} \cb \Gamma_N \types N[\dual \alpha/\dual \Phi]
+  }{
+    \unsigned{\Psi_M}, \unsigned{\Psi_N}, \unsigned{\Psi_2} \cb \Gamma_M, \Gamma_N \types M\otimes_\Phi N
+  }
 \end{mathpar}
-The left rule
-\begin{mathpar}
-  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
-    \Delta' \psplit \flip{\Psi},\Psi \\\\
-    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M,\Psi \types M\type \\
-    \Psi_N,\flip{\Psi} \types N\type \\ \Psi_C \types C\type \\\\
-    \Delta, \Delta' \cb \Gamma,M,N \types C}
-  {\Delta \cb \Gamma, M\otimes_\Psi N \types C}\and
-\end{mathpar}
-and right rule
-\begin{mathpar}
-  \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
-    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
-    \Psi_a \types a:A \\
-    \Psi_{\Gamma_M},\Psi_a^{\pm} \types \Gamma_M\ctx \\
-    \Psi_{\Gamma_N},\Psi_a^{\mp} \types \Gamma_N\ctx \\\\
-    \Psi_M,x\pmcol A \types M\type \\ \Psi_N,x\mpcol A \types N\type \\\\
-    \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
-    \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
-  {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
-\end{mathpar}
+In the other direction, the non-binding tensor is of course recoverable from the binding one by tensoring over the empty context.
+Less obviously, the coend should be derivable by tensoring over $(\hat x\pcol A,\check x\mcol A)$ with $\mor A(\check x, \hat x)$, but we should write out the details.
 
 
 \subsection{End type}
+\label{sec:end-type}
+
+\red{Left off updating to $\unsigned{\Psi}$ and $\Psi,\dual\Psi \types \Gamma\ctx, M\type$ here.}
+
 Formation rule:
 \begin{mathpar}
   \inferrule{
