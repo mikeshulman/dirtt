@@ -59,7 +59,7 @@
 \begin{array}{l}
 r :: = \ps \mid \ms \mid \pms \mid \uns \\
 v ::= \cdot \mid v,r \\
-p :: = \cdot \mid p,\ps \mid p,\ms p,\uns \\
+p :: = \cdot \mid p,\ps \mid p,\ms \mid p,\uns \\
 \Psi ::= \cdot \mid \Psi, x \vcol r A \\
 \Delta ::= \cdot \mid \Delta, x \pmcol A \mid \Delta, x \uncol A \\
 \\ 
@@ -174,7 +174,7 @@ renamings:
 The renaming for the empty context is well-formed if all of the
 assumptions have already been spent.
 
-The renmaing for extension by a $\uns$ variable gives
+The renaming for extension by a $\uns$ variable gives
 \emph{strengthening} for $x \uncol A$ --- we can supply nothing for it,
 because it can never be used.  Dually, the renaming that gives weakening
 when applied to a judgement should be admissible for the rest of the
@@ -223,20 +223,20 @@ that not every renaming for a $\pms$-assumption is of this form):
 \and
 \inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
             \Psi^{v_2} \vdash a : A \\
-             v = {v_1} \combine v_2 
+             v = {v_1} \combine v_2
            }
            {\Psi^{v} \vdash (\theta,a/x) : (\Psi',x \pcol A)}
 \and 
 \inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
             \Psi^{\flip{v_2}} \vdash a : A \\
-             v = {v_1} \combine v_2 
+             v = {v_1} \combine v_2
            }
            {\Psi^{v} \vdash (\theta,a/x) : (\Psi',x \pcol A)}
 \and
-\inferrule*{\Psi^{v'} \vdash \theta : \Psi'  \\
-             \Psi^{\flip{v_1}} \vdash {a_1} : A \\
-             \Psi^{v_2} \vdash {a_2} : A \\
-             v = {v'} \combine {({v_1} \combine {v_2})} \\
+\inferrule*{\Psi^{v_1} \vdash \theta : \Psi'  \\
+             \Psi^{\flip{v_{21}}} \vdash {a_1} : A \\
+             \Psi^{v_{22}} \vdash {a_2} : A \\
+             v = {v_1} \combine {({v_{21}} \combine {v_{22}})} \\
            }
            {\Psi^{v} \vdash (\theta,(a_1,a_2)/x) : (\Psi',x \pmcol A)}
 \end{mathpar}
@@ -254,6 +254,101 @@ There will need to be some operations decomposing a substitution along a
 splitting $v = v_1 \combine v_2$, and some operation applying $*$
 functorially to substitutions, which probably switches $(a_1,a_2)$ to
 $(a_2,a_1)$?
+
+\subsubsection*{Splitting} Suppose we have a rule like
+
+\begin{mathpar}
+\inferrule*{v' = v_1' \combine v_2'  \\ 
+            \Psi'^{v_1'} \vdash J_1 \\
+            \Psi'^{v_2'} \vdash J_2
+           }
+           { {\Psi'}^{v'} \vdash J }
+\end{mathpar}
+and we want to substitute ${\Psi}^{v} \types \theta : \Psi'$ into it.
+We need to find a $v = v_1 \combine v_2$ and $\theta_1$ and
+$\theta_2$ with $\Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}$ and
+$\Psi^{v_2} \vdash \theta_2 : \Psi'^{v_2'}$ to push the substitution
+inside.  
+
+\begin{mathpar}
+\inferrule*[right=admissible]
+           {v' = v_1' \combine v_2'  \\ 
+            {\Psi}^{v} \types \theta : {\Psi'}^{v'}
+           }
+           { v = v_1 \combine v_2\\
+             \Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}\\
+             \Psi^{v_2} \vdash \theta_2 : {\Psi'}^{v_2'}
+           }
+\end{mathpar}
+We write $\theta \splits \theta_1,\theta_2$ for this operation when the
+other arguments are clear from context.  
+
+If $\Psi'$ is $\cdot$, then the substitution must be $\cdot$, and $v' =
+v_1' \combine v_2'$ is $\cdot = \cdot \combine \cdot$, so we want
+\begin{mathpar}
+\uns = \uns \combine \uns \and \inferrule*{ }{\cdot \splits \cdot,\cdot}
+\end{mathpar}
+
+Suppose the $\Psi'$ in the theorem is of the form $\Psi', x \vcol r' A$,
+and the substitution is of the form $\theta,t/x$, where in every case we
+have 
+\begin{mathpar}
+v = {v_1} \combine {v_2} \\
+\Psi^{v_1} \types \theta : \Psi' \\
+\Psi^{v_2} \vdash t
+\end{mathpar}
+If $(v',r')$ is the resource vector for the $\Psi',x \vcol{r'} A$, then we
+have a splitting as
+\[
+(v',r') = (v_1',r_1') \combine (v_2',r_2')
+\]
+so in particular $v' = v_1' \combine v_2'$.  Therefore, by splitting
+$\theta$ with $v' = v_1' \combine v_2'$ we get
+\begin{mathpar}
+\theta \splits \theta_1,\theta_2 \\
+v_1 = v_{11} \combine v_{12}\\
+\Psi^{v_{11}} \vdash \theta_1 : {\Psi'}^{v_1'}\\
+\Psi^{v_{12}} \vdash \theta_2 : {\Psi'}^{v_2'}\\
+\end{mathpar}
+
+We want to construct 
+\begin{mathpar}
+(\theta,t/x) \splits (\theta_1,?/x),(\theta_2,?/x) \\
+v = (v_{11} \combine ?) \combine ({v_{21} \combine ?}) \\
+\Psi^{(v_{11} \combine ?)} \vdash (\theta_1,?/x) : (\Psi'^{v_1'},x \vcol{r_1'} A)\\
+\Psi^{(v_{21} \combine ?)} \vdash (\theta_1,?/x) : (\Psi'^{v_2'},x \vcol{r_2'} A)
+\end{mathpar}
+where the two goals split $v_2$, because we already know $v = v_1
+\combine v_2$, so by associativity and commutativity, we will have 
+$v = v_1 \combine v_2 = (v_{11} \combine v_{12}) \combine (? \combine ?)
+= (v_{11} \combine ?) \combine ({v_{21} \combine ?})$.  
+
+Writing $\Psi^{v_2} \vdash t \vcol{r'} A$ for the remaining premises of
+the substitution rule ($t$ might really be zero or two terms), the lemma
+we need is 
+\begin{mathpar}
+\inferrule{r' = r_1' \combine r_2' \\ 
+           \Psi^{v_2} \vdash t \vcol{r'} A
+          }
+          { v_2 = {v_{21}} \combine v_{22} \\ 
+            \Psi^{v_{21}} \vdash t_1 \vcol{r_1'} A\\
+            \Psi^{v_{21}} \vdash t_2 \vcol{r_2'} A\\
+          }
+\end{mathpar}
+which we write as $t \splits t_1,t_2$ because then we can define
+\begin{mathpar}
+(\theta,t/x) \splits (\theta_1,t_1/x),(\theta_2,t_2/x)
+\end{mathpar}
+and satisfy the above.  We define this by cases on how $r'$ splits:
+
+\begin{itemize}
+\item Case $r' = r' \combine \uns$.  In this case return $v_2 = v_2
+  \combine \uns$ and $t \splits (t,\triv)$.
+\item Case $r' = \uns \combine r'$.  In this case return $v_2 = \uns
+  \combine v_2$ and $t \splits (\triv,t)$.
+\item Case $\pms = \ps \combine \ms$. In this case $(a_1,a_2) \splits a_2,a_1$.
+\item Case $\pms = \ms \combine \ps$. In this case $(a_1,a_2) \splits a_1,a_2$.
+\end{itemize}
 
 \subsection*{Type Contexts}
 
