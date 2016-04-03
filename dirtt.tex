@@ -324,7 +324,7 @@ The first ``two-sided'' one is a ``directed'' analogue of the elimination rule f
   \inferrule{
     \Psi,\dual\Psi,\hat x\pcol A,\check x \mcol A \types \Gamma\ctx, M\type\\
     \Psi_a \types a:A \\
-    \Psi_b \types b:B \\
+    \Psi_b \types b:A \\
     \unsigned\Psi,x:A \cb \Gamma \types M
   }{
     \unsigned{\Psi},\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x,b/\hat{x}],\mor A(a,\dual b)
@@ -349,8 +349,19 @@ Similarly, we have the functorial action of any judgment $x\pcol A \types f(x):B
     {x:A \cb \ec \types \mor B(f(\check x),f(\hat x))}}
   {x:A, y:A \cb \mor A(\hat x, \check y) \types \mor B(f(\check x),f(\hat y))}
 \end{equation}
+And the action of morphisms on types (directed transport):
+\begin{equation}
+  \label{eq:transport}
+  \inferrule{\inferrule{
+      \Delta,u\pcol A \types M\type
+    }{
+      \Delta,x:A \cb M[\check x/u] \types M[\hat x/u]
+    }}{
+    \Delta,x:A,y:A \cb M[\check x/u], \mor A(\hat x,\check y) \types M[\hat y/u]
+    }
+\end{equation}
 
-We also consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Morhing rule for identity types):
+We also consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Mohring rule for identity types):
 \begin{mathpar}
   \inferrule{\Delta\cb \Gamma[\dual b/\check x] \types M[\dual b/\check x]}{\Delta,x:A\cb \Gamma,\mor A(\hat x, \dual b) \types M}\and
   \inferrule{\Delta\cb \Gamma[a/\hat x] \types M[a/\hat x]}{\Delta,x:A\cb \Gamma,\mor A(a, \check x) \types M}\and
@@ -366,20 +377,61 @@ And with substitutions:
   }\and
   \inferrule{
     \Psi,\dual\Psi,\dual{\Psi_a},v\pcol A \types \Gamma\ctx, M\type\\
-    \Psi_b \types b:B\\
+    \Psi_b \types b:A\\
     \unsigned\Psi, \unsigned{\Psi_a}\cb \Gamma[a/v] \types M[a/v]
   }{
     \unsigned\Psi,\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[b/v],\mor A(a, \dual b) \types M[b/v]
   }\and
 \end{mathpar}
+Note that these can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
 
-Either of these implies the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
-The converse implication in full dependent type theory requires a universe, so we probably don't expect it to hold here.
-I think we will probably want the one-sided rules (but there ought to be some compatibility between them, so that when they both apply they give the same result).
-Note that they can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
+Either one-sided rule makes the two-sided rule admissible, just as the Paulin-Mohring rule implies the Martin-L\"of one.
+For instance, here is a derivation of the two-sided rule from the second one-sided rule, using substitution for category-variables:
+\begin{mathpar}
+\inferrule{
+    \Psi_b \types b:A\\
+    % \inferrule{
+    %   \Psi_a \types a:A \\
+    %   \Psi,\dual\Psi,\hat x\pcol A,\check x \mcol A \types \Gamma\ctx, M\type\\
+    % }{
+    %   \Psi,\dual\Psi,\dual{\Psi_a},\hat x\pcol A \types \Gamma[\dual{a}/\check x]\ctx, M[\dual{a}/\check x]\type\\
+    % }\\
+    \inferrule*{
+      \Psi_a \types a:A \\
+      \unsigned\Psi,x:A \cb \Gamma \types M
+    }{
+      \unsigned\Psi, \unsigned{\Psi_a}\cb \Gamma[\dual{a}/\check x][a/\hat x] \types M[\dual{a}/\check x][a/\hat x]
+    }
+  }{
+    \unsigned{\Psi},\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x][b/\hat{x}],\mor A(a,\dual b)
+    \types M[\dual{a}/\check x][b/\hat{x}]
+  }
+\end{mathpar}
+Conversely, here is a proof of the second one-sided rule when the variable is on the right (i.e.\ $v$ occurs in $M$ rather than $\Gamma$):
+\begin{mathpar}
+  \scriptsize
+  \inferrule{
+    % \Psi,\dual\Psi,\dual{\Psi_a},v\pcol A \types \Gamma\ctx, M\type\\
+    \unsigned\Psi, \unsigned{\Psi_a}\cb \Gamma \types M[a/v]\\
+    \inferrule*{
+      \Psi_b \types b:A\\
+      \inferrule*{
+        \inferrule{ }{\unsigned{\Psi_M},x:A \cb M[\check x/v] \types M[\hat x/v]}\\
+      }{
+        \unsigned{\Psi_M},x:A,y:A \cb M[\check x/v], \mor A(\hat x,\check y) \types M[\hat y/v]
+      }
+    }{
+      \unsigned{\Psi_M},x:A,\unsigned{\Psi_b} \cb M[\check x/v], \mor A(\hat x,\dual b) \types M[b/v]
+    }
+  }{
+    \unsigned\Psi,\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma,\mor A(a, \dual b) \types M[b/v]
+  }\and
+\end{mathpar}
+We've left the division of $\Psi$ into $\Psi_M$ and a $\Psi_\Gamma$ implicit; the unification at the cut gives $\hat x \mapsto a$ and matches up all the other variables in $\Psi_M$ with their counterparts in $\Psi$, so that $\Psi_M$ disappears in the final conclusion.
+(Can we do something analogous when $v$ appears in $\Gamma$?)
 
-With morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types b:B$, and the 2-cells from $b$ to $b'$ are the judgments $x:A \cb \ec \types \mor B(b,b')$.
-The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) can be obtained from~\eqref{eq:composition} once we have a cut rule.
+Finally, note that with morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types f(x):B$, and the 2-cells from $f$ to $g$ are the judgments $x:A \cb \ec \types \mor B(f(\check x),g(\hat x))$.
+The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) is obtained by cutting with~\eqref{eq:composition}.
 Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~\eqref{eq:functor}.
 
 \subsection{Tensor}
