@@ -43,6 +43,7 @@
 \newcommand\vcol[1]{\overset{\scriptscriptstyle #1}{:}}
 \newcommand\combine{\sqcup}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
+\newcommand{\End}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
 \newcommand{\unsigned}[1]{#1^0}
 \newcommand{\joinvar}[1]{\left[#1\right]}
@@ -109,11 +110,16 @@ either $r' = r_1 \combine r_2$ and
 $r = r \combine r_3$ or the other associativity.  
 (FIXME: check that it's associative and commutativity).  
 
+We think of $\Gamma$ as an unordered list of assumptions, and since it
+is purely linear, we will use context splitting instead of resource
+counting.  
+
 Judgements:
 
 \begin{itemize}
 
-\item $A \cat$
+\item $A \cat$, $\Psi \ctx$ treated intrinsically for now (all syntax is
+  well-formed).
 
 \item $\Psi \types a : A$
 
@@ -123,7 +129,8 @@ Judgements:
 
 \item $\Psi \cb (\Gamma \vdash M) \ok$
 
-\item $\Delta \cb \Gamma \vdash M$
+\item $\Delta \cb \Gamma \vdash M$, presupposes 
+ $\Psi \cb (\Gamma \vdash M) \ok$.  
 
 \end{itemize}
 
@@ -212,6 +219,12 @@ that not every renaming for a $\pms$-assumption is of this form):
 \]
 
 \subsection*{Substitutions}
+
+The technically easiest thing is to consider total substitutions (a
+substitution plugs in for all of the variables in a context).  I think
+we could do a single-variable substitution version instead, which would
+be nicer to use, because there wouldn't be a bunch of identity
+substitutions running around, but I wanted to work this out first.
 
 For convenience, we use a notion of ``inhabitant of a type at resource
 $r$'', i.e. where we have variance on the right, $\Psi \types t \vcol r
@@ -501,24 +514,143 @@ same thing for both halves).
 \inferrule{\Psi^{p} \types a : A }
           {\Psi^{(\flip{p} \combine p)} \cb \ec \types \mor{A}(a,a) }
 
-\inferrule*{v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
+\inferrule{v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\
+           \Psi^{v_1}, x \mcol A, y \pcol A \cb (\Gamma \vdash M) \ok \\
+           \Psi^{p_1} \vdash a_1 : A \\
+           \Psi^{p_2} \vdash a_2 : A \\
+           \Delta, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ 
+           }
+          {\Psi^v \cb (\Gamma, \mor{A}(x,y) \types M)[ (a,a)/x\pm , (b,b)/y\pm] }
+\end{mathpar}
+
+Two-sided without a substitution:
+\begin{mathpar}
+\inferrule*[right=derivable]
+           {\Delta, x \mcol A, y \pcol A \cb (\Gamma \vdash M) \ok \\
+            \Delta, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ }
+           {\Delta, x \pmcol A, y \pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
+\end{mathpar}
+Officially, the total substitution in the premise should be 
+$(\Gamma \vdash M) [1_\Delta,x/x,x/y]$ but by convention we will leave
+off the identity parts.  
+
+Based rules:
+\begin{mathpar}
+\inferrule*[right=admissible using cut?]
+           {v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
             \Psi^{(v_1 \combine \flip{p_1})},x \pcol A \cb (\Gamma \vdash M) \ok \\\\
             \Psi^{p_1} \vdash {a_1} : A \\\\
             \Psi^{p_2} \vdash {a_2} : A \\\\
             \Psi^{(v_1 \combine \flip{p_1} \combine {p_1})} \cb (\Gamma \vdash M)[a_1/x] }
           {\Psi^{v} \cb (\Gamma, \mor{A} (a_1,x) \vdash M)[a_2/x]}
 
-\inferrule*{v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
+\inferrule*[right=admissible using cut?]
+           {v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
             \Psi^{(v_1 \combine \flip{p_2})},x \mcol A \cb (\Gamma \vdash M) \ok \\\\
             \Psi^{p_1} \vdash {a_1} : A \\\\
             \Psi^{p_2} \vdash {a_2} : A \\\\
             \Psi^{(v_1 \combine \flip{p_2} \combine {p_2})} \cb (\Gamma \vdash M)[a_2/x] }
-          {\Psi^{v} \cb (\Gamma, \mor{A} (x,a_2) \vdash M)[a_1/x]}
+           {\Psi^{v} \cb (\Gamma, \mor{A} (x,a_2) \vdash M)[a_1/x]}
 
 %% \inferrule{\Delta \cb (\Gamma \vdash M) [ \theta, a/\hat{x} ] \\ (\hat{x} \# a)}
 %%           {\Delta,x \pmcol A \cb (\Gamma, \mor{A}(a,\check x) \vdash M)[\theta,x \csplit \check x , \hat x]}
 \\
 \end{mathpar}
+
+\subsection*{Tensor}
+
+\begin{mathpar}
+  \inferrule{
+    v = v_1 \combine v_2 \\
+    \Psi^{v_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
+  }{
+    \Psi^{v} \types M_1\otimes M_2\type
+  }\and
+  \inferrule{
+    \Delta \cb \Gamma,M_1,M_2 \types N
+  }{
+    \Delta \cb \Gamma, M_1\otimes M_2 \types N
+  }\and
+  \inferrule{
+    v = v_1 \combine v_2 \\\\ 
+    \Psi^{v_1} \cb (\Gamma_1 \vdash M_1) \ok \\
+    \Psi^{v_1} \cb \Gamma_1 \vdash M_1 \\\\
+    \Psi^{v_2} \cb (\Gamma_2 \vdash M_2) \ok \\
+    \Psi^{v_2} \cb \Gamma_2 \vdash M_2
+  }{
+    \Psi^{v} \cb \Gamma_1,\Gamma_2 \types M_1\otimes M_2
+  }\and
+\end{mathpar}
+
+FIXME: Needing to check that the sequents are well-formed is weird;
+think more about this.  
+
+\subsection*{Coend}
+
+\begin{mathpar}
+
+  \inferrule{
+    \Psi, x \pmcol A \types M \type \\
+    }{
+    \Psi \types \coend^{x:A} M \type
+  }
+
+  \inferrule{
+    \Delta, x \pmcol A \cb \Gamma, M \types N
+    }{
+    \Delta \cb \Gamma,\coend_{x:A} M \types N
+  }\and
+
+\end{mathpar}
+
+\subsection*{End}
+
+\begin{mathpar}
+
+  \inferrule{
+    \Psi, x \pmcol A \types M \type \\
+    }{
+    \Psi \types \End_{x:A} M \type
+  }
+
+  \inferrule{
+    \Delta, x \pmcol A \cb \Gamma \types M
+    }{
+    \Delta \cb \Gamma \types \coend_{x:A} M
+  }\and
+
+\end{mathpar}
+
+\subsection*{Hom types (can we use a different name? Function types,
+  Closure types? Internal hom types?)}
+
+(I find the name confusing when there is something else notated $\mor{A}$).  
+
+\begin{mathpar}
+  \inferrule{
+    v = \flip{v_1} \combine v_2 \\
+    \Psi^{v_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
+  }{
+    \Psi^v \types M_1 \multimap M_2 \type
+  }
+
+  \inferrule{
+    \Delta \cb \Gamma, M \types N
+  }{
+    \Delta \cb \Gamma \types M\multimap N
+  }
+
+  \inferrule{
+    v = v_1 \combine v_2\\\\
+    \Psi^{v_1} \cb (\Gamma_1 \vdash M_1) \ok \\ 
+    \Psi^{v_1} \cb \Gamma_1 \vdash M_1 \\\\
+    \Psi^{v_2} \cb (\Gamma_2,M_2 \vdash N) \ok \\ 
+    \Psi^{v_2} \cb \Gamma_2,M_2 \vdash N \\ 
+  }{
+    \Psi^v \cb \Gamma_1,\Gamma_2,M_1\multimap M_2 \types N
+  }
+\end{mathpar}
+
 
 \end{document}
 
@@ -1005,7 +1137,7 @@ Formation rule:
   \inferrule{
     \Psi,\hat x\pcol A,\check x\mcol A \types M \type \\
     }{
-    \Psi \types \coend_{x:A} M \type
+    \Psi \types \End_{x:A} M \type
   }\and
 \end{mathpar}
 Right rule:
