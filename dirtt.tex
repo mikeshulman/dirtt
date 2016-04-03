@@ -591,33 +591,33 @@ Of course, in general we want to allow $a$ to depend on more than one variable, 
 \end{equation}
 (We are unable to use the single-judgment version~\eqref{eq:ctx-type} of the preconditions, since we need to ensure that $\hat w$ and $\check w$ appear in $M$ rather than in $\Gamma$.)
 Note that an extra generalization has also happened automatically: unlike $\hat z$ and $\check z$, each of which can appear in only one of $\Gamma$ and $M$, the variables in $\Psi_2$ and $\dual{\Psi_2}$ could each be distributed with some in $\Gamma$ and some in $M$.
-Furthermore, this rule now seems to include substitions already, so we don't need to incorporate them by a further step.
+Furthermore, this rule now includes substitutions already, so we don't need to incorporate them by a further step.
 
-It seems to me that this rule~\eqref{eq:coend-right} is basically equivalent to Patrick's rule, below, if we (1) identify $\Psi_2$ with $\Psi_x$, so that only half of the substitutions need to happen, (2) make the substitutions not involving $a$ happen in the conclusion rather than the premises, and (3) break up the contexts by where the variables appear so that we aren't writing no-op substitutions.
-\begin{mathpar}
-  \inferrule{
-    \Delta_a \iso \Delta'_a \\
-    \Delta_a \psplit (\flip{\Phi_\Gamma},\Phi_M),\Psi_a \\
-    \Delta'_a \psplit \flip{\Psi_a'},(\Phi_\Gamma',\flip{\Phi_M'}) \\
-    \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
-    \Psi_a \types a:A \\
-    \Psi_{\Gamma},\Phi_\Gamma,\Phi_\Gamma' \types \Gamma\ctx \\
-    \Psi_M,\Phi_M,\Phi_M',\hat x\pcol A,\check x\mcol A \types M\type \\\\
-    \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
-  }{
-    \Delta,\Delta_a \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
-  }\and
-  \inferrule{
-    \Phi_\Gamma \iso \Phi_\Gamma' \\
-    \Phi_M \iso \Phi_M' \\
-    \Phi_\Gamma, \flip{\Phi_M} \types a:A \\\\
-    \Psi_{\Gamma},\Phi_\Gamma,\flip{{\Phi_\Gamma'}} \types \Gamma\ctx \\\\
-    \Psi_M,\Phi_M,\flip{{\Phi_M'}},\hat x\pcol A,\check x\mcol A \types M\type \\\\
-    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M},\unsigned{{\Phi_\Gamma'}}, \unsigned{{\Phi_M'}} \cb \Gamma \types M[a/\hat x,a[\Phi_\Gamma'/\Phi_\Gamma, \Phi_M'/\Phi_M]/\check x]
-  }{
-    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
-  }\and
-\end{mathpar}
+% It seems to me that this rule~\eqref{eq:coend-right} is basically equivalent to Patrick's rule, below, if we (1) identify $\Psi_2$ with $\Psi_x$, so that only half of the substitutions need to happen, (2) make the substitutions not involving $a$ happen in the conclusion rather than the premises, and (3) break up the contexts by where the variables appear so that we aren't writing no-op substitutions.
+% \begin{mathpar}
+%   \inferrule{
+%     \Delta_a \iso \Delta'_a \\
+%     \Delta_a \psplit (\flip{\Phi_\Gamma},\Phi_M),\Psi_a \\
+%     \Delta'_a \psplit \flip{\Psi_a'},(\Phi_\Gamma',\flip{\Phi_M'}) \\
+%     \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
+%     \Psi_a \types a:A \\
+%     \Psi_{\Gamma},\Phi_\Gamma,\Phi_\Gamma' \types \Gamma\ctx \\
+%     \Psi_M,\Phi_M,\Phi_M',\hat x\pcol A,\check x\mcol A \types M\type \\\\
+%     \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
+%   }{
+%     \Delta,\Delta_a \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+%   }\and
+%   \inferrule{
+%     \Phi_\Gamma \iso \Phi_\Gamma' \\
+%     \Phi_M \iso \Phi_M' \\
+%     \Phi_\Gamma, \flip{\Phi_M} \types a:A \\\\
+%     \Psi_{\Gamma},\Phi_\Gamma,\flip{{\Phi_\Gamma'}} \types \Gamma\ctx \\\\
+%     \Psi_M,\Phi_M,\flip{{\Phi_M'}},\hat x\pcol A,\check x\mcol A \types M\type \\\\
+%     \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M},\unsigned{{\Phi_\Gamma'}}, \unsigned{{\Phi_M'}} \cb \Gamma \types M[a/\hat x,a[\Phi_\Gamma'/\Phi_\Gamma, \Phi_M'/\Phi_M]/\check x]
+%   }{
+%     \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+%   }\and
+% \end{mathpar}
 
 
 \subsection{Binding tensor types}
