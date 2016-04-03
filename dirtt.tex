@@ -241,8 +241,8 @@ The first ``two-sided'' one is a ``directed'' analogue of the elimination rule f
     \Psi_b \types b:B \\
     \unsigned\Psi,x:A \cb \Gamma \types M
   }{
-    \unsigned{\Psi},\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x,\dual{b}/\hat{x}],\mor A(a,b)
-    \types M[\dual{a}/\check x,\dual{b}/\hat{x}]
+    \unsigned{\Psi},\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x,b/\hat{x}],\mor A(a,\dual b)
+    \types M[\dual{a}/\check x,b/\hat{x}]
   }\and
 \end{mathpar}
 Note that although we write substitutions in both $\Gamma$ and $M$, the linearity means that each variable such as $\hat x$ or $\check x$ can only occur in one of the two.
