@@ -429,7 +429,27 @@ Conversely, here is a proof of the second one-sided rule when the variable is on
   }\and
 \end{mathpar}
 We've left the division of $\Psi$ into $\Psi_M$ and a $\Psi_\Gamma$ implicit; the unification at the cut gives $\hat x \mapsto a$ and matches up all the other variables in $\Psi_M$ with their counterparts in $\Psi$, so that $\Psi_M$ disappears in the final conclusion.
-(Can we do something analogous when $v$ appears in $\Gamma$?)
+
+(Can we do something analogous when $v$ appears in $\Gamma$? At least if we assume $\Gamma$ is a single type, we can. I (Patrick) think this could probably be made to work in general.)
+\begin{mathpar}
+  \scriptsize
+  \inferrule{
+    % \Psi,\dual\Psi,\dual{\Psi_a},v\pcol A \types \Gamma\ctx, M\type\\
+    \inferrule*{
+      \Psi_b \types b:A\\
+      \inferrule*{
+        \inferrule{ }{\unsigned{\Psi_N},x:A \cb N[\hat x/v] \types N[\check x/v]}\\
+      }{
+        \unsigned{\Psi_N},x:A,y:A \cb N[\hat y/v], \mor A(\hat x,\check y) \types N[\check x/v]
+      }
+    }{
+      \unsigned{\Psi_N},x:A,\unsigned{\Psi_b} \cb N[b/v], \mor A(\hat x,\dual b) \types N[\check x/v]
+    }\\
+    \unsigned\Psi, \unsigned{\Psi_a}\cb N[a/v] \types M
+  }{
+    \unsigned\Psi,\unsigned{\Psi_a},\unsigned{\Psi_b}\cb N[b/v],\mor A(a, \dual b) \types M
+  }\and
+\end{mathpar}
 
 Finally, note that with morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types f(x):B$, and the 2-cells from $f$ to $g$ are the judgments $x:A \cb \ec \types \mor B(f(\check x),g(\hat x))$.
 The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) is obtained by cutting with~\eqref{eq:composition}.
