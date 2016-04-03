@@ -379,6 +379,50 @@ Next, we define the term splitting operation by cases on how $r'$ splits:
   and define $(a_1,a_2) = a_2 \combine a_1$.
 \end{itemize}
 
+\subsubsection*{Flipping}
+
+Suppose we have a rule like
+\[
+\inferrule{\Psi'^* \vdash J_1}
+          {\Psi' \vdash J}
+\]
+and we want to push a substitution $\Psi \vdash \theta : \Psi'$ into it.
+We need to define $\flip{\Psi} \vdash \flip{\theta} : \flip{\Psi'}$,
+i.e. the action of the opposite functor from cat to cat on morphism.
+For the auxilary notion of terms with a variance on the right, we need
+the corresponding principle that $\Psi \types t \vcol r A$ implies
+$\flip{\Psi} \types \flip{t} \vcol {\flip r} A$.  
+
+This is defined as follows:
+\[
+\begin{array}{l}
+\flip{\cdot} = \cdot\\
+\flip{(\theta,t/x)} = \flip{\theta},\flip{t}/x\\
+\\
+\flip{a} = a \text{ when $r'$ is $\ps$ or $\ms$} \\
+\flip{(a_1,a_2)} = (a_2,a_1) \text{ when $r'$ is $\pms$} \\
+\end{array}
+\]
+
+For the first case, we use the fact that $\flip{\uns} = \uns$.  
+
+For the second, we have
+\begin{mathpar}
+\Psi^{v_1} \vdash \theta : \Psi' \and 
+\Psi^{v_2} \vdash t \vcol r A  \and
+v = {v_1} \combine v_2
+\end{mathpar}
+so $\flip{v} = \flip{v_1} \combine \flip{v_2}$ (FIXME: state this as a
+lemma), and by the IH $\Psi^{\flip{v_1}} \vdash \theta : \flip{\Psi'}$,
+and by the term lemma, $\Psi^{\flip{v_2}} \vdash t \vcol {\flip r} A$.
+so $\flip{{\Psi^v}} \types (\flip{\theta},\flip{r}) : \flip{(\Psi', x
+  \vcol r A)}$.
+
+For terms, we use $\flip{\uns} = \uns$ in the first case, and
+$\flip{(\flip{r})} = r$ in the $\ps$ and $\ms$ cases.  
+For the final case, we use $\flip{v} = \flip{v_1} \combine \flip{v_2}$
+and commutativity and involution.  
+
 \subsection*{Type Contexts}
 
 \begin{mathpar}
