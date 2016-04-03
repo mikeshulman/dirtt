@@ -796,6 +796,56 @@ The non-binding hom type acts mostly like a linear function type, except that it
 \label{sec:type-classifier}
 
 
+\section{Without terms}
+\label{sec:without-terms}
+
+We can do some category theory without a term calculus.
+All we need is the fact that the left/right rules for each type former express a universal property.
+In other words, for a positive type like $\mor A$, tensor, and coend:
+\begin{itemize}
+\item Applying the left rule, then cutting with the right rule, gives back what we started with.
+  This should be essentially the principal cut corresponding to this type former in the proof of cut admissibility.
+\item Cutting with a right rule, then applying the left rule, also gives back what we started with.
+  Equivalently, two sequents containing such a type on the left are equal if they become equal upon cutting with the right rule.
+  This should dually follow from the proof of admissibility for identity.
+\end{itemize}
+The situation with negative types like hom and end is the same but with the roles of right and left switched.
+
+(We also need the fact that cut is associative, unital, and commutes with things like substitution.)
+
+
+\subsection{The co-Yoneda lemma}
+\label{sec:co-yoneda-noterms}
+
+Recall that in \cref{sec:morphism-types} we defined the sequents going in both directions of the co-Yoneda lemma:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \inferrule{ }{x:A \cb M(\check x) \types M(\hat x)}
+    }{
+      x:A,y:A \cb M(\check y) \otimes \hom_A(\hat y,\check x) \types M(\hat x)
+    }
+  }{
+    x:A \cb \coend^{y:A} M(\check y) \otimes \hom_A(\hat y,\check x) \types M(\hat x)
+  }\and
+  \inferrule{
+    \inferrule*{
+      \inferrule{ }{x:A \cb M(\check x) \types M(\hat x)}\\
+      \inferrule{ }{y:A\cb \cdot \types \hom_A(\check y,\hat y)}
+    }{
+      x:A,y:A \cb M(\check x) \types M(\hat x) \otimes \hom_A(\check y,\hat y)
+    }
+  }{
+     z:A \cb M(\check z) \types \coend^{w:A} M(\hat w)\otimes \hom_A(\check w,\hat z)
+  }\and
+\end{mathpar}
+If we cut these together in the order
+\[ M(\check z) \types \coend^{w:A} M(\hat w)\otimes \hom_A(\check w,\hat z) \types M(\hat z) \]
+we have a right-then-left for the coend, and upon reducing that we have a right-then-left for the tensor, which reduces back to the identity.
+And if we cut them in the other order
+\[ \coend^{w:A} M(\hat w)\otimes \hom_A(\check w,\hat z) \types M(\hat z) \types \coend^{w:A} M(\hat w)\otimes \hom_A(\check w,\hat z) \]
+then we can test its equality with the identity by cutting with the two right rules on the left that form the map $M(\check z) \types \coend^{w:A} M(\hat w)\otimes \hom_A(\check w,\hat z)$; thus this direction follows from the other.
+
 
 \section{Terms}
 
