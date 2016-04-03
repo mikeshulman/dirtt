@@ -105,10 +105,16 @@ We write $p$ for a vector containing no $\pms$'s.  Note that $\flip{p}
 \combine p$ is always defined and is a vector containing only $\pms$'s
 and $\uns$'s, so $\Psi^{\flip{p} \combine p}$ is a $\Delta$.  
 
-We write $r = r_1 \combine r_2 \combine r_3$ to mean 
-either $r' = r_1 \combine r_2$ and 
-$r = r \combine r_3$ or the other associativity.  
-(FIXME: check that it's associative and commutativity).  
+The operation $\combine$ is commutative by definition.
+For its associativity, note that if $(r_1 \combine r_2) \combine r_3$ is defined, then at least one of $r_1,r_2,r_3$ must be $\uns$, since if $r_1\neq\uns\neq r_2$ then $r_1\combine r_2 = \pms$, hence $r_3$ must be $\uns$.
+Thus:
+\begin{itemize}
+\item If $r_1=\uns$, then $(\uns \combine r_2) \combine r_3 = r_2 \combine r_3 = \uns \combine (r_2\combine r_3)$.
+\item If $r_2=\uns$, then $(r_1 \combine \uns) \combine r_3 = r_1 \combine r_3 = r_1 \combine (\uns\combine r_3)$.
+\item If $r_3=\uns$, then $(r_1 \combine r_2) \combine \uns = r_1 \combine r_2 = r_1 \combine (r_2\combine \uns)$.
+\end{itemize}
+So in all cases if $(r_1 \combine r_2) \combine r_3$ is defined, then so is $r_1 \combine (r_2\combine r_3)$, and they are equal.
+Therefore, we can unambiguously write $r_1 \combine r_2 \combine r_3$.
 
 We think of $\Gamma$ as an unordered list of assumptions, and since it
 is purely linear, we will use context splitting instead of resource
