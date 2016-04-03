@@ -34,6 +34,7 @@
 \def\pmcol{\overset{\scriptscriptstyle \pm}{:}}
 \def\mpcol{\overset{\scriptscriptstyle \mp}{:}}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
+\newcommand{\tend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\Set}{\mathrm{Set}}
 \newcommand{\unsigned}[1]{#1^0}
 \newcommand{\joinvar}[1]{\left[#1\right]}
@@ -693,97 +694,87 @@ Less obviously, the coend should be derivable by tensoring over $(\hat x\pcol A,
 \subsection{End type}
 \label{sec:end-type}
 
-\red{Left off updating to $\unsigned{\Psi}$ and $\Psi,\dual\Psi \types \Gamma\ctx, M\type$ here.}
+The end type is dual to the coend type.
+In particular, its formation rule looks the same, and its right rule looks like the left rule for the coend type.
 
-Formation rule:
 \begin{mathpar}
   \inferrule{
     \Psi,\hat x\pcol A,\check x\mcol A \types M \type \\
     }{
-    \Psi \types \coend_{x:A} M \type
+    \Psi \types \tend_{x:A} M \type
   }\and
-\end{mathpar}
-Right rule:
-\begin{mathpar}
   \inferrule{
-    \Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\\\
-    \Psi_\Gamma \types \Gamma \ctx \\
-    \Psi_M,\hat x\pcol A,\check x\mcol A \types M \type \\
-    \Delta, x:A \cb \Gamma \types M
+    \Psi,\dual\Psi, \hat x \pcol A, \check x \mcol A \types \Gamma\ctx, M\type\\
+    \unsigned\Psi, x:A \cb \Gamma \types M
     }{
-    \Delta \cb \Gamma \types \coend_{x:A} M
+    \unsigned\Psi \cb \Gamma \types \tend_{x:A} M
   }\and
 \end{mathpar}
-Left rule:
+Its left rule similarly looks like the right rule for the coend; first without substitutions:
 \begin{mathpar}
   \inferrule{
-    \Delta_a \iso \Delta'_a \\\\
-    \Delta_a \psplit (\flip{\Psi_1},\flip{\Psi_2},\Psi_3),\Psi_a \\
-    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\Psi_2',\flip{\Psi_3'}) \\
-    \Delta \splits \flip{\Psi_{\Gamma}},\flip{\Psi_M},\Psi_C \\\\
-    \Psi_a \types a:A \\ \Psi_{\Gamma},\Psi_1,\Psi_1' \types \Gamma\ctx \\
-    \Psi_M,\Psi_2,\Psi'_2,\hat x\pcol A,\check x\mcol A \types M\type \\
-    \Psi_C,\Psi_3,\Psi'_3 \types C\type \\\\
-    \Delta,\Delta_a,\Delta'_a \cb \Gamma, M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x] \types C
+    \Delta, x : A, y : A \cb \Gamma[\check x / \check z , \hat y / \hat z], M[\check x / \check z , \hat x / \hat w , \check x / \check w , \hat y / \hat z] \types C[\check x / \check z , \hat y / \hat z]
   }{
-    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1], \coend_{x:A}M[\Psi_2/\Psi'_2] \types C[\Psi_3/\Psi'_3]
-  }\and
+    \Delta, z : A \cb \Gamma, \tend_{w : A} M \types C
+  }
+\end{mathpar}
+and then with them:
+\begin{mathpar}
+\scriptsize
+  \inferrule{
+    \Psi_1,\dual{\Psi_1},\Psi_2,\dual{\Psi_2} \cong \Psi_\Gamma, \Psi_M\\
+    \flip{\Psi_\Gamma} \types \Gamma \ctx\\
+    \Psi_M, \hat w\pcol A, \check w \mcol A \types M \type \\\\
+    \Psi_2 \types a:A\\
+    \Psi_x\cong \Psi_y\cong\Psi_2\\\\
+    \unsigned{\Psi_1}, \unsigned\Psi_x, \unsigned{\Psi_y} \cb \Gamma[\dual\Psi_x / \dual{\Psi_2}, \Psi_y / \Psi_2], M[\dual{\Psi_x} / \dual{\Psi_2} , a[\Psi_x/\Psi_2] / \hat w, \dual{a[\Psi_y/\Psi_2]} / \check w , \Psi_y / \Psi_2] \types N[\dual\Psi_x / \dual{\Psi_2}, \Psi_y / \Psi_2]
+  }{
+    \unsigned{\Psi_1}, \unsigned{\Psi_2} \cb \Gamma, \tend_{w:A} M \types N
+  }
 \end{mathpar}
 
-\subsubsection{Older stuff}
-The left rule can based on the function
-\begin{equation*}
-	[\coend_x \coend_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \coend_{z}[(\coend_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
-\end{equation*}
-where $F: A \times A\op \times A \times A\op \to \Set$ and $G : A\op \times A \to \Set$, defined by
-\begin{equation}
-	\lambda h.\lambda z.\lambda k.h(z, z, k(z))
-\end{equation}
-which should be in the end as we have only passed $z$ to ends. Then it becomes
-\begin{mathpar}
-	\inferrule{
-		\Delta, x : A, y : A \cb \Gamma[\check x / \check z , \hat y / \hat z], M[\check x / \check z , \hat x / \hat w , \check x / \check w , \hat y / \hat z] \types C[\check x / \check z , \hat y / \hat z]
-	}{
-		\Delta, z : A \cb \Gamma, \coend_{w : A} M \types C
-	}
-\end{mathpar}
+% \begin{mathpar}
+%   \inferrule{
+%     \Delta_a \iso \Delta'_a \\\\
+%     \Delta_a \psplit (\flip{\Psi_1},\flip{\Psi_2},\Psi_3),\Psi_a \\
+%     \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\Psi_2',\flip{\Psi_3'}) \\
+%     \Delta \splits \flip{\Psi_{\Gamma}},\flip{\Psi_M},\Psi_C \\\\
+%     \Psi_a \types a:A \\ \Psi_{\Gamma},\Psi_1,\Psi_1' \types \Gamma\ctx \\
+%     \Psi_M,\Psi_2,\Psi'_2,\hat x\pcol A,\check x\mcol A \types M\type \\
+%     \Psi_C,\Psi_3,\Psi'_3 \types C\type \\\\
+%     \Delta,\Delta_a,\Delta'_a \cb \Gamma, M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x] \types C
+%   }{
+%     \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1], \tend_{x:A}M[\Psi_2/\Psi'_2] \types C[\Psi_3/\Psi'_3]
+%   }\and
+% \end{mathpar}
+
 
 \subsection{Hom types}
 \label{sec:hom-types}
 
-The type former for the (non-binding) hom type is
+The non-binding hom type acts mostly like a linear function type, except that it reverses the variance of category-variables in its domain.
+
 \begin{mathpar}
   \inferrule{
     \Psi_M \types M\type \\ \Psi_N \types N\type
   }{
     \flip{\Psi_M},\Psi_N \types M\multimap N\type
-  }
-\end{mathpar}
-with right rule
-\begin{mathpar}
+  }\and
   \inferrule{
-    \Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\Psi_N \\\\
-    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
-    \Delta \cb \Gamma, M \types N
+    \Psi, \dual\Psi \types (\Gamma,M)\ctx, N\type\\
+    \unsigned\Psi \cb \Gamma, M \types N
   }{
-    \Delta \cb \Gamma \types M\multimap N
-  }
-\end{mathpar}
-and left rule
-\begin{mathpar}
+    \unsigned\Psi \cb \Gamma \types M\multimap N
+  }\and
   \inferrule{
-    \Delta_1 \splits \flip{\Psi_{\Gamma_1}},\Psi_M \\
-    \Delta_2 \splits \flip{\Psi_{\Gamma_2}},\flip{\Psi_N},\Psi_C \\\\
-    \Psi_{\Gamma_1} \types \Gamma_1\ctx \\ \Psi_{\Gamma_2} \types \Gamma_2\ctx \\\\
-    \Psi_M \types M\type \\ \Psi_N \types N\type\\ \Psi_C \types C\type \\\\
-    \Delta_1 \cb \Gamma_1 \types M \\ \Delta_2 \cb \Gamma_2,N \types C
+    \Psi_1, \dual{\Psi_1} \types \Gamma_1 \ctx, M\type\\
+    \Psi_2, \dual{\Psi_2} \types (\Gamma_2, N)\ctx, C \type\\\\
+    \unsigned{\Psi_1} \cb \Gamma_1 \types M \\
+    \unsigned{\Psi_2} \cb \Gamma_2,N \types C
   }{
-    \Delta_1,\Delta_2 \cb \Gamma_1,\Gamma_2,M\multimap N \types C
+    \unsigned{\Psi_1},\unsigned{\Psi_2} \cb \Gamma_1,\Gamma_2,M\multimap N \types C
   }
 \end{mathpar}
-
-\subsection{The type classifier}
-\label{sec:type-classifier}
 
 
 \section{Category formers}
@@ -800,6 +791,9 @@ and left rule
 
 \subsection{Collages}
 \label{sec:collages}
+
+\subsection{The type classifier}
+\label{sec:type-classifier}
 
 
 
