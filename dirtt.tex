@@ -39,6 +39,7 @@
 \newcommand{\joinvar}[1]{\left[#1\right]}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
+\def\unif{\doteq}
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
 \begin{document}
@@ -151,11 +152,11 @@ This is ``in context $\dual{\Psi}$'' but of course it is not well-typed on its o
 See, for instance, the substitution rule below.
 
 
-\section{Basic rules and type formers}
-\label{sec:rules}
+\section{Structural and admissible rules}
+\label{sec:structural}
 
-\subsection{Structural rules}
-\label{sec:structural-rules}
+\subsection{Basic rules}
+\label{sec:basic-rules}
 
 The basic structural rules for context formation are unsurprising, given our linearity restriction:
 \begin{mathpar}
@@ -173,7 +174,8 @@ The basic structural rules for context formation are unsurprising, given our lin
 \end{mathpar}
 
 For the moment, we are hoping to describe a cut-free sequent calculus with an admissible cut rule, and also admissible substitution for category-variables.
-We postpone describing exactly what the cut rule will look like, since it is somewhat complicated, but we can state the intended identity rule at this point:
+We discuss the cut rule in its own section, since it is somewhat complicated.
+But we can state the intended identity rule at this point:
 \begin{mathpar}
   \inferrule{
     \Psi \types M \type\\
@@ -200,6 +202,90 @@ The substitution rule for category-variables (which we also intend to be admissi
 \end{mathpar}
 Of course, by quadraticality, each of $\hat x$ and $\check x$ appears exactly once in $\Gamma$ and $M$ combined. 
 We may abbreviate a substitution $M[a/\hat x,\dual{a}/\check x]$ by $M[a/x]$.
+
+\subsection{Cut rule}
+\label{sec:cut-rule}
+
+The basic cut rule looks like this:
+\begin{mathpar}
+  \inferrule{
+    \Delta_1 \cb \Gamma_1 \types M' \\
+    \Delta_2 \cb \Gamma_2, M \types N\\\\
+    \text{$\dual M$ loop-free-unifies with $M'$ reducing $\Delta_1,\Delta_2$ to $\Delta$ by $\theta$}
+  }{
+    \Delta \cb \Gamma_1[\theta,\dual\theta],\Gamma_2[\theta,\dual\theta] \types N[\theta,\dual\theta]
+  }
+\end{mathpar}
+As usual, we assume at the outset that the variables in $\Delta_1$ and $\Delta_2$ are disjoint.
+Then $\theta$ is a substitution for some of the signed variables in $\Delta_1,\Delta_2$, assigning each of them to a term depending on signed versions of other variables in $\Delta_1,\Delta_2$ (i.e.\ with hats and/or checks), that is supposed to be produced by ``loop-free unification'' (to be described).
+As usual, we write $\dual M$ and $\dual\theta$ for the results of reversing all hats and checks (here a purely syntactic operation); and $\Delta$ is the obtained by omitting from $\Delta_1,\Delta_2$ those variables that are substituted for in $\theta$.
+
+The short description of loop-free unification is that it is like ordinary first-order unification, except that
+\begin{enumerate}
+\item after deciding on a substitution for a variable, we alter the remaining equations not just by that substitution but also by its dual (reversing hats and checks); and
+\item an ``identity'' equation such as $\hat x \unif \hat x$ is a failure rather than simply deleted (the loop-free condition).
+\end{enumerate}
+To explain this, we begin with simple examples.
+The simplest case is when neither $M'$ nor $M$ contains any duplicated variables.
+For instance, we can cut like this:
+\begin{mathpar}
+  \inferrule{
+    x:A \cb \Gamma_1 \types M(\hat x)\\
+    y:A \cb \Gamma_2, M(\check y) \types N
+  }{
+    x:A \cb \Gamma_1, \Gamma_2[\hat x/\hat y] \types N[\hat x/\hat y]
+  }
+\end{mathpar}
+where unifying $M(\hat x)$ with $\dual{M(\check y)} = M(\hat y)$ produces $\hat y\mapsto \hat x$.
+(If it instead produced $\hat x\mapsto \hat y$, then the conclusion would be the $\alpha$-variant $y:A \cb \Gamma_1[\check y/\check x], \Gamma_2 \types N$.)
+We can also cut like this:
+\begin{mathpar}
+  \inferrule{
+    x:A \cb \Gamma_1 \types M(f(\hat x))\\
+    y:B \cb \Gamma_2, M(\hat y) \types N
+  }{
+    x:A \cb \Gamma_1, \Gamma_2[f(\hat x)/\check y] \types N[f(\hat x)/\check y]
+  }
+\end{mathpar}
+Here the unification produces $\check y\mapsto f(\hat x)$, and it must be that $f$ is contravariant, i.e.\ that $u \mcol A \types f(u) :B$.
+It may also happen that there are variable duplications in the type being cut.
+For instance, we can cut:
+\begin{mathpar}
+  \inferrule{
+    x:A,y:A \cb \Gamma_1 \types M(\check x, \hat y)\\
+    z:A \cb \Gamma_2, M(\hat z, \check z) \types N
+  }{
+    z:A \cb \Gamma_1[\hat z/\hat x, \check z/\check y], \Gamma_2 \types N
+  }
+\end{mathpar}
+Here we have unified $M(\check x,\hat y)$ with $M(\check z, \hat z)$ to get $(\check x \mapsto \check z,\hat y \mapsto \hat z)$.
+A different path of unification could start by choosing $\check z \mapsto \check x$, and then the dual of this equation would alter the remaining equation $\hat y \unif \hat z$ to $\hat y \unif \hat x$.
+This would result in an eventual substitution such as $(\check z \mapsto \check x, \hat y \mapsto \hat x)$, giving the $\alpha$-variant conclusion $x:A \cb \Gamma_1[\check x/\check y], \Gamma_2 \types N$.
+
+A more complicated allowable cut is
+\begin{mathpar}
+  \inferrule{
+    x:A, y:A \cb \Gamma_1 \types M(\hat x, \check y, \hat y)\\
+    z:A, w:A \cb \Gamma_2, M(\check z, \hat z, \check w) \types N
+  }{
+    z:A \cb \Gamma_1[\check z/\check x,], \Gamma_2[\hat z/\hat w] \types N[\hat z/\hat w]
+  }
+\end{mathpar}
+Here unifying $M(\hat x, \check y, \hat y)$ with $M(\hat z, \check z, \hat w)$ has produced $(\hat x \mapsto\hat z, \check y \mapsto \check z, \hat w \mapsto \hat z)$.
+Finally, here is an example where the loop-free condition fails:
+\begin{mathpar}
+  \inferrule{
+    x:A \cb \Gamma_1 \types M(\check x, \hat x) \\
+    y:A \cb \Gamma_2, M(\hat y, \check y) \types N
+  }{
+    ???
+  }
+\end{mathpar}
+Here the unification of $M(\check x, \hat x)$ with $M(\check y,\hat y)$ may begin by choosing $\hat x \mapsto \hat y$, but then the remaining equation is substituted to become $\check y \unif \check y$, which fails the loop-free condition.
+
+
+\section{Type formers}
+\label{sec:type-formers}
 
 Now we are ready to start giving the rules for some type formers.
 Since we want substitution into category-variables to be admissible, many rules must incorporate a substitution; but they are easier to understand before that substitution has been incorporated.
