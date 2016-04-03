@@ -107,7 +107,7 @@ and $\uns$'s, so $\Psi^{\flip{p} \combine p}$ is a $\Delta$.
 We write $r = r_1 \combine r_2 \combine r_3$ to mean 
 either $r' = r_1 \combine r_2$ and 
 $r = r \combine r_3$ or the other associativity.  
-(FIXME: check that it's associative).  
+(FIXME: check that it's associative and commutativity).  
 
 Judgements:
 
@@ -213,47 +213,49 @@ that not every renaming for a $\pms$-assumption is of this form):
 
 \subsection*{Substitutions}
 
-\begin{mathpar}
+For convenience, we use a notion of ``inhabitant of a type at resource
+$r$'', i.e. where we have variance on the right, $\Psi \types t \vcol r
+A$, where $t$ is 0, 1, or 2 terms. 
 
+\begin{mathpar}
 \inferrule{ }
-          {\Psi^{\uns} \vdash \cdot : \cdot}
-\and 
-\inferrule{\Psi \vdash \theta : \Psi' }
-           {\Psi \vdash (\theta,\triv/x) : (\Psi', x \uncol A)}
+          {\Psi^\uns \types \triv \uncol A}
 \and
-\inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
-            \Psi^{v_2} \vdash a : A \\
-             v = {v_1} \combine v_2
-           }
-           {\Psi^{v} \vdash (\theta,a/x) : (\Psi',x \pcol A)}
-\and 
-\inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
-            \Psi^{\flip{v_2}} \vdash a : A \\
-             v = {v_1} \combine v_2
-           }
-           {\Psi^{v} \vdash (\theta,a/x) : (\Psi',x \pcol A)}
+\inferrule{ \Psi \types a : A }
+          {\Psi \types a \pcol A}
 \and
-\inferrule*{\Psi^{v_1} \vdash \theta : \Psi'  \\
-             \Psi^{\flip{v_{21}}} \vdash {a_1} : A \\
-             \Psi^{v_{22}} \vdash {a_2} : A \\
-             v = {v_1} \combine {({v_{21}} \combine {v_{22}})} \\
-           }
-           {\Psi^{v} \vdash (\theta,(a_1,a_2)/x) : (\Psi',x \pmcol A)}
+\inferrule{ \Psi^{v^*} \types a : A }
+          {\Psi^{v} \types a \mcol A}
+\and
+\inferrule{ v = v_1 \combine v_2 \\ \Psi^{v_1^*} \types a_1 : A \\ \Psi^{v_2} \types a_2 : A}
+          {\Psi^{v} \types (a_1,a_2) \pmcol A}
 \end{mathpar}
 
+Using this, the rules for substitutions are
 \begin{mathpar}
-\inferrule*[right=derivable?]
+\inferrule{ }
+          {\Psi^{\uns} \vdash \cdot : \cdot}
+\and
+\inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
+            \Psi^{v_2} \vdash t \vcol r A \\
+             v = {v_1} \combine v_2
+           }
+           {\Psi^{v} \vdash (\theta,t/x) : (\Psi',x \vcol r A)}
+\end{mathpar}
+
+For example, the following rule is derivable, and is the analogue of the
+$(\check{a}/\check{x},\hat{a}/\hat{x})$ substitution in the other
+version.  
+\begin{mathpar}
+\inferrule*[right=derivable]
            {\Psi^{v'} \vdash \theta : \Psi'  \\
              \Psi^{p} \vdash a : A \\
              v = {v'} \combine {(\flip{p} \combine p)} \\
            }
-           {\Psi^{v} \vdash (\theta,a/x) : (\Psi',x \pmcol A)}
+           {\Psi^{v} \vdash (\theta,(a,a)/x) : (\Psi',x \pmcol A)}
 \end{mathpar}
-
-There will need to be some operations decomposing a substitution along a
-splitting $v = v_1 \combine v_2$, and some operation applying $*$
-functorially to substitutions, which probably switches $(a_1,a_2)$ to
-$(a_2,a_1)$?
+On the other hand, a substitution $(\theta,(a,b)/x)$ is like
+$(a/\check{x},b/\hat{x})$.
 
 \subsubsection*{Splitting} Suppose we have a rule like
 
@@ -280,13 +282,41 @@ inside.
              \Psi^{v_2} \vdash \theta_2 : {\Psi'}^{v_2'}
            }
 \end{mathpar}
-We write $\theta \splits \theta_1,\theta_2$ for this operation when the
+We write $\theta = \theta_1 \combine \theta_2$ for this operation when the
 other arguments are clear from context.  
+
+We will need a corresponding operation on terms:
+\begin{mathpar}
+\inferrule*[right=admissible]
+           {r' = r_1' \combine r_2' \\ 
+             \Psi^{v_2} \vdash t \vcol{r'} A
+           }
+          { v_2 = {v_{21}} \combine v_{22} \\ 
+            \Psi^{v_{21}} \vdash t_1 \vcol{r_1'} A\\
+            \Psi^{v_{21}} \vdash t_2 \vcol{r_2'} A\\
+          }
+\end{mathpar}
+
+Here is the essence of the definition:
+\[
+\begin{array}{l}
+\cdot = \cdot \combine \cdot \\
+(\theta,t/x) = (\theta_1,t_1/x) \combine (\theta_2,t_2/x) \text{ when } \theta = \theta_1 \combine \theta_2
+\text{ and } t = t_1 \combine t_2 \\
+\\ 
+t = (t \combine \triv) \text{ if the splitting is } r = r \sqcup \uns\\
+t = (\triv \combine t) \text{ if the splitting is } r = \uns \sqcup r\\
+(a_1,a_2) = (a_1 \combine a_2) \text{ if the splitting is } \pms = \ms \sqcup \ps\\
+(a_1,a_2) = (a_2 \combine a_1) \text{ if the splitting is } \pms = \ps \sqcup \ms\\
+\end{array}
+\]
+
+What follows is a long-winded explanation of why this type checks.  
 
 If $\Psi'$ is $\cdot$, then the substitution must be $\cdot$, and $v' =
 v_1' \combine v_2'$ is $\cdot = \cdot \combine \cdot$, so we want
 \begin{mathpar}
-\uns = \uns \combine \uns \and \inferrule*{ }{\cdot \splits \cdot,\cdot}
+\uns = \uns \combine \uns \and \inferrule*{ }{\cdot \cdot \combine \cdot}
 \end{mathpar}
 
 Suppose the $\Psi'$ in the theorem is of the form $\Psi', x \vcol r' A$,
@@ -295,7 +325,7 @@ have
 \begin{mathpar}
 v = {v_1} \combine {v_2} \\
 \Psi^{v_1} \types \theta : \Psi' \\
-\Psi^{v_2} \vdash t
+\Psi^{v_2} \vdash t \vcol {r'} A
 \end{mathpar}
 If $(v',r')$ is the resource vector for the $\Psi',x \vcol{r'} A$, then we
 have a splitting as
@@ -305,49 +335,48 @@ have a splitting as
 so in particular $v' = v_1' \combine v_2'$.  Therefore, by splitting
 $\theta$ with $v' = v_1' \combine v_2'$ we get
 \begin{mathpar}
-\theta \splits \theta_1,\theta_2 \\
+\theta = \theta_1 \combine \theta_2 \\
 v_1 = v_{11} \combine v_{12}\\
 \Psi^{v_{11}} \vdash \theta_1 : {\Psi'}^{v_1'}\\
 \Psi^{v_{12}} \vdash \theta_2 : {\Psi'}^{v_2'}\\
 \end{mathpar}
 
-We want to construct 
+By term splitting, we have
 \begin{mathpar}
-(\theta,t/x) \splits (\theta_1,?/x),(\theta_2,?/x) \\
-v = (v_{11} \combine ?) \combine ({v_{21} \combine ?}) \\
-\Psi^{(v_{11} \combine ?)} \vdash (\theta_1,?/x) : (\Psi'^{v_1'},x \vcol{r_1'} A)\\
-\Psi^{(v_{21} \combine ?)} \vdash (\theta_1,?/x) : (\Psi'^{v_2'},x \vcol{r_2'} A)
+t = t_1 \sqcup t_2 \\
+v_2 = {v_{21}} \combine v_{22} \\ 
+\Psi^{v_{21}} \vdash t_1 \vcol{r_1'} A\\
+\Psi^{v_{21}} \vdash t_2 \vcol{r_2'} A\\
 \end{mathpar}
-where the two goals split $v_2$, because we already know $v = v_1
-\combine v_2$, so by associativity and commutativity, we will have 
-$v = v_1 \combine v_2 = (v_{11} \combine v_{12}) \combine (? \combine ?)
-= (v_{11} \combine ?) \combine ({v_{21} \combine ?})$.  
 
-Writing $\Psi^{v_2} \vdash t \vcol{r'} A$ for the remaining premises of
-the substitution rule ($t$ might really be zero or two terms), the lemma
-we need is 
+So we construct 
 \begin{mathpar}
-\inferrule{r' = r_1' \combine r_2' \\ 
-           \Psi^{v_2} \vdash t \vcol{r'} A
-          }
-          { v_2 = {v_{21}} \combine v_{22} \\ 
-            \Psi^{v_{21}} \vdash t_1 \vcol{r_1'} A\\
-            \Psi^{v_{21}} \vdash t_2 \vcol{r_2'} A\\
-          }
+(\theta,t/x) (\theta_1,t_1/x) \combine (\theta_2,t_2/x) \\
+v = (v_{11} \combine v_{21}) \combine (v_{21} \combine v_{22}) \\
+\Psi^{(v_{11} \combine v_{21})} \vdash (\theta_1,t_1/x) : (\Psi'^{v_1'},x \vcol{r_1'} A)\\
+\Psi^{(v_{21} \combine v_{22})} \vdash (\theta_1,t_2/x) : (\Psi'^{v_2'},x \vcol{r_2'} A)
 \end{mathpar}
-which we write as $t \splits t_1,t_2$ because then we can define
-\begin{mathpar}
-(\theta,t/x) \splits (\theta_1,t_1/x),(\theta_2,t_2/x)
-\end{mathpar}
-and satisfy the above.  We define this by cases on how $r'$ splits:
+where we use associativity and commutativity, we will have 
+$v = v_1 \combine v_2 = (v_{11} \combine v_{12}) \combine ({v_{21}} \combine {v_{22}})
+= (v_{11} \combine {v_{21}}) \combine ({v_{12} \combine v_{22}})$.  
 
+Next, we define the term splitting operation by cases on how $r'$ splits:
 \begin{itemize}
 \item Case $r' = r' \combine \uns$.  In this case return $v_2 = v_2
   \combine \uns$ and $t \splits (t,\triv)$.
-\item Case $r' = \uns \combine r'$.  In this case return $v_2 = \uns
-  \combine v_2$ and $t \splits (\triv,t)$.
-\item Case $\pms = \ps \combine \ms$. In this case $(a_1,a_2) \splits a_2,a_1$.
-\item Case $\pms = \ms \combine \ps$. In this case $(a_1,a_2) \splits a_1,a_2$.
+\item Case $r' = \uns \combine r'$.  In this case return $v_2 = \uns \combine v_2$ and $t \splits (\triv,t)$.
+
+\item Case $\pms = \ps \combine \ms$. In this case we have $v_2 =
+  {v_{21}} \combine {v_{22}}$, where $\Psi^{v_{21}^*} \vdash a_1 : A$
+  and $\Psi^{v_{22}} \vdash a_2 : A$, so we can return 
+  $v_2 = {v_{21}} \combine {v_{22}}$
+  and define $(a_1,a_2) = a_1 \combine a_2$.
+
+\item Case $\pms = \ps \combine \ms$. In this case we have $v_2 =
+  {v_{21}} \combine {v_{22}}$, where $\Psi^{v_{21}^*} \vdash a_1 : A$
+  and $\Psi^{v_{22}} \vdash a_2 : A$, so we can return 
+  $v_2 = {v_{22}} \combine {v_{21}}$
+  and define $(a_1,a_2) = a_2 \combine a_1$.
 \end{itemize}
 
 \subsection*{Type Contexts}
