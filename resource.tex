@@ -50,6 +50,8 @@
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \newcommand\triv{\_}
+\mprset{flushleft}
+
 
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
@@ -493,12 +495,65 @@ or $(\Gamma \vdash M) \ok$.
            \\
 \end{mathpar}
 
-TODO: substitution rule for $\Psi \cb \Gamma \types M$ (only allow
-same thing for both halves).  
+We write $\sigma$ for a special sort of substitution, whose source and
+target must both have only $\pms$ and $\uns$ variables (i.e. $\Psi^d
+\vdash \sigma : \Psi'^{d'}$).  Note that this is a subclass of the
+substitutions defined above (every $\sigma$ is a $\theta$).  
+\begin{mathpar}
+\inferrule{ } 
+          {\Psi^\times \vdash \cdot : \cdot}
+
+\inferrule{\Psi \vdash \sigma : \Psi'}
+          {\Psi \vdash \sigma,\triv/x : \Psi', x \uncol A}
+
+\inferrule{d = d_1 \combine (\flip{p} \combine p) \\
+           \Psi^{d_1} \vdash \sigma : \Psi' \\ 
+           \Psi^p \vdash a : A
+          }
+          {\Psi^d \vdash \sigma, (a,a)/x : \Psi', x \pmcol A}
+\end{mathpar}
+Using this, we should have
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {\Psi' \cb \Gamma \vdash M \\
+            \Psi \types \sigma : \Psi'
+           }
+           {\Psi \cb (\Gamma \vdash M)[\sigma]}
+\end{mathpar}
+
+\subsubsection*{Cut}
+
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {d = d_1 \combine d_2 \\\\
+             \Psi^{d_1} \types (\Gamma_1 \vdash M) \ok \\
+             \Psi^{d_1} \cb \Gamma_1 \vdash M \\
+             \Psi^{d_2} \types (\Gamma_2, M[\rho] \vdash N) \ok \\ \\
+             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N
+           }
+           {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
+\end{mathpar}
+
+For the premise to be well formed, it must be the case that
+\[
+\begin{array}{l}
+d_1 = v_1 \combine v_1' \\ 
+d_2 = v_2 \combine v_2' \combine v_2'' \\ 
+\Psi^{\flip{v_1}} \types \Gamma_1 \ctx \\ 
+\Psi^{v_1'} \types M \type \\ 
+\Psi^{\flip{v_2}} \types \Gamma_2 \ctx \\
+\Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\
+\Psi^{v_2''} \types N \type \\
+\end{array}
+\]
+
+Therefore, $\Psi^{v_1 \combine v_2 \combine v_2''} \types
+(\Gamma_1,\Gamma_2 \vdash N) \ok$.  
+
+So the unification needs to produce a context $\Psi_0$ and a renaming
+$\Psi_0 \vdash \rho_0 : \Psi^{v_1 \combine v_2 \combine v_2''}$.
 
 \subsection*{Morphism types}
-
-\mprset{flushleft}
 
 \begin{mathpar}
 \inferrule{ \Psi^{\flip{v_1}} \types a : A \and  
