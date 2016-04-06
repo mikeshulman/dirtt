@@ -50,6 +50,8 @@
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \newcommand\triv{\_}
+\mprset{flushleft}
+
 
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
@@ -61,8 +63,8 @@
 r :: = \ps \mid \ms \mid \pms \mid \uns \\
 v ::= \cdot \mid v,r \\
 p :: = \cdot \mid p,\ps \mid p,\ms \mid p,\uns \\
+d :: = \cdot \mid d,\pms \mid d,\uns \\
 \Psi ::= \cdot \mid \Psi, x \vcol r A \\
-\Delta ::= \cdot \mid \Delta, x \pmcol A \mid \Delta, x \uncol A \\
 \\ 
 \Gamma ::= \cdot \mid \Gamma, M\\
 J ::= \Gamma \types N 
@@ -103,7 +105,7 @@ appropriate number of times.
 
 We write $p$ for a vector containing no $\pms$'s.  Note that $\flip{p}
 \combine p$ is always defined and is a vector containing only $\pms$'s
-and $\uns$'s, so $\Psi^{\flip{p} \combine p}$ is a $\Delta$.  
+and $\uns$'s (which we write as $d$).  
 
 The operation $\combine$ is commutative by definition.
 For its associativity, note that if $(r_1 \combine r_2) \combine r_3$ is defined, then at least one of $r_1,r_2,r_3$ must be $\uns$, since if $r_1\neq\uns\neq r_2$ then $r_1\combine r_2 = \pms$, hence $r_3$ must be $\uns$.
@@ -133,10 +135,11 @@ Judgements:
 
 \item $\Psi \types \Gamma \ctx$
 
-\item $\Psi \cb (\Gamma \vdash M) \ok$
+\item $\Psi \types (\Gamma \vdash M) \ok$
 
-\item $\Delta \cb \Gamma \vdash M$, presupposes 
- $\Psi \cb (\Gamma \vdash M) \ok$.  
+\item $\Psi \cb \Gamma \vdash M$, presupposes 
+ $\Psi^d$ and 
+ $\Psi \types (\Gamma \vdash M) \ok$.  
 
 \end{itemize}
 
@@ -212,17 +215,6 @@ As a special case these might be two uses of the same $\pms$ variable.
 Thus, in all of the judgements $\Psi \vdash J$, $x \pmcol A$ is
 equivalent to $y \mcol A, z \pcol A$, but the former keeps track of
 which assumptions will be correlated by the term judgement.
-
-The following more compact version for context extension should be
-derivable, if we allow writing $y$ for $(y,y)$ in the $\pms$ case (note
-that not every renaming for a $\pms$-assumption is of this form):
-\[
-\inferrule*[right=derivable?]
-           {\Psi^{v_2} \vdash \rho : \Psi'  \\
-             v_1 = {v_2} \combine (y^v) 
-           }
-           {\Psi^{v_1} \vdash (\rho,y/x) : (\Psi',x \vcol r A)}
-\]
 
 \subsection*{Substitutions}
 
@@ -464,11 +456,11 @@ and commutativity and involution.
 
 \begin{mathpar}
   \inferrule{
-    \Psi^{v_1} \types \Gamma \ctx\\
+    \Psi^{v_1^*} \types \Gamma \ctx\\
     \Psi^{v_2} \types M \type\\
-    v = \flip{v_1} \combine v_2
+    v = v_1 \combine v_2
   }{
-    \Psi^{v} \cb (\Gamma \vdash M) \ok
+    \Psi^{v} \types (\Gamma \vdash M) \ok
   }
 \\ 
 \end{mathpar}
@@ -503,38 +495,90 @@ or $(\Gamma \vdash M) \ok$.
            \\
 \end{mathpar}
 
-TODO: substitution rule for $\Delta \cb \Gamma \types M$ (only allow
-same thing for both halves).  
+We write $\sigma$ for a special sort of substitution, whose source and
+target must both have only $\pms$ and $\uns$ variables (i.e. $\Psi^d
+\vdash \sigma : \Psi'^{d'}$).  Note that this is a subclass of the
+substitutions defined above (every $\sigma$ is a $\theta$).  
+\begin{mathpar}
+\inferrule{ } 
+          {\Psi^\times \vdash \cdot : \cdot}
+
+\inferrule{\Psi \vdash \sigma : \Psi'}
+          {\Psi \vdash \sigma,\triv/x : \Psi', x \uncol A}
+
+\inferrule{d = d_1 \combine (\flip{p} \combine p) \\
+           \Psi^{d_1} \vdash \sigma : \Psi' \\ 
+           \Psi^p \vdash a : A
+          }
+          {\Psi^d \vdash \sigma, (a,a)/x : \Psi', x \pmcol A}
+\end{mathpar}
+Using this, we should have
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {\Psi' \cb \Gamma \vdash M \\
+            \Psi \types \sigma : \Psi'
+           }
+           {\Psi \cb (\Gamma \vdash M)[\sigma]}
+\end{mathpar}
+
+\subsubsection*{Cut}
+
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {d = d_1 \combine d_2 \\\\
+             \Psi^{d_1} \types (\Gamma_1 \vdash M) \ok \\
+             \Psi^{d_1} \cb \Gamma_1 \vdash M \\
+             \Psi^{d_2} \types (\Gamma_2, M[\rho] \vdash N) \ok \\ \\
+             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N
+           }
+           {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
+\end{mathpar}
+
+For the premise to be well formed, it must be the case that
+\[
+\begin{array}{l}
+d_1 = v_1 \combine v_1' \\ 
+d_2 = v_2 \combine v_2' \combine v_2'' \\ 
+\Psi^{\flip{v_1}} \types \Gamma_1 \ctx \\ 
+\Psi^{v_1'} \types M \type \\ 
+\Psi^{\flip{v_2}} \types \Gamma_2 \ctx \\
+\Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\
+\Psi^{v_2''} \types N \type \\
+\end{array}
+\]
+
+Therefore, $\Psi^{v_1 \combine v_2 \combine v_2''} \types
+(\Gamma_1,\Gamma_2 \vdash N) \ok$.  So the unification needs to produce
+a context $\Psi_0^d$ and a renaming $\Psi_0 \vdash \rho_0 : \Psi^{v_1
+  \combine v_2 \combine v_2''}$.
 
 \subsection*{Morphism types}
 
-\mprset{flushleft}
-
 \begin{mathpar}
-\inferrule{ \Psi^{v_1} \types a : A \and  
+\inferrule{ \Psi^{\flip{v_1}} \types a : A \and  
             \Psi^{v_2} \types b : A \and
-            v = \flip{v_1} \combine v_2
+            v = v_1 \combine v_2
           }
           {\Psi^{v} \types \mor A(a,b) \type}
 
 \inferrule{\Psi^{p} \types a : A }
           {\Psi^{(\flip{p} \combine p)} \cb \ec \types \mor{A}(a,a) }
 
-\inferrule{v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\
-           \Psi^{v_1}, x \mcol A, y \pcol A \cb (\Gamma \vdash M) \ok \\
+\inferrule{d = {d_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\
+           \Psi^{d_1}, x \mcol A, y \pcol A \types (\Gamma \vdash M) \ok \\
            \Psi^{p_1} \vdash a_1 : A \\
            \Psi^{p_2} \vdash a_2 : A \\
-           \Delta, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ 
+           \Psi^{d_1}, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ 
            }
-          {\Psi^v \cb (\Gamma, \mor{A}(x,y) \types M)[ (a,a)/x\pm , (b,b)/y\pm] }
+          {\Psi^d \cb (\Gamma, \mor{A}(x,y) \types M)[ (a,a)/x\pm , (b,b)/y\pm] }
 \end{mathpar}
 
 Two-sided without a substitution:
 \begin{mathpar}
-\inferrule*[right=derivable]
-           {\Delta, x \mcol A, y \pcol A \cb (\Gamma \vdash M) \ok \\
-            \Delta, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ }
-           {\Delta, x \pmcol A, y \pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
+\inferrule*[right=derivable?]
+           {\Psi, x \mcol A, y \pcol A \types (\Gamma \vdash M) \ok \\
+            \Psi, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ }
+           {\Psi, x \pmcol A, y \pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
 \end{mathpar}
 Officially, the total substitution in the premise should be 
 $(\Gamma \vdash M) [1_\Delta,x/x,x/y]$ but by convention we will leave
@@ -543,48 +587,51 @@ off the identity parts.
 Based rules:
 \begin{mathpar}
 \inferrule*[right=admissible using cut?]
-           {v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
-            \Psi^{(v_1 \combine \flip{p_1})},x \pcol A \cb (\Gamma \vdash M) \ok \\\\
+           {d = {d_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
+            \Psi^{(d_1 \combine \flip{p_1})},x \pcol A \types (\Gamma \vdash M) \ok \\\\
             \Psi^{p_1} \vdash {a_1} : A \\\\
             \Psi^{p_2} \vdash {a_2} : A \\\\
-            \Psi^{(v_1 \combine \flip{p_1} \combine {p_1})} \cb (\Gamma \vdash M)[a_1/x] }
-          {\Psi^{v} \cb (\Gamma, \mor{A} (a_1,x) \vdash M)[a_2/x]}
+            \Psi^{(d_1 \combine \flip{p_1} \combine {p_1})} \cb (\Gamma \vdash M)[a_1/x] }
+          {\Psi^{d} \cb (\Gamma, \mor{A} (a_1,x) \vdash M)[a_2/x]}
 
 \inferrule*[right=admissible using cut?]
-           {v = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
-            \Psi^{(v_1 \combine \flip{p_2})},x \mcol A \cb (\Gamma \vdash M) \ok \\\\
+           {d = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
+            \Psi^{(d_1 \combine \flip{p_2})},x \mcol A \types (\Gamma \vdash M) \ok \\\\
             \Psi^{p_1} \vdash {a_1} : A \\\\
             \Psi^{p_2} \vdash {a_2} : A \\\\
-            \Psi^{(v_1 \combine \flip{p_2} \combine {p_2})} \cb (\Gamma \vdash M)[a_2/x] }
-           {\Psi^{v} \cb (\Gamma, \mor{A} (x,a_2) \vdash M)[a_1/x]}
+            \Psi^{(d_1 \combine \flip{p_2} \combine {p_2})} \cb (\Gamma \vdash M)[a_2/x] }
+           {\Psi^{d} \cb (\Gamma, \mor{A} (x,a_2) \vdash M)[a_1/x]}
 
 %% \inferrule{\Delta \cb (\Gamma \vdash M) [ \theta, a/\hat{x} ] \\ (\hat{x} \# a)}
 %%           {\Delta,x \pmcol A \cb (\Gamma, \mor{A}(a,\check x) \vdash M)[\theta,x \csplit \check x , \hat x]}
 \\
 \end{mathpar}
 
+TODO: think about the derivations of these using cut.  are the cuts
+reducible?  
+
 \subsection*{Tensor}
 
 \begin{mathpar}
   \inferrule{
-    v = v_1 \combine v_2 \\
-    \Psi^{v_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
+    d = d_1 \combine d_2 \\
+    \Psi^{d_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
   }{
-    \Psi^{v} \types M_1\otimes M_2\type
+    \Psi^{d} \types M_1\otimes M_2\type
   }\and
   \inferrule{
-    \Delta \cb \Gamma,M_1,M_2 \types N
+    \Psi \cb \Gamma,M_1,M_2 \types N
   }{
-    \Delta \cb \Gamma, M_1\otimes M_2 \types N
+    \Psi \cb \Gamma, M_1\otimes M_2 \types N
   }\and
   \inferrule{
-    v = v_1 \combine v_2 \\\\ 
-    \Psi^{v_1} \cb (\Gamma_1 \vdash M_1) \ok \\
-    \Psi^{v_1} \cb \Gamma_1 \vdash M_1 \\\\
-    \Psi^{v_2} \cb (\Gamma_2 \vdash M_2) \ok \\
-    \Psi^{v_2} \cb \Gamma_2 \vdash M_2
+    d = d_1 \combine d_2 \\\\ 
+    \Psi^{d_1} \types (\Gamma_1 \vdash M_1) \ok \\
+    \Psi^{d_1} \cb \Gamma_1 \vdash M_1 \\\\
+    \Psi^{d_2} \types (\Gamma_2 \vdash M_2) \ok \\
+    \Psi^{d_2} \cb \Gamma_2 \vdash M_2
   }{
-    \Psi^{v} \cb \Gamma_1,\Gamma_2 \types M_1\otimes M_2
+    \Psi^{d} \cb \Gamma_1,\Gamma_2 \types M_1\otimes M_2
   }\and
 \end{mathpar}
 
@@ -602,12 +649,32 @@ think more about this.
   }
 
   \inferrule{
-    \Delta, x \pmcol A \cb \Gamma, M \types N
+    \Psi, x \pmcol A \cb \Gamma, M \types N
     }{
-    \Delta \cb \Gamma,\coend_{x:A} M \types N
+    \Psi \cb \Gamma,\coend^{x:A} M \types N
   }\and
 
+  \inferrule{ d = d_1 \combine (\flip{p_x} \combine p_x) \combine (\flip{p_y} \combine p_y) \combine (\flip p \combine p) \\\\
+              \Psi^p \vdash a : A}
+            { \Psi^d \cb \Gamma \types \coend^{w:A} M }
+
 \end{mathpar}
+
+\begin{mathpar}
+
+  \inferrule*[right=derivable?]
+             { \Psi, x \pmcol A, y \pmcol A \cb (\Gamma \types M) [(x,y)/z, (y,x)/w ]}
+             { \Psi, z \pmcol A \cb \Gamma \types \coend^{w:A} M }
+
+  \inferrule*[right=derivable?]
+             { u \pcol A \cb a : A \\
+               \Psi, x \pmcol A, y \pmcol A \cb (\Gamma \types M) [(x,y)/z] [(a,a)/w] [ (y,x) / u ] 
+             }
+             { \Psi , z \pmcol A \cb \Gamma \types \coend^{w:A} M}
+\end{mathpar}
+It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
+[(a[y/u],a[x/u])/w]$, so that's another way to write the premise?
+
 
 \subsection*{End}
 
@@ -620,9 +687,9 @@ think more about this.
   }
 
   \inferrule{
-    \Delta, x \pmcol A \cb \Gamma \types M
+    \Psi, x \pmcol A \cb \Gamma \types M
     }{
-    \Delta \cb \Gamma \types \coend_{x:A} M
+    \Psi \cb \Gamma \types \coend_{x:A} M
   }\and
 
 \end{mathpar}
@@ -634,26 +701,26 @@ think more about this.
 
 \begin{mathpar}
   \inferrule{
-    v = \flip{v_1} \combine v_2 \\
-    \Psi^{v_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
+    d = d_1 \combine d_2 \\
+    \Psi^{\flip{d_1}} \types M_1\type \\ \Psi^{d_2} \types M_2\type
   }{
-    \Psi^v \types M_1 \multimap M_2 \type
+    \Psi^d \types M_1 \multimap M_2 \type
   }
 
   \inferrule{
-    \Delta \cb \Gamma, M \types N
+    \Psi \cb \Gamma, M \types N
   }{
-    \Delta \cb \Gamma \types M\multimap N
+    \Psi \cb \Gamma \types M\multimap N
   }
 
   \inferrule{
-    v = v_1 \combine v_2\\\\
-    \Psi^{v_1} \cb (\Gamma_1 \vdash M_1) \ok \\ 
-    \Psi^{v_1} \cb \Gamma_1 \vdash M_1 \\\\
-    \Psi^{v_2} \cb (\Gamma_2,M_2 \vdash N) \ok \\ 
-    \Psi^{v_2} \cb \Gamma_2,M_2 \vdash N \\ 
+    d = d_1 \combine d_2\\\\
+    \Psi^{\flip{d_1}} \types (\Gamma_1 \vdash M_1) \ok \\ 
+    \Psi^{\flip{d_1}} \cb \Gamma_1 \vdash M_1 \\\\
+    \Psi^{d_2} \types (\Gamma_2,M_2 \vdash N) \ok \\ 
+    \Psi^{d_2} \cb \Gamma_2,M_2 \vdash N \\ 
   }{
-    \Psi^v \cb \Gamma_1,\Gamma_2,M_1\multimap M_2 \types N
+    \Psi^d \cb \Gamma_1,\Gamma_2,M_1\multimap M_2 \types N
   }
 \end{mathpar}
 
