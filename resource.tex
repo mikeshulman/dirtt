@@ -658,24 +658,25 @@ The rules for this judgement are
          {(\rho \combine (y/x))}
          {(\Psi^{d \combine x\pm} \vdash \rho_0 \combine (x/x) \combine (x/y))}
   }
-  \\
-  \inferrule{
-    \unif{\Psi^{d_1}}{\Psi^{d_2\combine x\pm}}{\rho}{\rho_0}
-  }{
-    \unif{\Psi^{d_1\combine z\pm}}{\Psi^{d_2\combine x\pm\combine y\pm}}{(\rho,(x,y)/z)}{\rho_0}
-  }
-  \\
-  \inferrule{
-    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
-  }{
-    \unif{\Psi^{d_1\combine x\pm\combine y\pm}}{\Psi^{d_2\combine
-    z\pm}}{(\rho,z/x,z/y)}{\rho_0}
-  }
+
+  Others TODO
+  %% \\
+  %% \inferrule{
+  %%   \unif{\Psi^{d_1}}{\Psi^{d_2\combine x\pm}}{\rho}{\rho_0}
+  %% }{
+  %%   \unif{\Psi^{d_1\combine z\pm}}{\Psi^{d_2\combine x\pm\combine y\pm}}{(\rho,(x,y)/z)}{\rho_0}
+  %% }
+  %% \\
+  %% \inferrule{
+  %%   \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
+  %% }{
+  %%   \unif{\Psi^{d_1\combine x\pm\combine y\pm}}{\Psi^{d_2\combine
+  %%   z\pm}}{(\rho,z/x,z/y)}{\rho_0}
+  %% }
 \end{mathpar}
 
-In the first case, the splitting puts everything into $v_1$ and $v_2$,
-and the renaming is all $\triv/x$ for the unused variables.  
-
+\red{
+Original rules for comparison:
 \begin{mathpar}
   \inferrule{ }{
     \unif{\Psi^{d_1}}{\Psi^{d_2}}{(\ec)}{1_{\Psi^{d_1\combine d_2}}}
@@ -700,6 +701,7 @@ and the renaming is all $\triv/x$ for the unused variables.
     z\pm}}{(\rho,z/x,z/y)}{\rho_0}
   }
 \end{mathpar}
+}
 
 The cut rule is then
 \begin{mathpar}
