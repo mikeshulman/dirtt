@@ -50,6 +50,7 @@
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \newcommand\triv{\_}
+\newcommand{\unif}[4]{#1\doteq #2\,\text{via }#3\cb #4}
 \mprset{flushleft}
 
 
@@ -523,13 +524,48 @@ Using this, we should have
 
 \subsubsection*{Cut}
 
+Before we can state a cut rule, we introduce a new judgement and rules for deriving valid string
+diagram compositions. The new judgement has the form $\unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}$,
+where $d_1=v_1\combine v_1'$, $d_2=v_2\combine v_2'$, $\Psi^{\flip{v_2'}} \types \rho:\Psi^{v_1'}$,
+and $\Psi^d \types \rho_0:\Psi^{v_1\combine v_2}$. This should be read as stating that $\Psi^d$ is
+the result of composing $\Psi^{d_1}$ and $\Psi^{d_2}$ by gluing along $\rho$, and that the
+composition introduced no loops.
+
+The rules for this judgement are
+\begin{mathpar}
+  \inferrule{ }{
+    \unif{\Psi^{d_1}}{\Psi^{d_2}}{(\ec)}{1_{\Psi^{d_1\combine d_2}}}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2\combine y\pm}}{(\rho,y/x)}{(\rho_0,x/x,x/y)}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1}}{\Psi^{d_2\combine x\pm}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine z\pm}}{\Psi^{d_2\combine x\pm\combine y\pm}}{(\rho,(x,y)/z)}{\rho_0}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine x\pm\combine y\pm}}{\Psi^{d_2\combine
+    z\pm}}{(\rho,z/x,z/y)}{\rho_0}
+  }
+\end{mathpar}
+
+The cut rule is then
 \begin{mathpar}
 \inferrule*[right=admissible?]
            {d = d_1 \combine d_2 \\\\
              \Psi^{d_1} \types (\Gamma_1 \vdash M) \ok \\
              \Psi^{d_1} \cb \Gamma_1 \vdash M \\
              \Psi^{d_2} \types (\Gamma_2, M[\rho] \vdash N) \ok \\ \\
-             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N
+             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N \\\\
+             \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}
            }
            {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \end{mathpar}
@@ -538,19 +574,18 @@ For the premise to be well formed, it must be the case that
 \[
 \begin{array}{l}
 d_1 = v_1 \combine v_1' \\ 
-d_2 = v_2 \combine v_2' \combine v_2'' \\ 
+d_2 = v_2 \combine v_2' \\ 
 \Psi^{\flip{v_1}} \types \Gamma_1 \ctx \\ 
 \Psi^{v_1'} \types M \type \\ 
-\Psi^{\flip{v_2}} \types \Gamma_2 \ctx \\
+\Psi^{v_2} \types (\Gamma_2 \vdash N) \ok \\
 \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\
-\Psi^{v_2''} \types N \type \\
 \end{array}
 \]
 
-Therefore, $\Psi^{v_1 \combine v_2 \combine v_2''} \types
+Therefore, $\Psi^{v_1 \combine v_2} \types
 (\Gamma_1,\Gamma_2 \vdash N) \ok$.  So the unification needs to produce
 a context $\Psi_0^d$ and a renaming $\Psi_0 \vdash \rho_0 : \Psi^{v_1
-  \combine v_2 \combine v_2''}$.
+  \combine v_2}$.
 
 \subsection*{Morphism types}
 
