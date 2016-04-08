@@ -51,7 +51,7 @@
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \newcommand\triv{\_}
 \newcommand\samestring{\leftrightarrow}
-
+\newcommand{\unif}[4]{#1\doteq #2\,\text{via }#3\cb #4}
 \mprset{flushleft}
 
 
@@ -237,8 +237,8 @@ be nicer to use, because there wouldn't be a bunch of identity
 substitutions running around, but I wanted to work this out first.
 
 For convenience, we use a notion of ``inhabitant of a type at resource
-$r$'', i.e. where we have variance on the right, $\Psi \types t \vcol r
-A$, where $t$ is 0, 1, or 2 terms. 
+$r$'', i.e. where we have variance on the right, $\Psi \types \vec{a} \vcol r
+A$, where $\vec{a}$ is 0, 1, or 2 terms. 
 
 \begin{mathpar}
 \inferrule{ }
@@ -260,10 +260,10 @@ Using this, the rules for substitutions are
           {\Psi^{\uns} \vdash \cdot : \cdot}
 \and
 \inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
-            \Psi^{v_2} \vdash t \vcol r A \\
+            \Psi^{v_2} \vdash \vec{a} \vcol r A \\
              v = {v_1} \combine v_2
            }
-           {\Psi^{v} \vdash (\theta,t/x) : (\Psi',x \vcol r A)}
+           {\Psi^{v} \vdash (\theta,\vec{a}/x) : (\Psi',x \vcol r A)}
 \end{mathpar}
 
 For example, the following rule is derivable, and is the analogue of the
@@ -315,8 +315,8 @@ We will need a corresponding operation on terms:
              \Psi^{v_2} \vdash t \vcol{r'} A
            }
           { v_2 = {v_{21}} \combine v_{22} \\ 
-            \Psi^{v_{21}} \vdash t_1 \vcol{r_1'} A\\
-            \Psi^{v_{21}} \vdash t_2 \vcol{r_2'} A\\
+            \Psi^{v_{21}} \vdash \vec{a}_1 \vcol{r_1'} A\\
+            \Psi^{v_{21}} \vdash \vec{a}_2 \vcol{r_2'} A\\
           }
 \end{mathpar}
 
@@ -324,11 +324,11 @@ Here is the essence of the definition:
 \[
 \begin{array}{l}
 \cdot = \cdot \combine \cdot \\
-(\theta,t/x) = (\theta_1,t_1/x) \combine (\theta_2,t_2/x) \text{ when } \theta = \theta_1 \combine \theta_2
-\text{ and } t = t_1 \combine t_2 \\
+(\theta,\vec{a}/x) = (\theta_1,\vec{a}_1/x) \combine (\theta_2,\vec{a}_2/x) \text{ when } \theta = \theta_1 \combine \theta_2
+\text{ and } \vec{a} = \vec{a}_1 \combine \vec{a}_2 \\
 \\ 
-t = (t \combine \triv) \text{ if the splitting is } r = r \sqcup \uns\\
-t = (\triv \combine t) \text{ if the splitting is } r = \uns \sqcup r\\
+\vec{a} = (\vec{a} \combine \triv) \text{ if the splitting is } r = r \sqcup \uns\\
+\vec{a} = (\triv \combine \vec{a}) \text{ if the splitting is } r = \uns \sqcup r\\
 (a_1,a_2) = (a_1 \combine a_2) \text{ if the splitting is } \pms = \ms \sqcup \ps\\
 (a_1,a_2) = (a_2 \combine a_1) \text{ if the splitting is } \pms = \ps \sqcup \ms\\
 \end{array}
@@ -343,12 +343,12 @@ v_1' \combine v_2'$ is $\cdot = \cdot \combine \cdot$, so we want
 \end{mathpar}
 
 Suppose the $\Psi'$ in the theorem is of the form $\Psi', x \vcol r' A$,
-and the substitution is of the form $\theta,t/x$, where in every case we
+and the substitution is of the form $\theta,\vec{a}/x$, where in every case we
 have 
 \begin{mathpar}
 v = {v_1} \combine {v_2} \\
 \Psi^{v_1} \types \theta : \Psi' \\
-\Psi^{v_2} \vdash t \vcol {r'} A
+\Psi^{v_2} \vdash \vec{a} \vcol {r'} A
 \end{mathpar}
 If $(v',r')$ is the resource vector for the $\Psi',x \vcol{r'} A$, then we
 have a splitting as
@@ -366,18 +366,18 @@ v_1 = v_{11} \combine v_{12}\\
 
 By term splitting, we have
 \begin{mathpar}
-t = t_1 \sqcup t_2 \\
+\vec{a} = \vec{a}_1 \sqcup \vec{a}_2 \\
 v_2 = {v_{21}} \combine v_{22} \\ 
-\Psi^{v_{21}} \vdash t_1 \vcol{r_1'} A\\
-\Psi^{v_{21}} \vdash t_2 \vcol{r_2'} A\\
+\Psi^{v_{21}} \vdash \vec{a}_1 \vcol{r_1'} A\\
+\Psi^{v_{21}} \vdash \vec{a}_2 \vcol{r_2'} A\\
 \end{mathpar}
 
 So we construct 
 \begin{mathpar}
-(\theta,t/x) (\theta_1,t_1/x) \combine (\theta_2,t_2/x) \\
+(\theta,\vec{a}/x) = (\theta_1,\vec{a}_1/x) \combine (\theta_2,\vec{a}_2/x) \\
 v = (v_{11} \combine v_{21}) \combine (v_{21} \combine v_{22}) \\
-\Psi^{(v_{11} \combine v_{21})} \vdash (\theta_1,t_1/x) : (\Psi'^{v_1'},x \vcol{r_1'} A)\\
-\Psi^{(v_{21} \combine v_{22})} \vdash (\theta_1,t_2/x) : (\Psi'^{v_2'},x \vcol{r_2'} A)
+\Psi^{(v_{11} \combine v_{21})} \vdash (\theta_1,\vec{a}_1/x) : (\Psi'^{v_1'},x \vcol{r_1'} A)\\
+\Psi^{(v_{21} \combine v_{22})} \vdash (\theta_1,\vec{a}_2/x) : (\Psi'^{v_2'},x \vcol{r_2'} A)
 \end{mathpar}
 where we use associativity and commutativity, we will have 
 $v = v_1 \combine v_2 = (v_{11} \combine v_{12}) \combine ({v_{21}} \combine {v_{22}})
@@ -563,7 +563,8 @@ Using this, we should have
            {\Psi \cb (\Gamma \vdash M)[\sigma]}
 \end{mathpar}
 
-\subsection*{Cut for Types}
+
+\subsection*{Cut for Types (Equivalence relation)}
 
 We write $x \in \Psi$ to mean $\Psi$ contains $x \vcol r A$ for some
 non-$\uns$ $r$.  Under the prespposition that $\Psi^{v_1} \vdash \rho :
@@ -626,25 +627,70 @@ $\rho$-equivalence-classes.  In an implementation, a $\rho_0$ satisfying
 this condition could be inferred from $\rho$, using some convention for
 which variables are kept.
 
-%% In the conlusion of the cut, the context includes (a) all $\pms$
-%% variables from $v_1$, and (b) all $\pms$ variables from $v_2$, and (c)
-%% all variables from $v_1$ that were either $\ps$ or $\ms$, now promoted
-%% to $\pms$.  The idea is that the non-$\pms$ variables from $v_1$ and
-%% $v_2$ are now paired up, and we are choosing (somewhat arbitrarily) to
-%% use the sames from $v_1$ for them.  Formally, recall that $\forgetpandm
-%% v_2$ keeps only the $\pms$ variables, and $\complete v_1$ = $v_1
-%% \combine \flip{\forgetpm{v_1}}$ (where $\forgetpm{v_1}$ keeps only the
-%% $\ps$ and $\ms$ variables) completes $v_1$ with every $\ps$ or $\ms$
-%% becoming a $\pm$.  The renaming $\rho_{12}$ matches up the $\ps$ or
-%% $\ms$ variables from $v_2$ with the variables from $v_1$ that they will
-%% be paired with.
+\subsection{Cut For Types (Unification)}
 
-%% A $\rho_{12}$ satisfying the conditions should be unique if it exists.
+Before we can state a cut rule, we introduce a new judgement and rules for deriving valid string
+diagram compositions. The new judgement has the form $\unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}$,
+where $d_1=v_1\combine v_1'$, $d_2=v_2\combine v_2'$, $\Psi^{\flip{v_2'}} \types \rho:\Psi^{v_1'}$,
+and $\Psi^d \types \rho_0:\Psi^{v_1\combine v_2}$. This should be read as stating that $\Psi^d$ is
+the result of composing $\Psi^{d_1}$ and $\Psi^{d_2}$ by gluing along $\rho$, and that the
+composition introduced no loops.
 
-%% Algorithmically, given the $\rho$, we compute a $\rho'$ option by
-%% computing the equivalence classes of $x \samestring y [ \rho ]$,
-%% and then testing the conditions.  FIXME: check/explain
+The rules for this judgement are
+\begin{mathpar}
+  \inferrule{ }{
+    \unif{\Psi^{d_1}}{\Psi^{d_2}}{(\ec)}{1_{\Psi^{d_1\combine d_2}}}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2\combine y\pm}}{(\rho,y/x)}{(\rho_0,x/x,x/y)}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1}}{\Psi^{d_2\combine x\pm}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine z\pm}}{\Psi^{d_2\combine x\pm\combine y\pm}}{(\rho,(x,y)/z)}{\rho_0}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine x\pm\combine y\pm}}{\Psi^{d_2\combine
+    z\pm}}{(\rho,z/x,z/y)}{\rho_0}
+  }
+\end{mathpar}
 
+The cut rule is then
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {d = d_1 \combine d_2 \\\\
+             \Psi^{d_1} \types (\Gamma_1 \vdash M) \ok \\
+             \Psi^{d_1} \cb \Gamma_1 \vdash M \\
+             \Psi^{d_2} \types (\Gamma_2, M[\rho] \vdash N) \ok \\ \\
+             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N \\\\
+             \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}
+           }
+           {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
+\end{mathpar}
+
+%% For the premise to be well formed, it must be the case that
+%% \[
+%% \begin{array}{l}
+%% d_1 = v_1 \combine v_1' \\ 
+%% d_2 = v_2 \combine v_2' \\ 
+%% \Psi^{\flip{v_1}} \types \Gamma_1 \ctx \\ 
+%% \Psi^{v_1'} \types M \type \\ 
+%% \Psi^{v_2} \types (\Gamma_2 \vdash N) \ok \\
+%% \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\
+%% \end{array}
+%% \]
+
+%% Therefore, $\Psi^{v_1 \combine v_2} \types
+%% (\Gamma_1,\Gamma_2 \vdash N) \ok$.  So the unification needs to produce
+%% a context $\Psi_0^d$ and a renaming $\Psi_0 \vdash \rho_0 : \Psi^{v_1
+%%   \combine v_2}$.
 
 \subsection*{Morphism types}
 

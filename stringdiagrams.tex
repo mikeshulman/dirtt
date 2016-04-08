@@ -39,7 +39,8 @@
 \newcommand{\strtoco}{\rotatebox{180}{$\curvearrowleft$}}
 \newcommand{\introcoend}{\mathsf{incoend}}
 \newcommand{\introend}{\mathsf{inend}}
-\newcommand{\letexp}[3]{\left(#1\mathrel{\reflectbox{$\mapsto$}}#2\right).#3}
+%\newcommand{\letexp}[3]{\left(#1 := #2\right).#3}
+\newcommand{\letexp}[3]{\left(#1\mathrel{\reflectbox{$\Rrightarrow$}}#2\right).#3}
 
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
@@ -61,7 +62,8 @@ For certain types (see the co-end type), it happens that a variable that is not 
 
 Furthermore, since our theory is linear, every type variable will occur precisely once in the term.
 
-\section{Category contexts and string diagrams}
+\section{Details}
+\subsection{Category contexts and string diagrams}
 \begin{mathpar}
 	\inferrule{
 	}{
@@ -98,7 +100,7 @@ We may abbreviate $(x :\m A, y \p A, x \strto y)$ as $(x \strto y : A)$. When we
 
 We may use a set of strings $\strs s$ as a substitution, where we mean to replace every variable with the variable at the other end of the string.
 
-\section{Structural rules}
+\subsection{Structural rules}
 \begin{mathpar}
 	\inferrule{
 		\Psi_\Gamma \vdash \Gamma \ctx \\
@@ -159,8 +161,164 @@ Thus, $n_0[m_0/m]$ uses $\flip{\Psi_\Gamma}, \flip{\Psi_\Delta}, \Psi_N$. On top
 \end{mathpar}
 This suggests the simple computation rule: $(m_0)_{M \strto M[\strs t]} \jdeq m_0[\strs t]$, which removes all double occurrences of variables from $\Psi_M$. Note that $\strs t$ can be completely inferred from ``$M \strto M[\strs t]$'' because $M$ uses every variable in its context precisely once.
 
-\section{Morphism types}
-Formation rule:
+\subsection{Non-mixing tensor types}
+\subsubsection{Formation}
+\begin{mathpar}
+	\inferrule{
+		\Phi \vdash S \type \\
+		\Psi \vdash T \type
+	}{
+		\Phi \Psi \vdash S \otimes T \type
+	}
+\end{mathpar}
+\subsubsection{Right rule}
+\begin{mathpar}
+	\inferrule{
+		\Phi, \strs s \cb \Gamma \vdash s : S \\
+		\Psi, \strs t \cb \Delta \vdash t : T
+	}{
+		\Phi, \strs s, \Psi, \strs t \cb \Gamma, \Delta \vdash s \otimes t : S \otimes T
+	}
+\end{mathpar}
+\subsubsection{Left rule}
+\begin{mathpar}
+	\inferrule{
+		\Phi, \strs s \cb \Gamma, s : S, t : T \vdash r : R
+	}{
+		\Phi, \strs s \cb \Gamma, p : S \otimes T \vdash \letexp{s \otimes t}{p}{r} : R
+	}
+\end{mathpar}
+\subsubsection{$\beta$-rule}
+Suppose we have $\Phi_S \vdash S \type$ and $\Phi_T \vdash T \type$. Suppose also that $\strs s$, $\strs t$ and $\strs u$ compose loop-freely We can form two terms of the same premises:
+\begin{mathpar}
+	%\footnotesize
+	\inferrule{
+		\inferrule{
+			\Phi_\Gamma, \Phi_S, \strs s \cb \Gamma \vdash s_0 : S \\\\
+			\Phi_\Delta, \Phi_T, \strs t \cb \Delta \vdash t_0 : T
+		}{
+			{\begin{pmatrix}
+				\Phi_\Gamma, \Phi_S, \strs s, \Phi_\Delta, \Phi_T, \strs t \cb \\
+				\Gamma, \Delta \vdash s_0 \otimes t_0 : S \otimes T
+			\end{pmatrix}}
+		} \\
+		\inferrule{
+			\Phi_S, \Phi_T, \Psi, \strs u \cb \Theta, s : S, t : T \vdash r_0 : R
+		}{
+			{\begin{pmatrix}
+				\Phi_S, \Phi_T, \Psi, \strs u \cb \\
+			\Theta, p : S \otimes T \vdash \letexp{s \otimes t}{p}{r_0} : R
+			\end{pmatrix}}
+		}
+	}{
+		\Phi_\Gamma, \Phi_\Delta, \Psi, \strs s \circ_{\Phi_S} \strs u \circ_{\Phi_T} \strs t \cb \Theta, \Gamma, \Delta \vdash \letexp{s \otimes t}{s_0 \otimes t_0}{r_0} : R
+	}
+\end{mathpar}
+On the other hand, we can substitute without using tensor products:
+\begin{mathpar}
+	\inferrule{
+		\Phi_\Gamma, \Phi_S, \strs s \cb \Gamma \vdash s_0 : S \\\\
+		\Phi_\Delta, \Phi_T, \strs t \cb \Delta \vdash t_0 : T \\\\
+		\Phi_S, \Phi_T, \Psi, \strs u \cb \Theta, s : S, t : T \vdash r_0 : R
+	}{
+		\Phi_\Gamma, \Phi_\Delta, \Psi, \strs s \circ_{\Phi_S} \strs u \circ_{\Phi_T} \strs t \cb \Theta, \Gamma, \Delta \vdash r_0[s_0/s, t_0/t] : R.
+	}
+\end{mathpar}
+This suggests the $\beta$-rule:
+\begin{equation}
+	\letexp{s \otimes t}{s_0 \otimes t_0}{r_0} \jdeq r_0[s_0/s, t_0/t],
+\end{equation}
+as one would expect.
+
+\subsubsection{$\eta$-rule}
+Let us first apply right and left rule to variables:
+\begin{mathpar}
+	\inferrule{
+		\inferrule{
+			\inferrule{
+				\Phi \vdash S \type
+			}{
+				\strs s : \Phi' \strto \Phi \cb s : S[\strs s] \vdash s_{S[\strs s] \strto S} : S
+			} \\
+			\inferrule{
+				\Psi \vdash T \type
+			}{
+				\strs t : \Psi' \strto \Phi \cb t : T[\strs t] \vdash t_{T[\strs t] \strto T} : T
+			}
+		}{
+			\strs s : \Phi' \strto \Phi, \strs t : \Psi' \strto \Psi \cb s : S[\strs s], t : T[\strs t] \vdash s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T} : S \otimes T
+		}
+	}{
+		\strs s : \Phi' \strto \Phi, \strs t : \Psi' \strto \Psi \cb p : S[\strs s] \otimes T[\strs t] \vdash \letexp{s \otimes t}{p}{s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T}} : S \otimes T
+	}
+\end{mathpar}
+We can also apply the variable rule to tensor types:
+\begin{mathpar}
+	\inferrule{
+		\inferrule{
+				\Phi \vdash S \type \\
+				\Psi \vdash T \type
+		}{
+			\Phi, \Psi \vdash S \otimes T \type
+		}
+	}{
+		\strs u : \Upsilon \strto (\Phi, \Psi) \cb p : (S \otimes T)[\strs u] \vdash p_{(S \otimes T)[\strs u] \strto S \otimes T} : S \otimes T
+	}
+\end{mathpar}
+Note that this notation implies that $\Upsilon \cong (\Phi, \Psi)$, so that $\Upsilon$ decomposes into $\Upsilon \jdeq (\Phi', \Psi')$ and $\strs u$ decomposes into $\strs s : \Phi' \strto \Phi$ and $\strs t : \Psi' \strto \Psi$. Thus, both derivation trees end in judgements of the same signature. We can then have the following $\eta$-rule:
+\begin{equation}
+	\letexp{s \otimes t}{p}{s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T}} \jdeq p_{S[\strs s] \otimes T[\strs t] \strto S \otimes T}. \label{eq:eta-simple}
+\end{equation}
+However, we can do better. In the derivation tree above, we can include a substitution between the applications the right and the left rule. We start with the outcome of the right rule:
+\begin{mathpar}
+	\inferrule{
+		\inferrule{
+			\strs s : \Phi' \strto \Phi, \strs t : \Psi' \strto \Psi \cb s : S[\strs s], t : T[\strs t] \vdash s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T} : S \otimes T \\\\
+			\Phi, \Psi, \Upsilon, \strs u \cb \Gamma, q : S \otimes T \vdash r : R
+		}{
+			\Phi', \Psi', \Upsilon, \strs s \circ_{\Phi} \strs u \circ_{\Psi} \strs t \cb \Gamma, s : S[\strs s], t : T[\strs t] \vdash r[s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T}/q] : R
+		}
+	}{
+		{\begin{pmatrix}
+			\Phi', \Psi', \Upsilon, \strs s \circ_{\Phi} \strs u \circ_{\Psi} \strs t \cb \Gamma, p : S[\strs s] \otimes T[\strs t] \vdash \\
+			\letexp{s \otimes t}{p}{r[s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T}/p]} : R
+		\end{pmatrix}}
+	}
+\end{mathpar}
+Note that the string-diagrams automatically compose loop-freely, as $\strs s$ and $\strs t$ are simply diagrams of natural transformations.
+
+On the other hand, we can substitute an ordinary variable into the same $r$:
+\begin{mathpar}
+	\inferrule{
+		\strs s : \Phi' \strto \Phi, \strs t : \Psi' \strto \Psi \cb p : S[\strs s] \otimes T[\strs t] \vdash p_{S[\strs s] \otimes T[\strs t] \strto S \otimes T} : S \otimes T \\\\
+		\Phi, \Psi, \Upsilon, \strs u \cb \Gamma, q : S \otimes T \vdash r : R
+	}{
+		\Phi', \Psi', \Upsilon, \strs s \circ_{\Phi} \strs u \circ_{\Psi} \strs t \cb \Gamma, p : S[\strs s] \otimes T[\strs t] \vdash r[p_{S[\strs s] \otimes T[\strs t] \strto S \otimes T}/q] : R
+	}
+\end{mathpar}
+This leads to a more general $\eta$-rule:
+\begin{equation}
+	r[p_{S[\strs s] \otimes T[\strs t] \strto S \otimes T}/q] \jdeq \letexp{s \otimes t}{p}{r[s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T}/p]}. \label{eq:eta}
+\end{equation}
+The simpler one is derivable from this one, taking $r$ a simple variable ($r \jdeq q_{S \otimes T \strto S[\strs s'] \otimes T[\strs t']}$), and using computation of variables:
+\begin{align*}
+	\text{LHS}
+	&\jdeq (p_{S[\strs s] \otimes T[\strs t] \strto S \otimes T})_{S \otimes T \strto S[\strs s'] \otimes T[\strs t']} \\
+	&\jdeq p_{S[\strs s] \otimes T[\strs t] \strto S[\strs s'] \otimes T[\strs t']}, \\
+	\text{RHS}
+	&\jdeq \letexp{s \otimes t}{p}{(s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T})_{S \otimes T \strto S[\strs s'] \otimes T[\strs t']}} \\
+	&\jdeq \letexp{s \otimes t}{p}{(s_{S[\strs s] \strto S[\strs s']} \otimes t_{T[\strs t] \strto T[\strs t']})}
+\end{align*}
+It only remains to observe that any $S$ and $T$ can be written as $S'[\strs s']$ and $T'[\strs t']$ where $S'$ and $T'$ are the same types in an $\alpha$-equivalent context.
+
+By applying \eqref{eq:eta-simple} to the left of \eqref{eq:eta}, we obtain:
+\begin{equation}
+	r[\letexp{s \otimes t}{p}{s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T}}/q] \jdeq \letexp{s \otimes t}{p}{r[s_{S[\strs s] \strto S} \otimes t_{T[\strs t] \strto T}/p]}. \label{eq:eta-commut}
+\end{equation}
+In other words: let-binders commute.
+
+\subsection{Morphism types}
+\subsubsection{Formation}
 \begin{mathpar}
 	\inferrule{
 		A \cat \\
@@ -170,7 +328,7 @@ Formation rule:
 		\flip\Phi, \Psi \vdash \mor A(a, b) \type
 	}\and
 \end{mathpar}
-Right rule:
+\subsubsection{Right rule}
 \begin{mathpar}
 	\inferrule{
 		A \cat
@@ -189,7 +347,7 @@ Right rule with built-in substitution:
 		\strs s : \Phi' \strto \Phi \cb \cdot \vdash \id(a[\strs s] \strto a) : \mor A(a[\strs s], a)
 	}\and
 \end{mathpar}
-Left rule:
+\subsubsection{Left rule}
 \begin{mathpar}
 	\inferrule{
 		\Psi, \strs s, w \strto z : A \cb \Gamma \vdash m : M
@@ -197,19 +355,7 @@ Left rule:
 		\Psi, \strs s, w \strto x : A, y \strto z : A \cb \Gamma, f : \mor A(x, y) \vdash \letexp{\id(x \strto y)}{f}{m} : M
 	}\and
 \end{mathpar}
-Here we are using $x$ covariantly and $y$ contravariantly, because this is an eliminator. Note that $f$ is not a well-formed term: it is a variable. When we plug a term into it, it will mention $x$ contra- and $y$ covariantly, while both will have disappeared from the context. Computation will resolve this:
-\[
-	\letexp{\id(a \strto b)}{\id(a \strto b)}{m} \jdeq m.
-\]
-As another demonstration of substitution, let us plug identity into the left rule:
-\begin{mathpar}
-	\inferrule{
-		x \strto y : A \cb \cdot \vdash \id(x \strto y) : \mor{A}(x, y) \\
-		\Psi, \strs s, w \strto x : A, y \strto z : A \cb \Gamma, f : \mor A(x, y) \vdash \letexp{\id(x \strto y)}{f}{n} : N
-	}{
-		\Psi, \strs s, w \strto z : A \cb \Gamma \vdash \letexp{\id(x \strto y)}{\id(x \strto y)}{n} : N
-	}.
-\end{mathpar}
+Here we are using $x$ covariantly and $y$ contravariantly, because this is an eliminator. Note that $f$ is not a well-formed term: it is a variable. When we plug a term into it, it will mention $x$ contra- and $y$ covariantly, while both will have disappeared from the context. Computation will resolve this.
 
 With built-in substitution, we can consider source-based, target-based and two-sided elimination. The two-sided one can be derived from either based one, and the target-based one should be derivable from the morphism type of the opposite category. So we just give the source-based one:
 \begin{mathpar}
@@ -222,8 +368,89 @@ With built-in substitution, we can consider source-based, target-based and two-s
 \end{mathpar}
 The two-sided one is probably more natural, so ideally we could derive the based ones from it.
 
-\section{Co-end type}
-Formation rule:
+\subsubsection{$\beta$-rule}
+As another demonstration of substitution, let us plug identity into the left rule:
+\begin{mathpar}
+	\inferrule{
+		x \strto y : A \cb \cdot \vdash \id(x \strto y) : \mor{A}(x, y) \\
+		\Psi, \strs s, w \strto x : A, y \strto z : A \cb \Gamma, f : \mor A(x, y) \vdash \letexp{\id(x \strto y)}{f}{n} : N
+	}{
+		\Psi, \strs s, w \strto z : A \cb \Gamma \vdash \letexp{\id(x \strto y)}{\id(x \strto y)}{n} : N
+	}.
+\end{mathpar}
+This suggests the $\beta$-rule 
+\[
+	\letexp{\id(a \strto b)}{\id(a \strto b)}{m} \jdeq m.
+\]
+
+\subsubsection{$\eta$-rule}
+We start with the less-general variant. Using right and left rule, we get:
+\begin{mathpar}
+	\small
+		\inferrule{
+			\inferrule{
+				A \cat
+			}{
+				w \strto z : A \cb \cdot \vdash \id(w \strto z) : \mor A(w, z)
+			}
+		}{
+			w \strto x : A, y \strto z : A \cb f : \mor A(x, y) \vdash \letexp{\id(x \strto y)}{f}{\id(w \strto z)} : \mor A(w, z)
+		}
+\end{mathpar}
+Using the variable rule, we get:
+\begin{mathpar}
+	\inferrule{
+		\inferrule{
+			A \cat
+		}{
+			w \strto z : A \vdash \mor A(w, z) \type
+		}
+	}{
+		w \strto x : A, y \strto z : A \cb f : \mor A(x, y) \vdash f_{\mor A(x, y) \strto \mor A(w, z)} : \mor A(w, z)
+	}
+\end{mathpar}
+Thus, the simple $\eta$-rule becomes:
+\begin{equation}
+	f_{\mor A(x, y) \strto \mor A(w, z)} \jdeq \letexp{\id(x \strto y)}{f}{\id(w \strto z)}.
+\end{equation}
+We can now proceed to the more general one. Note that, in the string diagram of $r$, it is not a bizarre restriction to introduce $w$ and $z$. Indeed, if the string diagrams compose, then the diagram of $r$ cannot connect $x$ and $y$ to each other. By consequence, it must connect them to some $w$ and $z$.
+\begin{mathpar}
+	\small
+	\inferrule{
+		\inferrule{
+			x \strto y : A \cb \cdot \vdash \id(x \strto y) : \mor A(x, y) \\\\
+			w \strto x : A, y \strto z : A, (\Upsilon, \strs u) \cb \Gamma, g : \mor A(x, y) \vdash r : R
+		}{
+			w \strto z : A, (\Upsilon, \strs u) \cb \Gamma \vdash r[\id(x \strto y)/f] : R
+		}
+	}{
+		w \strto x' : A, y' \strto z : A, (\Upsilon, \strs u) \cb \Gamma, f: \mor A(x', y') \vdash \letexp{\id(x', y')}{f}{r[\id(x \strto y)/g]} : R
+	}
+\end{mathpar}
+On the other hand, we can substitute an ordinary variable into the same $r$:
+\begin{mathpar}
+	\small
+	\inferrule{
+		x \strto x' : A, y' \strto y : A \cb f : \mor A(x', y') \vdash f_{\mor A(x', y') \strto \mor A(x, y)} : \mor A(x, y) \\\\
+		w \strto x : A, y \strto z : A, (\Upsilon, \strs u) \cb \Gamma, g : \mor A(x, y) \vdash r : R
+	}{
+		w \strto x' : A, y' \strto z : A, (\Upsilon, \strs u) \cb \Gamma, f : \mor A(x', y') \vdash r[f_{\mor A(x', y') \strto \mor A(x, y)}/g] : R
+	}
+\end{mathpar}
+
+This leads to the following $\eta$-rule:
+\begin{align*}
+	r[f_{\mor A(x', y') \strto \mor A(x, y)}/g] \jdeq \letexp{\id(x' \strto y')}{f}{r[\id(x \strto y)/g]}
+\end{align*}
+which only makes sense when $f$ and $g$ interrupt the same string, in this case $w \strto z$.
+
+Again, plugging the simple $\eta$-rule into the more general one, we obtain a commutation law:
+\begin{equation}
+	r[\letexp{\id(x' \strto y')}{f}{\id(x \strto y)}/g] \jdeq \letexp{\id(x' \strto y')}{f}{r[\id(x \strto y)/g]}.
+\end{equation}
+
+\subsection{Co-end type}
+\subsubsection{Formation rule}
 \begin{mathpar}
 	\inferrule{
 		\Psi, x :\m A, y :\p A \vdash M \type
@@ -233,18 +460,21 @@ Formation rule:
 \end{mathpar}
 We write $y \strto x$ instead of $x \strto y$ so that currying looks good.
 
+\subsubsection{Right rule}
 The following right rule is insufficiently general, but easier to understand.
 \begin{mathpar}
 	\inferrule{
 		\Psi_\Gamma \vdash \Gamma \ctx \\
 		\Psi_M, x :\m A, y :\p A \vdash M \type \\
-		(\flip{\Psi_\Gamma}, \Psi_M) = (\Psi, w :\m A, z :\p A) \\
+		(\flip{\Psi_\Gamma}, \Psi_M) = (\Psi, w :\p A, z :\m A) \\
 		\Psi, \strs s, z \strto y : A, x \strto w : A \cb \Gamma \vdash m : M
 	}{
 		\Psi, \strs s, z \strto w : A \cb \Gamma \vdash (y \strto x, m) : \coend^{y \strto x : A} M
 	}\and
 \end{mathpar}
 Note that the term $(y \strto x, m)$ mentions $x$ and $y$ once in every variance. (Which, to be honest, is my only reason for writing $y \strto x$ and not $x \strto y$ in the term.) We consider $x$ and $y$ bound.
+
+Note also that this right rule is `non-deterministic': when we compare the context of $(y \strto x, m)$ to the one of $m$, we see that the string $z \strto w$ has been interrupted. However, $\Psi$ may contain other strings of type $A$, and we could instead be interrupting any of those other strings. This is perhaps comparable to what happens in cartesian type theory when you use the projections out of the product type. If $\pi_1 p$ has type $M$, then $p$ has type $M \times N$, where $N$ has to be inferred from the syntax of $p$. Here, similarly, we will have to infer what string has been interrupted, from the syntax of $m$. Hopefully that is possible. 
 
 Sufficiently general right rule:
 \begin{mathpar}
@@ -253,12 +483,43 @@ Sufficiently general right rule:
 		\Psi_M, x :\m A, y :\p A \vdash M \type \\
 		\Phi_w \vdash a : A \\
 		(\flip{\Psi_\Gamma}, \Psi_M) = (\Psi, \flip{\Phi_w}, \Phi_z) \\
-		(\Psi, \strs s), \strs u : \Phi_z \strto \Phi_y, \strs t : \Phi_x \strto \Phi_w \cb \Gamma \vdash m : M[a[\strs t]/x, a[\strs u \circ \strs r]/y]
+		(\Psi, \strs s), \strs u : \Phi_z \strto \Phi_y, \strs t : \Phi_x \strto \Phi_w \cb \Gamma \vdash m : M[a_x/x, a_y/y]
 	}{
-		(\Psi, \strs s), \strs r : \Phi_z \strto \Phi_w \cb \Gamma \vdash (a[\strs u \circ \strs r] \strto a[\strs t], m) : \coend^{y \strto x : A} M
+		(\Psi, \strs s), \strs r : \Phi_z \strto \Phi_w \cb \Gamma \vdash (a_y \strto a_x, m) : \coend^{y \strto x : A} M
 	}\and
 \end{mathpar}
+where
+\begin{equation}
+	a_w :\jdeq a, \qquad
+	a_x :\jdeq a[\strs t], \qquad
+	a_y :\jdeq a[\strs u \circ_{\Phi_z} \strs r],
+	\qquad a_z :\jdeq a[\strs r].
+\end{equation}
 Here, the resulting term binds all variables from $\Phi_x$ and $\Phi_y$ by double occurrence.
+
+%The condition $(\flip{\Psi_\Gamma}, \Psi_M) = (\Psi, \flip{\Phi_w}, \Phi_z)$ is awkward. We can remove it:
+%\begin{mathpar}
+%	\inferrule{
+%		\Psi_\Gamma \vdash \Gamma \ctx \\
+%		\Psi_M, x :\m A, y :\p A \vdash M \type \\
+%		\Phi_w \vdash a : A \\
+%		\flip{\Psi_\Gamma}, \Psi_M, \Phi_x, \Phi_y, \strs q \cb \Gamma \vdash m : M[a_x/x, a_y/y] \\
+%		\text{$\Phi_x$ and $\Phi_y$ do not share any strings in $\strs q$}
+%	}{
+%		\flip{\Psi_\Gamma}, \Psi_M, \Phi_x, \Phi_y, \strs q \circ_{\Phi_x, \Phi_y} (\strs p : \Phi_x \strto \Phi_y) \cb \Gamma \vdash (a_y \strto a_x, m) : \coend^{y \strto x : A} M
+%	}\and
+%\end{mathpar}
+%where
+%\begin{equation}
+%	\Phi_w :\jdeq \Phi_x[\strs q], \qquad \Phi_z :\jdeq \Phi_y[\strs q],
+%\end{equation}
+%\begin{equation}
+%	a_w :\jdeq a, \qquad
+%	a_x :\jdeq a_w[\strs q], \qquad
+%	a_y :\jdeq a_x[\strs p], \qquad
+%	a_z :\jdeq a_y[\strs q].
+%\end{equation}
+
 %\begin{mathpar}
 %	\inferrule{
 %		\Psi_\Gamma \vdash \Gamma \ctx \\
@@ -288,21 +549,103 @@ Here, the resulting term binds all variables from $\Phi_x$ and $\Phi_y$ by doubl
 %
 %\textbf{Edit:} This rule probably does not admit substitution. We probably need a rule where you can pair with category terms, rather than category variables, in which case it may become more interesting to use a pairing notation.
 
-The left rule is:
+\subsubsection{Left rule}
 \begin{mathpar}
 	\inferrule{
 		\Psi_\Gamma \vdash \Gamma \ctx \\
 		\Psi_M, x :\m A, y :\p A \vdash M \type \\
 		\Psi_N \vdash N \type \\
-		\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s, y \strto x : A \cb \Gamma, m : M \vdash n : N
+		(\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s), y \strto x : A \cb \Gamma, m : M \vdash n : N
 	}{
 		\flip{\Psi_\Gamma}, \flip{\Psi_M}, \Psi_N, \strs s \cb \Gamma, q : \coend^{y \strto x:A} M \vdash \letexp{(y \strto x, m)}{q}{n} : N
 	}\and
 \end{mathpar}
 Here, the resulting term uses $x$ positively through $n$ and negatively in the let-binder, and similarly for $y$. We consider these variables bound. This may seem obvious, as it is a let-binder, but note that in the $J$-binder, they were present in the context.
 
-If we substitute the right rule into the left rule, we obtain an expression of the form $\letexp{(x \strto y, m)}{(a \strto b, m')}{n}$. Remember that $a$ and $b$ bind an entire context of type variables into $m'$. The variables $x$ and $y$ occur again in $n$. We compute this expression to $\letexp{(x \strto y, m)}{(a \strto b, m')}{n} \jdeq n[a/x, b/y, m'/m]$, removing the double occurrences of $x$ and $y$ in the usual way. The other double occurrences may still be there, likely triggering further computation.
+\subsubsection{$\beta$-rule}
+We will plug the right rule into the left rule. We use the same names as when we stated the rules, except for $\Gamma$, $\strs s$ and $m$, which we rename to $\Delta$, $\strs t$ and $\mu$ in the left rule.
+\begin{mathpar}
+	\inferrule{
+		(\flip{\Psi_\Gamma}, \Psi_M) = (\Psi, \flip{\Phi_w}, \Phi_z) \\\\
+		(\Psi, \strs s), \strs r : \Phi_z \strto \Phi_w \cb \Gamma \vdash (a_y \strto a_x, m) : \coend^{y \strto x : A} M \\\\
+		\flip{\Psi_\Delta}, \flip{\Psi_M}, \Psi_N, \strs t \cb \Delta, q : \coend^{y \strto x:A} M \vdash \letexp{(y \strto x, \mu)}{q}{n} : N
+	}{
+		\flip{\Psi_\Gamma}, \flip{\Psi_\Delta}, \Psi_N, \circ_{\Psi_M}(\strs r, \strs s, \strs t) \cb \Gamma, \Delta \vdash \letexp{(y \strto x, \mu)}{(a_y \strto a_x, m)}{n} : N
+	}
+\end{mathpar}
+From the same premises, we could have derived
+\begin{equation}
+	\flip{\Psi_\Gamma}, \flip{\Psi_\Delta}, \Psi_N, \circ_{\Psi_M}(\strs r, \strs s, \strs t) \cb \Gamma, \Delta \vdash n[a_x/x, a_y/y, m/\mu] : N.
+\end{equation}
+So the $\beta$-rule is:
+\begin{equation}
+	\letexp{(y \strto x, \mu)}{(a_y \strto a_x, m)}{n} \jdeq n[a_x/x, a_y/y, m/\mu].
+\end{equation}
+Note that $n[a_x/x, a_y/y, m/\mu]$ still refers to the context $\Psi_M$ twice, and will have to be computed further.
 
+%If we substitute the right rule into the left rule, we obtain an expression of the form $\letexp{(x \strto y, m)}{(a \strto b, m')}{n}$. Remember that $a$ and $b$ bind an entire context of type variables into $m'$. The variables $x$ and $y$ occur again in $n$. We compute this expression to $\letexp{(x \strto y, m)}{(a \strto b, m')}{n} \jdeq n[a/x, b/y, m'/m]$, removing the double occurrences of $x$ and $y$ in the usual way. The other double occurrences may still be there, likely triggering further computation.
+
+\subsubsection{$\eta$-rule}
+\paragraph{Substitutionless $\eta$ for substitutionless right rule.}
+We first consider the less general variant, where we just apply right and left rules to a variable. The right rule with substitution does not apply here.
+\begin{mathpar}
+	\footnotesize
+	\inferrule{
+		\inferrule{
+			\inferrule{
+				x :\m A, y :\p A, \Psi \vdash T(x, y) \type
+			}{
+				z \strto y : A, x \strto w : A, \strs r : \Psi' \strto \Psi \cb t : T(w, z)[\strs r] \vdash t_{T(w, z)[\strs r] \strto T(x, y)} : T(x, y)
+			}
+		}{
+			z \strto w : A, \strs r : \Psi' \strto \Psi \cb t : T(w, z)[\strs r] \vdash (y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)}) : \coend^{y \strto x : A} T(x, y)
+		}
+	}{
+		\strs r : \Psi' \strto \Psi \cb q : \coend^{z \strto w : A} T(w, z)[\strs r] \vdash \letexp{(z \strto w, t)}{q}{(y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)})} : \coend^{y \strto x : A} T(x, y)
+	}
+\end{mathpar}
+Note that if we call the term's type $Q$, then up to $\alpha$-equivalence the variable $q$ has type $Q[\strs r]$. Then we also have:
+\begin{equation}
+	q : \coend^{z \strto w} T(w, z)[\strs r] \vdash q_{Q[\strs r] \strto Q} : \coend^{y \strto x : A} T(x, y).
+\end{equation}
+This gives us the simplified $\eta$-rule
+\begin{equation}
+	q_{Q[\strs r] \strto Q} \jdeq \letexp{(z \strto w, t)}{q}{(y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)})}.
+\end{equation}
+
+\paragraph{$\eta$ with substitution for substitutionless right rule.} 
+We start with the outcome of the right rule, and then apply a substitution before applying the left rule:
+\begin{mathpar}
+		\footnotesize
+	\inferrule{
+		\inferrule{
+			z \strto w : A, \strs r : \Psi' \strto \Psi \cb t : T(w, z)[\strs r] \vdash (y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)}) : \coend^{y \strto x : A} T(x, y) \\\\
+			\Upsilon \cb \Gamma, p : \coend^{y \strto x : A} T(x, y) \vdash r : R
+		}{
+			\Upsilon, z \strto w : A, \strs r : \Psi' \strto \Psi \cb \Gamma, t : T(w, z)[\strs r] \vdash r[(y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)})/p] : R
+		}
+	}{
+		\Upsilon \cb \Gamma, q : \coend^{z \strto w : A} T(w, z)[\strs r] \vdash \letexp{(z \strto w, t)}{q}{r[(y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)})/p]} : R.
+	}
+\end{mathpar}
+We could have obtained the same by simply substituting $q$ into $r$ (still calling the coend type $Q$):
+\begin{equation}
+	\Upsilon \cb \Gamma, q : \coend^{z \strto w : A} T(w, z)[\strs r] \vdash r[q_{Q[\strs r] \strto Q}/p] : R.
+\end{equation}
+Thus, we get a slightly more advanced $\eta$-rule:
+\begin{equation}
+	r[q_{Q[\strs r] \strto Q}/p] \jdeq \letexp{(z \strto w, t)}{q}{r[(y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)})/p]}.
+\end{equation}
+Combined with the previous one, we get another commutation law:
+\begin{align*}
+	&r[\letexp{(z \strto w, t)}{q}{(y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)})}/p] \\
+	\jdeq &\letexp{(z \strto w, t)}{q}{r[(y \strto x, t_{T(w, z)[\strs r] \strto T(x, y)})/p]}.
+\end{align*}
+
+\paragraph{$\eta$ for right rule with substitution.}
+Hmm, how does this work? You cannot apply the left rule to an entire context\ldots Unless you do it variable by variable, but then you get an iterated co-end type on the left.
+
+\subsubsection{Co-Yoneda lemma}
 We can now prove the co-Yoneda lemma:
 \begin{mathpar}
 	\inferrule{
@@ -333,7 +676,7 @@ We can now prove the co-Yoneda lemma:
 		\letexp{(x \strto y, s)}{q}{\letexp{t \otimes f}{s}{\letexp{\id_{y \strto z}}{f}{t_{T(x) \strto T(w)}}}} : T(w)
 	}
 \end{mathpar}
-These are inverses:
+These are inverses. To plug one into the other, we have to avoid overloading of variables. Therefore, we add a prime to every variable that occurs in the inner term, except for the variable where we connect both string diagrams. Here, that variable is $z$:
 \begin{align*}
 	&\letexp{(x \strto y, s)}{[(x' \strto y', t_{T(w') \strto T(x')} \otimes \id(y' \strto z))]}{\letexp{t \otimes f}{s}{\letexp{\id_{y \strto z}}{f}{t_{T(x) \strto T(w)}}}} \\
 	&\jdeq \letexp{t \otimes f}{[t_{T(w') \strto T(x')} \otimes \id(y' \strto z)]}{\letexp{\id_{y' \strto z}}{f}{t_{T(x') \strto T(w)}}} \\
@@ -341,16 +684,80 @@ These are inverses:
 	&\jdeq [t_{T(w') \strto T(x')}]_{T(x') \strto T(w)} \\
 	&\jdeq t_{T(w') \strto T(w)}
 \end{align*}
-The other direction holds if let-binders commute with everything, which seems legitimate (do we typically have this property in a sequent calculus?), as well as $\eta$-laws:
-\todoi{Nonsense?}
-\begin{align*}
-	&(x \strto y, [\letexp{(x' \strto y', s)}{q}{\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(w)}}}}]_{T(w) \strto T(x)} \otimes \id(y \strto z)) \\
-	&\jdeq (x \strto y, [\letexp{(x' \strto y', s)}{q}{\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(x)}}}}] \otimes \id(y \strto z)) \\
-	&\jdeq \letexp{(x' \strto y', s)}{q}{(x \strto y, [\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(x)}}}] \otimes \id(y \strto z))} \\
-	&\jdeq \letexp{(x' \strto y', s)}{q}{(x \strto y, [\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(x)}}} \otimes \id(y \strto z)])} \\
-\end{align*}
 
-\section{End type}
+In the other direction, we connect at $w$.
+We need to prove ($Q(z)$ abbreviates the co-end type):
+\begin{align*}
+	&q_{Q(z') \strto Q(z)} \jdeq (x \strto y, [\letexp{(x' \strto y', s)}{q}{\letexp{t \otimes f}{s}{ \\
+	&\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(w)}}}}]_{T(w) \strto T(x)} \otimes \id_{y \strto z})
+\end{align*}
+Both terms have signature
+\begin{equation}
+	z' \strto z : A \cb q : \coend^{x' \strto y'} T(x') \otimes \mor A{y', z'} \vdash \coend^{x \strto y} T(x) \otimes \mor A{y, z}.
+\end{equation}
+We can expand the LHS:
+\begin{equation*}
+q_{Q(z') \strto Q(z)} \jdeq \letexp{(x' \strto y', s)}{q}{(x \strto y, s_{T(x') \otimes \mor A(y', z') \strto T(x) \otimes \mor A(y, z)})}
+\end{equation*}
+In the RHS, we can use a commutation law to pull the let-binder to the front:
+\begin{align*}
+	\text{RHS} \jdeq &\letexp{(x' \strto y', s)}{q}{(x \strto y, [\letexp{t \otimes f}{s}{ \\
+	&\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(w)}}}]_{T(w) \strto T(x)} \otimes \id_{y \strto z})}
+\end{align*}
+Now both sides start with left and right rules of the co-end type.
+Then it remains to be proven that
+\begin{align*}
+	&s_{T(x') \otimes \mor A(y', z') \strto T(x) \otimes \mor A(y, z)} \\
+	\jdeq & [\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(w)}}}]_{T(w) \strto T(x)} \otimes \id_{y \strto z}
+\end{align*}
+These terms both have signature
+\begin{equation*}
+	z' \strto z :A, x' \strto x :A, y \strto y' : A \cb s : T(x') \otimes \mor A(y', z') \vdash T(x) \otimes \mor A(y, z).
+\end{equation*}
+To see this, let us descend the derivation tree from this point. The right rule of the co-end type binds $x$ and $y$ and leaves a string $x' \strto y'$. Then the left rule pops this string from the context.
+
+We can expand the LHS:
+\begin{align*}
+	\text{LHS} &\jdeq s_{T(x') \otimes \mor A(y', z') \strto T(x) \otimes \mor A(y, z)} \\
+	&\jdeq \letexp{t \otimes f}{s}{(t_{T(x') \strto T(x)} \otimes f_{\mor A(y', z') \strto \mor A(y, z)})}.
+\end{align*}
+On the RHS, we first use the computation rule for variables to eliminate $w$. 
+Then, we can pull the tensor let-binder to the front. Curiously, we can also pull the hom binder to the front, and then push it back to the other component.
+\todoi{This is REALLY bizarre and needs precise justification.}
+\begin{align*}
+	&[\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(w)}}}]_{T(w) \strto T(x)} \otimes \id_{y \strto z} \\
+	&\jdeq [\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(x)}}}] \otimes \id_{y \strto z} \\
+	&\jdeq \letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{(t_{T(x') \strto T(x)} \otimes \id_{y \strto z})}}  \\
+	&\jdeq \letexp{t \otimes f}{s}{(t_{T(x') \strto T(x)} \otimes \letexp{\id_{y' \strto z'}}{f}{\id_{y \strto z}})}
+\end{align*}
+We now have equal components on the left. On the right, we need to prove
+\begin{equation}
+	f_{\mor A(y', z') \strto \mor A(y, z)} \jdeq \letexp{\id_{y' \strto z'}}{f}{\id_{y \strto z}},
+\end{equation}
+of signature
+\begin{equation}
+	z' \strto z : A, y \strto y' : A \cb f : \mor A(y', z') \vdash \mor A(y, z).
+\end{equation}
+But this is just an $\eta$-law. $\square$
+
+%In the other direction, we connect at $w$. This direction holds if let-binders commute with everything, which seems legitimate (do we typically have this property in a sequent calculus?), as well as $\eta$-laws:
+%\todoi{Nonsense?}
+%\begin{align*}
+%	&(x \strto y, [\letexp{(x' \strto y', s)}{q}{\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(w)}}}}]_{T(w) \strto T(x)} \otimes \id_{y \strto z}) \\
+%	&\jdeq (x \strto y, [\letexp{(x' \strto y', s)}{q}{\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(x)}}}}] \otimes \id_{y \strto z}) \\
+%	&\jdeq \letexp{(x' \strto y', s)}{q}{(x \strto y, [\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(x)}}}] \otimes \id(y \strto z))} \\
+%	&\jdeq \letexp{(x' \strto y', s)}{q}{(x \strto y, [\letexp{t \otimes f}{s}{\letexp{\id_{y' \strto z'}}{f}{t_{T(x') \strto T(x)}}} \otimes \id(y \strto z)])} \\
+%%	&\jdeq \letexp{(x' \strto y', s)}{q}{
+%%		\letexp{t \otimes f}{s}{
+%%			\letexp{\id_{y' \strto z'}}{f}{
+%%				(x \strto y, t_{T(x') \strto T(x)} \otimes \id_{y \strto z})
+%%			}
+%%		}
+%%	}
+%\end{align*}
+
+\subsection{End type}
+\todoi{Not up-to-date}
 Formation rule:
 \begin{mathpar}
 	\inferrule{
