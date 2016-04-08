@@ -50,6 +50,11 @@
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \newcommand\triv{\_}
+\newcommand\forgetpandm{\downarrow^{\ps\ms}}
+\newcommand\forgetpm{\downarrow^{\pms}}
+\newcommand\complete{\uparrow}
+\newcommand\samestring{\leftrightarrow}
+
 \mprset{flushleft}
 
 
@@ -94,18 +99,31 @@ r & = & \uns \combine r \\
 \end{array}
 \]
 
+We will also need operations that drop things
+\[
+\begin{array}{lll}
+\forgetpm \pms & = & \uns \\
+\forgetpm r & = & r \text{ otherwise } \\
+\\ 
+\forgetpandm \ps & = & \uns \\
+\forgetpandm \ms & = & \uns \\
+\forgetpandm r & = & r \text{ otherwise } \\
+\end{array}
+\]
+
+
 We write $\Psi^{v}$ to indicate that ${v}$ is the vector of variances on
-the assumptions in $\Psi$, and write $v_1 \combine v_2$ for combining
-variances pointwise.  When $x$ comes from a context $\Psi$, we write
-$x^v$ for the vector whose $x$ component is $v$ and is $\uns$
-otherwise.  
+the assumptions in $\Psi$, and write $\combine$, $\flip{}$, $\forgetpm$,
+$\forgetpandm$ for the pointwise operation on vectors.  When $x$ comes
+from a context $\Psi$, we write $x^v$ for the vector whose $x$ component
+is $v$ and is $\uns$ otherwise.  When we write an $r$ in place of a
+vector, that means repeat $r$ the appropriate number of times.
 
-When we write an $r$ in place of a vector, that means repeat $r$ the
-appropriate number of times.  
-
-We write $p$ for a vector containing no $\pms$'s.  Note that $\flip{p}
-\combine p$ is always defined and is a vector containing only $\pms$'s
-and $\uns$'s (which we write as $d$).  
+We write $p$ for a vector containing no $\pms$'s, and $d$ for a vector
+containing only $\pms$ and $\uns$.  Note that $\flip{p} \combine p$ is
+always defined and is a $d$.  We write $\complete v := v \combine
+\flip{(\forgetpm v)}$ for the vector where every $\ps$ or $\ms$ in $v$
+has been replaced by a $\pm$.
 
 The operation $\combine$ is commutative by definition.
 For its associativity, note that if $(r_1 \combine r_2) \combine r_3$ is defined, then at least one of $r_1,r_2,r_3$ must be $\uns$, since if $r_1\neq\uns\neq r_2$ then $r_1\combine r_2 = \pms$, hence $r_3$ must be $\uns$.
@@ -150,29 +168,37 @@ with different resources, because we can weaken.
 \subsection*{Renamings}
 
 Judgements with $\Psi$ on the left are supposed to respect the following
-renamings:
+renamings.  In this context, renamings (variable for variable
+substitutions) are all isomorphisms.
+
+First, we write $\vec{x}$ for a thing that can be substituted for a
+single variable, which is either 0,1, or 2 variables:
 \begin{mathpar}
-\inferrule*{ }
-           {\Psi^{\uns} \vdash \cdot : \cdot}
+\inferrule{ }
+          {\Psi^\uns \types \triv \uncol A}
 \and
-\inferrule*{\Psi \vdash \rho : \Psi' }
-           {\Psi \vdash (\rho,\triv/x) : (\Psi', x \uncol A)}
-\and 
-\inferrule*{\Psi^{v'} \vdash \rho : \Psi' \and 
-             v = v' \combine y\p
-           }
-           {\Psi^{v} \vdash (\rho,y/x) : (\Psi', x \pcol A)}
+\inferrule{ }
+          {\Psi^{x\p} \types x \pcol A}
 \and
-\inferrule*{\Psi^{v'} \vdash \rho : \Psi' \and 
-             v = v' \combine y\m
-           }
-           {\Psi^{v} \vdash (\rho,y/x) : (\Psi', x \mcol A)}
-\and 
-\inferrule*{\Psi^{v'} \vdash \rho : \Psi'  \\
-             v = {v'} \combine y\m \combine z\p 
-           }
-           {\Psi^{v} \vdash (\rho,(y,z)/x) : (\Psi',x \pmcol A)}
+\inferrule{ }
+          {\Psi^{x\m} \types x \mcol A}
 \and
+\inferrule{ }
+          {\Psi^{y\m \combine z\p} \types (y,z) \pmcol A}
+\end{mathpar}
+Using this, the rules for renamings are
+\begin{mathpar}
+\inferrule{ }
+          {\Psi^{\uns} \vdash \cdot : \cdot}
+\and
+\inferrule{\Psi^{v_1} \vdash \rho : \Psi'  \\
+            \Psi^{v_2} \vdash \vec{x} \vcol r A \\
+             v = {v_1} \combine v_2
+           }
+           {\Psi^{v} \vdash (\rho,\vec{x}/x) : (\Psi',x \vcol r A)}
+\end{mathpar}
+
+\begin{mathpar}
 \inferrule*[right=admissible?]
            {\Psi \vdash \rho : \Psi' }
            {\Psi, x \uncol A \vdash \rho : \Psi' } 
@@ -185,6 +211,10 @@ renamings:
            {\Psi \vdash \rho' : \Psi' \and
             \Psi' \vdash \rho : \Psi''}
            {\Psi \vdash \rho[\rho'] : \Psi'' }
+\and
+\inferrule*[right=admissible? (not used yet)]
+           {\Psi \vdash \rho' : \Psi'}
+           {\Psi' \vdash \rho'^{-1} : \Psi}
 \end{mathpar}
 
 The renaming for the empty context is well-formed if all of the
@@ -194,12 +224,13 @@ The renaming for extension by a $\uns$ variable gives
 \emph{strengthening} for $x \uncol A$ --- we can supply nothing for it,
 because it can never be used.  Dually, the renaming that gives weakening
 when applied to a judgement should be admissible for the rest of the
-rules.  
+rules.
 
-The renaming for a context extension with $x \pcol A$ says that you need
-to spend a $\ps$ use of an assumption $y$ in the context, with whatever
-is left over being used in the rest of the renaming.  Similarly for
-$\ms$ variables.  For example, we have
+Unpacking the rule for context extension together with the rules for
+$\vec{x}$, the renaming for a context extension with $x \pcol A$ says
+that you need to spend a $\ps$ use of an assumption $y$ in the context,
+with whatever is left over being used in the rest of the renaming.
+Similarly for $\ms$ variables.  For example, we have
 \[
 \inferrule*{ \inferrule*{x \uncol A \vdash \cdot \\
                          + = \times \combine +}
@@ -208,7 +239,6 @@ $\ms$ variables.  For example, we have
            }
            { x \pmcol A \vdash (\cdot, x / y, x / z) : (y \pcol A , z \mcol A)}
 \]
-
 The final rule allows ``unpairing'' an $x \pmcol A$ variable,
 substituting two variables for its contravariant and covariant aspects.
 As a special case these might be two uses of the same $\pms$ variable.
@@ -434,6 +464,34 @@ $\flip{(\flip{r})} = r$ in the $\ps$ and $\ms$ cases.
 For the final case, we use $\flip{v} = \flip{v_1} \combine \flip{v_2}$
 and commutativity and involution.  
 
+\subsubsection*{Merging}
+
+We should also have an inverse operation
+\begin{mathpar}
+\inferrule*[right=admissible]
+           { v = v_1 \combine v_2\\
+             v' = v_1' \combine v_2'  \\ 
+             \Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}\\
+             \Psi^{v_2} \vdash \theta_2 : {\Psi'}^{v_2'}
+           }
+           {
+            {\Psi}^{v} \types \theta_1 \combine \theta_2 : {\Psi'}^{v'}
+           }
+\end{mathpar}
+That it is inverse means that if $\theta = \theta_1 \combine \theta_2$
+(referring to the splitting operation defined above) then $\theta_1
+\combine \theta_2$ (referring to the merging operation defined here) is
+equal to the original $\theta$, and that merging $\theta_1$ and
+$\theta_2$ and then splitting it gives back the same $\theta_1$ and
+$\theta_2$.  Because of this, using the same notation for splitting and
+merging is justified.  FIXME: It might be better to define
+splitting/merging as a single judgement that is proved functional in
+both directions (with the $v$ splitting an input for one and an output
+for the other).  
+
+
+
+
 \subsection*{Type Contexts}
 
 \begin{mathpar}
@@ -465,7 +523,7 @@ and commutativity and involution.
 \\ 
 \end{mathpar}
 
-\subsection*{Structural Rules}
+\subsection*{Identity Rules}
 
 \begin{mathpar}
 \inferrule{ }
@@ -475,6 +533,8 @@ and commutativity and involution.
           {\Psi^{(\flip{p} \combine p)} \cb N \types N}
 \\
 \end{mathpar}
+
+\subsection*{Substitution for Categories}
 
 In the next two rules, let $J$ be $a : A$ or $\Gamma \ctx$ or $M \type$
 or $(\Gamma \vdash M) \ok$.
@@ -521,36 +581,80 @@ Using this, we should have
            {\Psi \cb (\Gamma \vdash M)[\sigma]}
 \end{mathpar}
 
-\subsubsection*{Cut}
+\subsection*{Cut for Types}
+
+We write $x \in \Psi$ to mean $\Psi$ contains $x \vcol r A$ for some
+(FIXME: non-$\uns$?) $r$.  Under the prespposition that $\Psi^{v_1}
+\vdash \rho : \Psi^{v_2}$ (i.e. $\rho$ is an isomorphism between two
+parts of $\Psi$) and $x,y \in \Psi$ , we define the relation $x
+\samestring y [ \rho ]$, which means $x$ and $y$ are on the same string
+when the two parts of $\Psi$ are glued together by $\rho$.  We write
+$\rho(x,y)$ to mean $y/x$ or $(y,z)/x$ or $(z,y)/x$ is one of the
+substitutions in $\rho$.  
+
+\begin{mathpar}
+\infer{ }
+      { x \samestring x [ \rho ]}
+\and 
+\infer{ y \samestring x [ \rho ]}
+      { x \samestring y [ \rho ]}
+\and 
+\infer{ x \samestring y [ \rho ] \and 
+        y \samestring z [ \rho ] 
+      }
+      { x \samestring z [ \rho ]}
+\and
+\infer{ \rho(x,y) } 
+      { x \samestring y [ \rho ]}
+\end{mathpar}
 
 \begin{mathpar}
 \inferrule*[right=admissible?]
-           {d = d_1 \combine d_2 \\\\
-             \Psi^{d_1} \types (\Gamma_1 \vdash M) \ok \\
-             \Psi^{d_1} \cb \Gamma_1 \vdash M \\
-             \Psi^{d_2} \types (\Gamma_2, M[\rho] \vdash N) \ok \\ \\
-             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N
+           { d = d_1 \combine d_2 \and 
+             d_1 = v_1 \combine v_1' \and  
+             d_2 = v_2 \combine v_2' \\\\
+             \Psi^{\flip{v_1}} \types \Gamma_1 \ctx \and
+             \Psi^{v_1'} \types M \type \and
+             \Psi^{\flip{v_2}} \types (\Gamma_2 \types N) \ok \and
+             \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\\\
+             \Psi^{d_1} \cb \Gamma_1 \vdash M \and 
+             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N \\\\
+             \Psi^{\flip{\forgetpm v_1}} \types \rho_{12} : \Psi^{\forgetpm{v_2}} \and
+             (\forall x,y \in \Psi, \rho_{12}(x,y) \: \supset \: x \samestring y [\rho] ) \and
+             (\forall x \in \Psi^{v_1' \combine v_2'}. \exists y \in \Psi^{v_1}. x \samestring y [\rho] ) \and
            }
-           {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
+           {\Psi^{(\complete v_1) \combine (\forgetpandm v_2)} \cb (\Gamma_1,\Gamma_2 \vdash N)[1_{v_1} \combine \rho' \combine 1_{\forgetpandm {v_2}}]}
 \end{mathpar}
 
-For the premise to be well formed, it must be the case that
-\[
-\begin{array}{l}
-d_1 = v_1 \combine v_1' \\ 
-d_2 = v_2 \combine v_2' \combine v_2'' \\ 
-\Psi^{\flip{v_1}} \types \Gamma_1 \ctx \\ 
-\Psi^{v_1'} \types M \type \\ 
-\Psi^{\flip{v_2}} \types \Gamma_2 \ctx \\
-\Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\
-\Psi^{v_2''} \types N \type \\
-\end{array}
-\]
+FIXME: this is too restrictive: something can start and end on the same
+side.  
 
-Therefore, $\Psi^{v_1 \combine v_2 \combine v_2''} \types
-(\Gamma_1,\Gamma_2 \vdash N) \ok$.  So the unification needs to produce
-a context $\Psi_0^d$ and a renaming $\Psi_0 \vdash \rho_0 : \Psi^{v_1
-  \combine v_2 \combine v_2''}$.
+The first two lines are just the preconditions for the two terms being
+cut together on the third line: $d_1$ and $d_2$ are two independent
+parts of $\Psi$, which each are split, with some resources going towards
+$M$ and the the leftovers going towards the rest of the sequent.
+Because the cut formula $M$ occurs in two different contexts, we use a
+renaming $\rho$ to match up the variables.  
+
+In the conlusion of the cut, the context includes (a) all $\pms$
+variables from $v_1$, and (b) all $\pms$ variables from $v_2$, and (c)
+all variables from $v_1$ that were either $\ps$ or $\ms$, now promoted
+to $\pms$.  The idea is that the non-$\pms$ variables from $v_1$ and
+$v_2$ are now paired up, and we are choosing (somewhat arbitrarily) to
+use the sames from $v_1$ for them.  Formally, recall that $\forgetpandm
+v_2$ keeps only the $\pms$ variables, and $\complete v_1$ = $v_1
+\combine \flip{\forgetpm{v_1}}$ (where $\forgetpm{v_1}$ keeps only the
+$\ps$ and $\ms$ variables) completes $v_1$ with every $\ps$ or $\ms$
+becoming a $\pm$.  The renaming $\rho_{12}$ matches up the $\ps$ or
+$\ms$ variables from $v_2$ with the variables from $v_1$ that they will
+be paired with.
+
+A $\rho_{12}$ satisfying the conditions should be unique if it exists.
+
+Algorithmically, given the $\rho$, we compute a $\rho'$ option by
+computing the equivalence classes of $x \samestring y [ \rho ]$,
+and then testing the conditions.  FIXME: check/explain
+
 
 \subsection*{Morphism types}
 
