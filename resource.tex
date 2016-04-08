@@ -50,9 +50,6 @@
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \newcommand\triv{\_}
-\newcommand\forgetpandm{\downarrow^{\ps\ms}}
-\newcommand\forgetpm{\downarrow^{\pms}}
-\newcommand\complete{\uparrow}
 \newcommand\samestring{\leftrightarrow}
 
 \mprset{flushleft}
@@ -99,31 +96,16 @@ r & = & \uns \combine r \\
 \end{array}
 \]
 
-We will also need operations that drop things
-\[
-\begin{array}{lll}
-\forgetpm \pms & = & \uns \\
-\forgetpm r & = & r \text{ otherwise } \\
-\\ 
-\forgetpandm \ps & = & \uns \\
-\forgetpandm \ms & = & \uns \\
-\forgetpandm r & = & r \text{ otherwise } \\
-\end{array}
-\]
-
-
 We write $\Psi^{v}$ to indicate that ${v}$ is the vector of variances on
-the assumptions in $\Psi$, and write $\combine$, $\flip{}$, $\forgetpm$,
-$\forgetpandm$ for the pointwise operation on vectors.  When $x$ comes
-from a context $\Psi$, we write $x^v$ for the vector whose $x$ component
-is $v$ and is $\uns$ otherwise.  When we write an $r$ in place of a
-vector, that means repeat $r$ the appropriate number of times.
+the assumptions in $\Psi$, and write $\combine$ and $\flip{}$ for the
+pointwise operation on vectors.  When $x$ comes from a context $\Psi$,
+we write $x^v$ for the vector whose $x$ component is $v$ and is $\uns$
+otherwise.  When we write an $r$ in place of a vector, that means repeat
+$r$ the appropriate number of times.
 
 We write $p$ for a vector containing no $\pms$'s, and $d$ for a vector
 containing only $\pms$ and $\uns$.  Note that $\flip{p} \combine p$ is
-always defined and is a $d$.  We write $\complete v := v \combine
-\flip{(\forgetpm v)}$ for the vector where every $\ps$ or $\ms$ in $v$
-has been replaced by a $\pm$.
+always defined and is a $d$.  
 
 The operation $\combine$ is commutative by definition.
 For its associativity, note that if $(r_1 \combine r_2) \combine r_3$ is defined, then at least one of $r_1,r_2,r_3$ must be $\uns$, since if $r_1\neq\uns\neq r_2$ then $r_1\combine r_2 = \pms$, hence $r_3$ must be $\uns$.
@@ -584,13 +566,12 @@ Using this, we should have
 \subsection*{Cut for Types}
 
 We write $x \in \Psi$ to mean $\Psi$ contains $x \vcol r A$ for some
-(FIXME: non-$\uns$?) $r$.  Under the prespposition that $\Psi^{v_1}
-\vdash \rho : \Psi^{v_2}$ (i.e. $\rho$ is an isomorphism between two
-parts of $\Psi$) and $x,y \in \Psi$ , we define the relation $x
-\samestring y [ \rho ]$, which means $x$ and $y$ are on the same string
-when the two parts of $\Psi$ are glued together by $\rho$.  We write
-$\rho(x,y)$ to mean $y/x$ or $(y,z)/x$ or $(z,y)/x$ is one of the
-substitutions in $\rho$.  
+non-$\uns$ $r$.  Under the prespposition that $\Psi^{v_1} \vdash \rho :
+\Psi^{v_2}$ (i.e. $\rho$ is an isomorphism between two parts of $\Psi$)
+and $x,y \in \Psi$ , we define the relation $x \samestring y [ \rho ]$,
+which means $x$ and $y$ are on the same string when the two parts of
+$\Psi$ are glued together by $\rho$.  We write $\rho(x,y)$ to mean $y/x$
+or $(y,z)/x$ or $(z,y)/x$ is one of the substitutions in $\rho$.
 
 \begin{mathpar}
 \infer{ }
@@ -615,45 +596,54 @@ substitutions in $\rho$.
              d_2 = v_2 \combine v_2' \\\\
              \Psi^{\flip{v_1}} \types \Gamma_1 \ctx \and
              \Psi^{v_1'} \types M \type \and
-             \Psi^{\flip{v_2}} \types (\Gamma_2 \types N) \ok \and
-             \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\\\
+             \Psi^{\flip{v_2}} \types (\Gamma_2 \types N) \ok \\\\
+             \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \and
+             (\forall x \in \Psi^{v_1' \combine v_2'}. \: \exists y \in \Psi^{v_1 \combine v_2}. \: x = y [ \rho ]) \\\\
              \Psi^{d_1} \cb \Gamma_1 \vdash M \and 
              \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N \\\\
-             \Psi^{\flip{\forgetpm v_1}} \types \rho_{12} : \Psi^{\forgetpm{v_2}} \and
-             (\forall x,y \in \Psi, \rho_{12}(x,y) \: \supset \: x \samestring y [\rho] ) \and
-             (\forall x \in \Psi^{v_1' \combine v_2'}. \exists y \in \Psi^{v_1}. x \samestring y [\rho] ) \and
+             \Psi_0\types \rho_{0} : \Psi^{v_1 \combine v_2} \and
+             (\forall x,y \in \Psi^{v_1 \combine v_2}. \: x \samestring y [\rho] \: \supset \: \rho_0(x) = \rho_0(y)) \and
            }
-           {\Psi^{(\complete v_1) \combine (\forgetpandm v_2)} \cb (\Gamma_1,\Gamma_2 \vdash N)[1_{v_1} \combine \rho' \combine 1_{\forgetpandm {v_2}}]}
+           {\Psi_0^d \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \end{mathpar}
 
-FIXME: this is too restrictive: something can start and end on the same
-side.  
+The first three lines are mostly just the preconditions for the two
+sequents being cut together on the fourth line: $d_1$ and $d_2$ are two
+independent parts of $\Psi$, which each are split, with some resources
+going towards $M$ and the the leftovers going towards the rest of the
+sequent.  Because the cut formula $M$ occurs in two different contexts,
+we use a renaming $\rho$ to match up the variables.  $\rho$ must have
+the property it connects every ``inside'' variable in $\Psi^{v_1'
+  \combine v_2'}$ to one on the outside; this ensures the absence of
+loops (FIXME: check?).  On the fourth line we have the two sequents
+being cut together.  
 
-The first two lines are just the preconditions for the two terms being
-cut together on the third line: $d_1$ and $d_2$ are two independent
-parts of $\Psi$, which each are split, with some resources going towards
-$M$ and the the leftovers going towards the rest of the sequent.
-Because the cut formula $M$ occurs in two different contexts, we use a
-renaming $\rho$ to match up the variables.  
+The result context of the cut is morally the $\rho$-equivalence-classes
+of $\Psi$, but since there is no canonical way to name them (when two
+``outside'' variables are paired, which one disappears?), we build in a
+renaming $\rho_0$, with the condition that it is well-defined on
+$\rho$-equivalence-classes.  In an implementation, a $\rho_0$ satisfying
+this condition could be inferred from $\rho$, using some convention for
+which variables are kept.
 
-In the conlusion of the cut, the context includes (a) all $\pms$
-variables from $v_1$, and (b) all $\pms$ variables from $v_2$, and (c)
-all variables from $v_1$ that were either $\ps$ or $\ms$, now promoted
-to $\pms$.  The idea is that the non-$\pms$ variables from $v_1$ and
-$v_2$ are now paired up, and we are choosing (somewhat arbitrarily) to
-use the sames from $v_1$ for them.  Formally, recall that $\forgetpandm
-v_2$ keeps only the $\pms$ variables, and $\complete v_1$ = $v_1
-\combine \flip{\forgetpm{v_1}}$ (where $\forgetpm{v_1}$ keeps only the
-$\ps$ and $\ms$ variables) completes $v_1$ with every $\ps$ or $\ms$
-becoming a $\pm$.  The renaming $\rho_{12}$ matches up the $\ps$ or
-$\ms$ variables from $v_2$ with the variables from $v_1$ that they will
-be paired with.
+%% In the conlusion of the cut, the context includes (a) all $\pms$
+%% variables from $v_1$, and (b) all $\pms$ variables from $v_2$, and (c)
+%% all variables from $v_1$ that were either $\ps$ or $\ms$, now promoted
+%% to $\pms$.  The idea is that the non-$\pms$ variables from $v_1$ and
+%% $v_2$ are now paired up, and we are choosing (somewhat arbitrarily) to
+%% use the sames from $v_1$ for them.  Formally, recall that $\forgetpandm
+%% v_2$ keeps only the $\pms$ variables, and $\complete v_1$ = $v_1
+%% \combine \flip{\forgetpm{v_1}}$ (where $\forgetpm{v_1}$ keeps only the
+%% $\ps$ and $\ms$ variables) completes $v_1$ with every $\ps$ or $\ms$
+%% becoming a $\pm$.  The renaming $\rho_{12}$ matches up the $\ps$ or
+%% $\ms$ variables from $v_2$ with the variables from $v_1$ that they will
+%% be paired with.
 
-A $\rho_{12}$ satisfying the conditions should be unique if it exists.
+%% A $\rho_{12}$ satisfying the conditions should be unique if it exists.
 
-Algorithmically, given the $\rho$, we compute a $\rho'$ option by
-computing the equivalence classes of $x \samestring y [ \rho ]$,
-and then testing the conditions.  FIXME: check/explain
+%% Algorithmically, given the $\rho$, we compute a $\rho'$ option by
+%% computing the equivalence classes of $x \samestring y [ \rho ]$,
+%% and then testing the conditions.  FIXME: check/explain
 
 
 \subsection*{Morphism types}
