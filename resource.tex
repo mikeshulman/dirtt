@@ -51,7 +51,7 @@
 \newcommand{\gray}[1]{\textcolor{gray}{#1}}
 \newcommand\triv{\_}
 \newcommand\samestring{\leftrightarrow}
-\newcommand{\unif}[4]{#1\doteq #2\,\text{via }#3\cb #4}
+\newcommand{\unif}[4]{#1\doteq #2\,\mathsf{ via }\,#3\cb #4}
 \mprset{flushleft}
 
 
@@ -627,16 +627,55 @@ $\rho$-equivalence-classes.  In an implementation, a $\rho_0$ satisfying
 this condition could be inferred from $\rho$, using some convention for
 which variables are kept.
 
-\subsection{Cut For Types (Unification)}
+\subsection*{Cut For Types (Unification)}
 
-Before we can state a cut rule, we introduce a new judgement and rules for deriving valid string
-diagram compositions. The new judgement has the form $\unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}$,
-where $d_1=v_1\combine v_1'$, $d_2=v_2\combine v_2'$, $\Psi^{\flip{v_2'}} \types \rho:\Psi^{v_1'}$,
-and $\Psi^d \types \rho_0:\Psi^{v_1\combine v_2}$. This should be read as stating that $\Psi^d$ is
-the result of composing $\Psi^{d_1}$ and $\Psi^{d_2}$ by gluing along $\rho$, and that the
-composition introduced no loops.
+Before we can state a cut rule, we introduce a new judgement and rules
+for deriving valid string diagram compositions. The new judgement has
+the form $\unif{\Psi^{d_1=v_1\combine v_1'}}{\Psi^{d_2 = v_2\combine
+    v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}$, under the presupposition that
+$d_1 \combine d_2$ is defined ($d_1$ and $d_2$ are independent) and $d_1
+= v_1 \combine v_1'$, $d_2 = v_2 \combine v_2'$ and $\Psi^{\flip{v_2'}}
+\types \rho:\Psi^{v_1'}$, and $\Psi^d \types \rho_0:\Psi^{v_1\combine
+  v_2}$. This should be read as stating that $\Psi^d$ is the result of
+composing $\Psi^{d_1}$ and $\Psi^{d_2}$ by gluing along $\rho$, and that
+the composition introduced no loops.  Formally, this judgement is a
+relation on $(\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho,d,\rho_0)$---$\Psi$
+occuring three times and the $=$ and $\combine$ and $\vdash$ in the
+judgement are just notation.
 
 The rules for this judgement are
+\begin{mathpar}
+  \inferrule{ }
+            {
+              \unif{\Psi^{d_1 = d_1 \combine \uns}}{\Psi^{d_2 = d_2 \combine \uns}}{\overline{\triv/x}}{({\Psi^{d_1 \combine d_2}} \vdash 1)}
+            }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1 = v_1 \combine v_1'}}{\Psi^{d_2 = v_2 \combine v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{(d_1\combine x\pm) = (v_1 \combine x^{\flip{b}}) \combine (v_1' \combine x^{b})}}
+         {\Psi^{(d_2\combine y\pm) = (v_2 \combine y^b) \combine (v_2' \combine y^{\flip{b}})}}
+         {(\rho \combine (y/x))}
+         {(\Psi^{d \combine x\pm} \vdash \rho_0 \combine (x/x) \combine (x/y))}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1}}{\Psi^{d_2\combine x\pm}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine z\pm}}{\Psi^{d_2\combine x\pm\combine y\pm}}{(\rho,(x,y)/z)}{\rho_0}
+  }
+  \\
+  \inferrule{
+    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
+  }{
+    \unif{\Psi^{d_1\combine x\pm\combine y\pm}}{\Psi^{d_2\combine
+    z\pm}}{(\rho,z/x,z/y)}{\rho_0}
+  }
+\end{mathpar}
+
+In the first case, the splitting puts everything into $v_1$ and $v_2$,
+and the renaming is all $\triv/x$ for the unused variables.  
+
 \begin{mathpar}
   \inferrule{ }{
     \unif{\Psi^{d_1}}{\Psi^{d_2}}{(\ec)}{1_{\Psi^{d_1\combine d_2}}}
