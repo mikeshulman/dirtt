@@ -194,7 +194,7 @@ Using this, the rules for renamings are
             \Psi' \vdash \rho : \Psi''}
            {\Psi \vdash \rho[\rho'] : \Psi'' }
 \and
-\inferrule*[right=admissible? (not used yet)]
+\inferrule*[right=admissible?]
            {\Psi \vdash \rho' : \Psi'}
            {\Psi' \vdash \rho'^{-1} : \Psi}
 \end{mathpar}
@@ -689,7 +689,6 @@ The rules for this judgement are
             {
               \unif{\Psi^{d_1 = d_1 \combine \uns}}{\Psi^{d_2 = d_2 \combine \uns}}{\overline{\triv/x}}{({\Psi^{d_1 \combine d_2}} \vdash 1)}
             }
-  \\
 
   \inferrule{
     \unif{\Psi^{d_1 = v_1 \combine v_1'}}{\Psi^{d_2 = v_2 \combine v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}
@@ -701,7 +700,8 @@ The rules for this judgement are
   }
 
   \inferrule{
-        (\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}) =^{d_2 = v_2 \combine v_2'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}) \\\\
+        (\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine
+    x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p)= v_2 \combine v_2'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}) \\\\
         \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = v_3 \combine v_3'}}{\rho[\flip{\rho_3'}]}{(\Psi^d \vdash \rho_0)}
   }{
     \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
@@ -710,13 +710,15 @@ The rules for this judgement are
          {(\Psi_d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
   }
 
-  %% \\
-  %% \inferrule{
-  %%   \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
-  %% }{
-  %%   \unif{\Psi^{d_1\combine x\pm\combine y\pm}}{\Psi^{d_2\combine
-  %%   z\pm}}{(\rho,z/x,z/y)}{\rho_0}
-  %% }
+  \inferrule{
+        (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
+        \unif{\Psi^{(d_1 \combine x\pm)=v_3 \combine v_3'}}{\Psi^{(d_2 = v_2 \combine v_2')}}{\rho_3'^{-1}[\rho]}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{d_1\combine x\pm\combine y\pm = (v_1 \combine (v_1' \combine (x\p \combine y\m)))}}
+         {\Psi^{d_2\combine z\pm = v_2 \combine (v_2' \combine z\pm)}}
+         {(\rho \combine z/x \combine z/y)}
+         {(\Psi_d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+  }
 \end{mathpar}
 
 Reading the rules bottom-to-top as an algorithm for finding $d$ and
@@ -758,14 +760,15 @@ output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
 with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
 \combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.
 
-Rule 3: Why it type checks: We have $\Psi^{\flip{v_2'}} \vdash \rho :
-\Psi^{v_1'}$ and $d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
-However, we can't make a recursive call with this, because $d_2 \combine
-(x\m \combine y\p)$ is not $d$-context, so we first need to merge $x$
-and $y$.  $x$ and $y$ might occur in either $v_2$ or $v_2'$, so it seems
-like we need to do a bunch of cases, to see where to do the
-substitution.  However, a slick way to handle this is to start with the
-renaming
+Rule 3: Two variables on the right are getting glued together by an
+internal line on the left.  Why it type checks: We have
+$\Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'}$ and $d_2 \combine (x\m
+\combine y\p) = v_2 \combine v_2'$.  However, we can't make a recursive
+call with this, because $d_2 \combine (x\m \combine y\p)$ is not
+$d$-context, so we first need to merge $x$ and $y$.  $x$ and $y$ might
+occur in either $v_2$ or $v_2'$, so it seems like we need to do a bunch
+of cases, to see where to do the substitution.  However, a slick way to
+handle this is to start with the renaming
 \[
 \Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}
 \]
@@ -791,6 +794,14 @@ Finally we compose with
 \Psi^{v_1 \combine v_3} \vdash 1_{v_1} \combine \rho_3 : \Psi^{v_1 \combine v_2}
 \end{mathpar}
 to get the result.
+
+FIXME: it seems arbitrary that we pick $x$ and not $y$ here?
+
+Rule 4: This is symmetric to rule 3, except here two variables on the
+left are getting glued together by an internal line on the right.  
+The code is basically dual, except we use $p_3'^{-1}$.  
+
+FIXME: how exactly does this preclude loops?
 
 \red{
 Original rules for comparison:
