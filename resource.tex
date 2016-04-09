@@ -228,6 +228,46 @@ Thus, in all of the judgements $\Psi \vdash J$, $x \pmcol A$ is
 equivalent to $y \mcol A, z \pcol A$, but the former keeps track of
 which assumptions will be correlated by the term judgement.
 
+FIXME: Just like for substitutions, we'll want
+
+\begin{mathpar}
+\inferrule*[right=admissible]
+           {v' = v_1' \combine v_2'  \\ 
+            {\Psi}^{v} \types \rho : {\Psi'}^{v'}
+           }
+           { v = v_1 \combine v_2\\
+             \Psi^{v_1} \vdash \rho_1 : {\Psi'}^{v_1'}\\
+             \Psi^{v_2} \vdash \rho_2 : {\Psi'}^{v_2'}
+           }
+
+\inferrule*[right=admissible]
+           { v = v_1 \combine v_2\\
+             v' = v_1' \combine v_2'  \\ 
+             \Psi^{v_1} \vdash \rho_1 : {\Psi'}^{v_1'}\\
+             \Psi^{v_2} \vdash \rho_2 : {\Psi'}^{v_2'}
+           }
+           {
+            {\Psi}^{v} \types \rho_1 \combine \rho_2 : {\Psi'}^{v'}
+           }
+\end{mathpar}
+
+Which are mutually inverse, so it isn't cheating too badly to write $\rho =^{v' = v_1' \combine v_2'} (\rho_1 \combine \rho_2)$ to mean $\rho_1$ and $\rho_2$ are the outputs
+of the first.  FIXME: define as one relation 
+$\textsf{split}(\rho,\rho_1,\rho_2)$ on 
+$v' = v_1' \combine v_2'$, 
+${\Psi}^{v} \types \rho : {\Psi'}^{v'}$,
+$v = v_1 \combine v_2$,
+$\Psi^{v_1} \vdash \rho_1 : {\Psi'}^{v_1'}$,
+$\Psi^{v_2} \vdash \rho_2 : {\Psi'}^{v_2'}$
+and then prove it functional with two different modes?
+
+Also
+\begin{mathpar}
+\inferrule{\Psi \vdash \theta : \Psi'}
+          {\flip{\Psi} \vdash \flip{\theta} : \flip{\Psi'}}
+\end{mathpar}
+
+
 \subsection*{Substitutions}
 
 The technically easiest thing is to consider total substitutions (a
@@ -650,6 +690,7 @@ The rules for this judgement are
               \unif{\Psi^{d_1 = d_1 \combine \uns}}{\Psi^{d_2 = d_2 \combine \uns}}{\overline{\triv/x}}{({\Psi^{d_1 \combine d_2}} \vdash 1)}
             }
   \\
+
   \inferrule{
     \unif{\Psi^{d_1 = v_1 \combine v_1'}}{\Psi^{d_2 = v_2 \combine v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}
   }{
@@ -660,12 +701,13 @@ The rules for this judgement are
   }
 
   \inferrule{
-    \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = (v_2 \combine x\pm) \combine v_2'}}{\rho[1_{v_1 \combine v_2} \combine x/x \combine x/y]}{(\Psi^d \vdash \rho_0)}
+        (\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}) =^{d_2 = v_2 \combine v_2'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}) \\\\
+        \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = v_3 \combine v_3'}}{\rho[\flip{\rho_3'}]}{(\Psi^d \vdash \rho_0)}
   }{
     \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
-         {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (x\m \combine y\p)) \combine (v_2' \combine (x\p \combine y\m))}}
+         {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (v_2' \combine (x\p \combine y\m)))}}
          {(\rho \combine (x,y)/z)}
-         {(\Psi_d \vdash (1_{v_1 \combine v_2} \combine x/x \combine x/y)[\rho_0])}
+         {(\Psi_d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
   }
 
   %% \\
@@ -676,8 +718,6 @@ The rules for this judgement are
   %%   z\pm}}{(\rho,z/x,z/y)}{\rho_0}
   %% }
 \end{mathpar}
-
-FIXME: missing some possibilities?
 
 Reading the rules bottom-to-top as an algorithm for finding $d$ and
 $\rho_0$, to get the recursion to go through, it seems necessary to
@@ -696,7 +736,7 @@ every other $z \in \Psi$ (formally, this has to be defined by induction
 on $\Psi$).
 
 Operationally, we think of $\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho$ as
-inputs, and $d,\rho_0$ as outputs.  FIXMEL: when can the rules fail?
+inputs, and $d,\rho_0$ as outputs.  FIXME: when can the rules fail?
 
 In the first rule, if the given splitting puts all the resources in
 $v_1$ and $v_2$, and $v_1'$ and $v_2'$ are $\uns$ in each component,
@@ -716,13 +756,41 @@ the renaming splits to include $y/x$, then we are joining the $x$ string
 and the $y$, so we want to identify the external $x$ and $y$ in the
 output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
 with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
-\combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.  FIXME:
-missing cases when both $x$'s are internal and when both $y$'s are
-internal?  
+\combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.
 
-Rule 3: FIXME missing cases when $x$ is internal and/or $y$ is internal?
-FIXME: does it matter whether we replace both both $x$ and $y$ with $x$
-or with $y$?
+Rule 3: Why it type checks: We have $\Psi^{\flip{v_2'}} \vdash \rho :
+\Psi^{v_1'}$ and $d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
+However, we can't make a recursive call with this, because $d_2 \combine
+(x\m \combine y\p)$ is not $d$-context, so we first need to merge $x$
+and $y$.  $x$ and $y$ might occur in either $v_2$ or $v_2'$, so it seems
+like we need to do a bunch of cases, to see where to do the
+substitution.  However, a slick way to handle this is to start with the
+renaming
+\[
+\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}
+\]
+and then split it along the known context splitting 
+$d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
+to get
+\begin{mathpar}
+d_2 \combine x\pm = v_3 \combine v_3' \and
+\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} \and
+\Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}
+\end{mathpar}
+This will push the appropriate part of $x/x$ and $x/y$ into the
+appropriate half.  Then   
+\begin{mathpar}
+\Psi^{\flip{v_3'}} \vdash \rho[\flip{\rho_3'}] : \Psi^{v_1'}
+\end{mathpar}
+so we can recur, getting 
+\begin{mathpar}
+\Psi^{d} \vdash \rho_0 : \Psi^{v_1 \combine v_3}
+\end{mathpar}
+Finally we compose with 
+\begin{mathpar}
+\Psi^{v_1 \combine v_3} \vdash 1_{v_1} \combine \rho_3 : \Psi^{v_1 \combine v_2}
+\end{mathpar}
+to get the result.
 
 \red{
 Original rules for comparison:
