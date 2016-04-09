@@ -659,13 +659,15 @@ The rules for this judgement are
          {(\Psi^{d \combine x\pm} \vdash \rho_0 \combine (x/x) \combine (x/y))}
   }
 
-  Others TODO
-  %% \\
-  %% \inferrule{
-  %%   \unif{\Psi^{d_1}}{\Psi^{d_2\combine x\pm}}{\rho}{\rho_0}
-  %% }{
-  %%   \unif{\Psi^{d_1\combine z\pm}}{\Psi^{d_2\combine x\pm\combine y\pm}}{(\rho,(x,y)/z)}{\rho_0}
-  %% }
+  \inferrule{
+    \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = (v_2 \combine x\pm) \combine v_2'}}{\rho[1_{v_1 \combine v_2} \combine x/x \combine x/y]}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
+         {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (x\m \combine y\p)) \combine (v_2' \combine (x\p \combine y\m))}}
+         {(\rho \combine (x,y)/z)}
+         {(\Psi_d \vdash (1_{v_1 \combine v_2} \combine x/x \combine x/y)[\rho_0])}
+  }
+
   %% \\
   %% \inferrule{
   %%   \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
@@ -674,6 +676,53 @@ The rules for this judgement are
   %%   z\pm}}{(\rho,z/x,z/y)}{\rho_0}
   %% }
 \end{mathpar}
+
+FIXME: missing some possibilities?
+
+Reading the rules bottom-to-top as an algorithm for finding $d$ and
+$\rho_0$, to get the recursion to go through, it seems necessary to
+process the renaming $\rho$ in the conclusion by \emph{splitting} it,
+not by case-analyzing it as $\rho,\vec{x}/x$.  This way, the premises
+are in the same context $\Psi$ as the conclusion, but under different
+resources.  If we case-analyze as $\rho,\vec{x}/x$, then we would need
+to generalize the operation somehow, because the codomain of $\rho$
+would be different of a different length than its domain.  The judgement
+is therefore non-deterministic, because the same renaming can be split
+in many different ways.  Conjecture: all of the results are isomorphic.
+
+We write $b$ for $\ps$ or $\ms$.  We write $\Psi^{y^b} \types y/x :
+\Psi^{x^b}$ for the renaming given by $y/x$ along with $\triv/z$ for
+every other $z \in \Psi$ (formally, this has to be defined by induction
+on $\Psi$).
+
+Operationally, we think of $\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho$ as
+inputs, and $d,\rho_0$ as outputs.  FIXMEL: when can the rules fail?
+
+In the first rule, if the given splitting puts all the resources in
+$v_1$ and $v_2$, and $v_1'$ and $v_2'$ are $\uns$ in each component,
+then $\rho$ can only consist of $\triv/x$ for each variable $x$.  In
+this case, we return the identity renaming.
+
+Draw $d_1 = v_1 \combine v_1'$ and $d_2 = v_2 \combine v_2'$ like in
+Patrick's email, with vertical columns for the aspects in $v_1$, $v_1'$,
+$v_2'$, and then $v_2$ from left to right.  We say that the $v_1'$ and
+$v_2'$ aspects are ``internal'' and the $v_1$ and $v_2$ are external
+(they will be in the boundary of the result, but maybe connected up).
+
+Rule 2: if the given $d_1$ and $d_2$ each have a distinguished variable
+$x$ (split with half going in $v_1$ and the other half in $v_1'$) and
+$y$ (split with half going in $v_2$ and the other half in $v_2'$), and
+the renaming splits to include $y/x$, then we are joining the $x$ string
+and the $y$, so we want to identify the external $x$ and $y$ in the
+output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
+with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
+\combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.  FIXME:
+missing cases when both $x$'s are internal and when both $y$'s are
+internal?  
+
+Rule 3: FIXME missing cases when $x$ is internal and/or $y$ is internal?
+FIXME: does it matter whether we replace both both $x$ and $y$ with $x$
+or with $y$?
 
 \red{
 Original rules for comparison:
