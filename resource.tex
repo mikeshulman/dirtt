@@ -707,17 +707,18 @@ The rules for this judgement are
     \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
          {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (v_2' \combine (x\p \combine y\m)))}}
          {(\rho \combine (x,y)/z)}
-         {(\Psi_d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
   }
 
   \inferrule{
-        (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
+%%      (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
+        ((1_{d_1} \combine (x/x \combine x/y))) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\rho_3 , \rho_3') \\\\
         \unif{\Psi^{(d_1 \combine x\pm)=v_3 \combine v_3'}}{\Psi^{(d_2 = v_2 \combine v_2')}}{\rho_3'^{-1}[\rho]}{(\Psi^d \vdash \rho_0)}
   }{
     \unif{\Psi^{d_1\combine x\pm\combine y\pm = (v_1 \combine (v_1' \combine (x\p \combine y\m)))}}
          {\Psi^{d_2\combine z\pm = v_2 \combine (v_2' \combine z\pm)}}
          {(\rho \combine z/x \combine z/y)}
-         {(\Psi_d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
   }
 \end{mathpar}
 
@@ -839,7 +840,7 @@ The cut rule is then
              \Psi^{d_1} \cb \Gamma_1 \vdash M \\
              \Psi^{d_2} \types (\Gamma_2, M[\rho] \vdash N) \ok \\ \\
              \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N \\\\
-             \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}
+             \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{(\Psi_0 \vdash \rho_0)}
            }
            {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \end{mathpar}
