@@ -712,7 +712,7 @@ The rules for this judgement are
 
   \inferrule{
 %%      (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
-        ((1_{d_1} \combine (x/x \combine x/y))) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\rho_3 , \rho_3') \\\\
+        (1_{d_1} \combine (x/x \combine x/y)) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\rho_3 , \rho_3') \\\\
         \unif{\Psi^{(d_1 \combine x\pm)=v_3 \combine v_3'}}{\Psi^{(d_2 = v_2 \combine v_2')}}{\rho_3'^{-1}[\rho]}{(\Psi^d \vdash \rho_0)}
   }{
     \unif{\Psi^{d_1\combine x\pm\combine y\pm = (v_1 \combine (v_1' \combine (x\p \combine y\m)))}}
@@ -951,7 +951,6 @@ think more about this.
 \subsection*{Coend}
 
 \begin{mathpar}
-
   \inferrule{
     \Psi, x \pmcol A \types M \type \\
     }{
@@ -964,11 +963,47 @@ think more about this.
     \Psi \cb \Gamma,\coend^{x:A} M \types N
   }\and
 
-  \inferrule{ d = d_1 \combine (\flip{p_x} \combine p_x) \combine (\flip{p_y} \combine p_y) \combine (\flip p \combine p) \\\\
-              \Psi^p \vdash a : A}
-            { \Psi^d \cb \Gamma \types \coend^{w:A} M }
-
+  \inferrule{ d = d_1 \combine d_2 \and 
+              d_1 = v_1 \combine v_1' \and 
+              d_2 = v_2 \combine v_2' \\\\
+              \Psi^{v_1 \combine v_2} \vdash (\Gamma \types \coend^{x:A} M) \ok \\\\
+              \Psi^{v_1'} \vdash a : A \and 
+              \Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'} \\\\
+              \Psi^{d} \cb \Gamma \types M[(a[\rho],a)/w] \\\\
+              \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{d_2=v_2 \combine v_2'}}{\rho}{(\Psi_0,\rho_0)}
+            }
+            { \Psi_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0] }
 \end{mathpar}
+
+\subsubsection*{Examples}
+
+Here's the functoriality along a map one.  Assume $z_1 \pmcol C \types
+M$ and $x \pmcol A \types N$.
+
+\begin{mathpar}
+  \inferrule{
+  \inferrule{
+    \inferrule{
+      (z_1\pm,z_2\pm) = z_1\pm \combine z_2\pm \and
+      z_1\pm = z_1\m \combine z_1\p \and 
+      z_2\pm = z_2\p \combine z_2\m \\\\
+      {z_1 \mcol C, z_2 \pcol C \types (M[(z_2,z_1)/z] \types \coend^{x:A} N) \ok} \\\\
+      z_1 \pcol C \types a : A \and 
+      \flip{(z_2\m)} \types z_2/z_1 : z_1\p\\\\
+      %% z_1\pm = z^\pm \combine v_1' \and 
+      %% d_2 = v_2 \combine v_2' \and
+      %% d' = d_1 \combine d_2 \\\\
+      z_1\pmcol C,z_2\pmcol C \cb M[(z_2, z_1)/z] \types N[(a[z_2/z_1], a)/w]\\\\
+      \unif{\Psi^{z_1\pm}}{\Psi^{z_2\pm}}{z_2/z_1}{(z_1\pm \vdash (z_1/z_1,z_1/z_2))}
+    }{
+      z_1 \pmcol C, z_2 \uncol C \types M \types \coend^{w:A} N
+    }
+  }{
+    z_2 \uncol C \types \coend^{z_1:C} M \types \coend^{x:A} N
+  }}
+  { \ec \types \coend^{z_1:C} M \types \coend^{x:A} N } 
+\end{mathpar}
+
 
 \begin{mathpar}
 
