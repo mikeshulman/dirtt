@@ -1004,13 +1004,22 @@ M$ and $x \pmcol A \types N$.
   { \ec \types \coend^{z_1:C} M \types \coend^{x:A} N } 
 \end{mathpar}
 
+\begin{mathpar}
+  \inferrule*{ z\pmcol A \types \Gamma \ctx \and
+               w\pmcol A \types M \type \\\\
+               x\pm,y\pm = x\pm \combine y\pm \and
+               x\pm = x\m \combine x\p \and
+               y\pm = y\p \combine y\m \\\\
+               x\m,y\p \types (\Gamma[(y,x)/z] \types \coend^{w:A} M)\ok \\\\
+               x\p \vdash x : A \and 
+               \flip{(y\m)} \vdash y/x : x\p \\\\
+               x \pmcol A, y \pmcol A \cb \Gamma[(y,x)/z] \types M[(y,x)/w] \\\\
+               \unif{{x\pmcol A}}{{y\pmcol A}}{y/x}{(x\pmcol A, (x/x,x/y))}
+             }
+             { x \pmcol A \cb \Gamma \types \coend^{w:A} M }
+\end{mathpar}
 
 \begin{mathpar}
-
-  \inferrule*[right=derivable?]
-             { \Psi, x \pmcol A, y \pmcol A \cb (\Gamma \types M) [(x,y)/z, (y,x)/w ]}
-             { \Psi, z \pmcol A \cb \Gamma \types \coend^{w:A} M }
-
   \inferrule*[right=derivable?]
              { u \pcol A \cb a : A \\
                \Psi, x \pmcol A, y \pmcol A \cb (\Gamma \types M) [(x,y)/z] [(a,a)/w] [ (y,x) / u ] 
