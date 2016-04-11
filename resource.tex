@@ -974,7 +974,7 @@ The right rule is trickier. Here is the most basic form, with no built-in substi
   }
 \end{mathpar}
 
-With build in substitions, this becomes
+With built in substitions, this becomes
 
 \begin{mathpar}
   \inferrule{ d = d_1 \combine d_2 \and 
@@ -987,6 +987,57 @@ With build in substitions, this becomes
               \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{d_2=v_2 \combine v_2'}}{\rho}{(\Psi_0,\rho_0)}
             }
             { \Psi_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0] }
+\end{mathpar}
+
+We can derive the second form from the first using cut. To do this, we must first setup some context
+manipulations. Let $v_1\combine v_2=v_3\combine v_3'$ such that $\Psi^{\flip{v_3}}\types \Gamma\ctx$ and
+$\Psi^{v_3'}\types\coend^{w:A}M \type$, and let $\Psi^{p_1'}\types\rho_1':\Psi^{v_1'}$ and
+$\Psi^{p_3'}\types\rho_3':\Psi^{v_3'}$ be renamings to $p$ contexts. The following rule should be
+admissable. FIXME: check.
+
+\begin{mathpar}
+  \inferrule{
+    d = d_1 \combine d_2 \and
+    d_1 = v_1 \combine v_1' \and
+    d_2 = v_2 \combine v_2' \\\\
+    v_1\combine v_2=v_3\combine v_3' \and
+    \Psi^{p_1'}\types\rho_1':\Psi^{v_1'} \and
+    \Psi^{p_3'}\types\rho_3':\Psi^{v_3'} \\\\
+    \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{d_2=v_2 \combine v_2'}}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \unif{\Psi^{d=v_3\combine(v_3'\combine v_1'\combine v_2')}}
+      {\Psi^{p_3'\combine(\flip{p_3'}\combine p_1'\combine\flip {p_1'})}}
+      {(\rho^{-1}[\rho_1']\combine\rho_1'\combine\rho_3')}
+      {(\Psi_0,(1_{\Psi^{v_3}}\combine\rho_3'^{-1})[\rho_0])}
+  }
+\end{mathpar}
+
+Using this, we can derive
+
+\begin{mathpar}
+  \tiny
+  \inferrule{
+    \Psi^d \cb \Gamma \types M[(a[\rho],a)/w]
+    \and
+    \inferrule*{
+      \Psi^{v_1'}\types a:A
+      \and
+      \inferrule*{
+        \inferrule{ }{
+          \Psi^{p_3'\combine\flip{p_3'}\combine x\pm\combine y\pm} \cb M[\rho_3'\combine((x,y)/w)]
+            \types M[\rho_3'\combine(x,y)/w)]
+          }
+        }{
+        \Psi^{p_3'\combine\flip{p_3'}\combine z\pm} \cb M[\rho_3'\combine ((z,z)/w)] \types
+          (\coend^{w:A}M)[\rho_3']
+      }
+      }{
+      \Psi^{p_3'\combine\flip{p_3'}\combine p_1'\combine\flip{p_1'}} \cb
+        M[\rho_3'\combine((a[\rho_1'],a[\rho_1'])/w)] \types (\coend^{w:A}M)[\rho_3']
+    }
+    }{
+    \Psi_0 \cb (\Gamma\types\coend^{w:A}M)[\rho_0]
+  }
 \end{mathpar}
 
 \subsubsection*{Examples}
