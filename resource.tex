@@ -962,7 +962,21 @@ think more about this.
     }{
     \Psi \cb \Gamma,\coend^{x:A} M \types N
   }\and
+\end{mathpar}
 
+The right rule is trickier. Here is the most basic form, with no built-in substitutions.
+\begin{mathpar}
+  \inferrule{
+    \Psi^{d\combine x\p\combine y\m} \types (\Gamma\types\coend^{w:A} M) \ok \\\\
+    \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w]
+    }{
+    \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
+  }
+\end{mathpar}
+
+With build in substitions, this becomes
+
+\begin{mathpar}
   \inferrule{ d = d_1 \combine d_2 \and 
               d_1 = v_1 \combine v_1' \and 
               d_2 = v_2 \combine v_2' \\\\
