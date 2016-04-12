@@ -743,12 +743,17 @@ Using this, we should have
 
 \begin{mathpar}
 \inferrule*[right=admissible?]
-           {d = d_1 \combine d_2 \\\\
-             \Psi^{d_1} \types (\Gamma_1 \vdash M) \ok \\
-             \Psi^{d_1} \cb \Gamma_1 \vdash M \\
-             \Psi^{d_2} \types (\Gamma_2, M[\rho] \vdash N) \ok \\ \\
-             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N \\\\
-             \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{(\Psi_0 \vdash \rho_0)}
+           {d = d_1 \combine d_2 \and
+            d_1 = v_1 \combine v_1' \and
+            d_2 = v_2 \combine v_2' \\\\
+            \Psi^{v_1'} \types M \type \and
+            \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \and
+            \Psi^{v_1} \types \Gamma_1 \ctx \and 
+            \Psi^{v_2} \types (\Gamma_2 \types N) \ok \\\\
+            \Psi^{d_1} \cb \Gamma_1 \vdash M \and 
+            \Psi^{d_2} \cb \Gamma_2,M[\rho] \vdash N \and 
+            \\\\
+            \unif{\Psi^{d_1=v_1\combine v_1'}}{\Psi^{d_2 = v_2 \combine v_2'}}{\rho}{(\Psi_0 \vdash \rho_0)} \\
            }
            {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \end{mathpar}
