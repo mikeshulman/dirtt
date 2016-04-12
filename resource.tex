@@ -267,6 +267,142 @@ Also
           {\flip{\Psi} \vdash \flip{\theta} : \flip{\Psi'}}
 \end{mathpar}
 
+\subsection*{Unification of Renamings}
+
+We introduce a new judgement and rules for deriving valid string diagram
+compositions. The new judgement has the form
+$\unif{\Psi^{d_1=v_1\combine v_1'}}{\Psi^{d_2 = v_2\combine
+    v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}$, under the presupposition that
+$d_1 \combine d_2$ is defined ($d_1$ and $d_2$ are independent) and $d_1
+= v_1 \combine v_1'$, $d_2 = v_2 \combine v_2'$ and $\Psi^{\flip{v_2'}}
+\types \rho:\Psi^{v_1'}$, and $\Psi^d \types \rho_0:\Psi^{v_1\combine
+  v_2}$. This should be read as stating that $\Psi^d$ is the result of
+composing $\Psi^{d_1}$ and $\Psi^{d_2}$ by gluing along $\rho$, and that
+the composition introduced no loops.  Formally, this judgement is a
+relation on $(\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho,d,\rho_0)$---$\Psi$
+occuring three times and the $=$ and $\combine$ and $\vdash$ in the
+judgement are just notation.
+
+The rules for this judgement are
+\begin{mathpar}
+  \inferrule{ }
+            {
+              \unif{\Psi^{d_1 = d_1 \combine \uns}}{\Psi^{d_2 = d_2 \combine \uns}}{\overline{\triv/x}}{({\Psi^{d_1 \combine d_2}} \vdash 1)}
+            }
+
+  \inferrule{
+    \unif{\Psi^{d_1 = v_1 \combine v_1'}}{\Psi^{d_2 = v_2 \combine v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{(d_1\combine x\pm) = (v_1 \combine x^{\flip{b}}) \combine (v_1' \combine x^{b})}}
+         {\Psi^{(d_2\combine y\pm) = (v_2 \combine y^b) \combine (v_2' \combine y^{\flip{b}})}}
+         {(\rho \combine (y/x))}
+         {(\Psi^{d \combine x\pm} \vdash \rho_0 \combine (x/x) \combine (x/y))}
+  }
+
+  \inferrule{
+        (\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine
+    x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p)= v_2 \combine v_2'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}) \\\\
+        \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = v_3 \combine v_3'}}{\rho[\flip{\rho_3'}]}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
+         {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (v_2' \combine (x\p \combine y\m)))}}
+         {(\rho \combine (x,y)/z)}
+         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+  }
+
+  \inferrule{
+%%      (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
+        (1_{d_1} \combine (x/x \combine x/y)) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\rho_3 , \rho_3') \\\\
+        \unif{\Psi^{(d_1 \combine x\pm)=v_3 \combine v_3'}}{\Psi^{(d_2 = v_2 \combine v_2')}}{\rho_3'^{-1}[\rho]}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{d_1\combine x\pm\combine y\pm = (v_1 \combine (v_1' \combine (x\p \combine y\m)))}}
+         {\Psi^{d_2\combine z\pm = v_2 \combine (v_2' \combine z\pm)}}
+         {(\rho \combine z/x \combine z/y)}
+         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+  }
+\end{mathpar}
+
+Reading the rules bottom-to-top as an algorithm for finding $d$ and
+$\rho_0$, to get the recursion to go through, it seems necessary to
+process the renaming $\rho$ in the conclusion by \emph{splitting} it,
+not by case-analyzing it as $\rho,\vec{x}/x$.  This way, the premises
+are in the same context $\Psi$ as the conclusion, but under different
+resources.  If we case-analyze as $\rho,\vec{x}/x$, then we would need
+to generalize the operation somehow, because the codomain of $\rho$
+would be different of a different length than its domain.  The judgement
+is therefore non-deterministic, because the same renaming can be split
+in many different ways.  Conjecture: all of the results are isomorphic.
+
+We write $b$ for $\ps$ or $\ms$.  We write $\Psi^{y^b} \types y/x :
+\Psi^{x^b}$ for the renaming given by $y/x$ along with $\triv/z$ for
+every other $z \in \Psi$ (formally, this has to be defined by induction
+on $\Psi$).
+
+Operationally, we think of $\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho$ as
+inputs, and $d,\rho_0$ as outputs.  FIXME: when can the rules fail?
+
+In the first rule, if the given splitting puts all the resources in
+$v_1$ and $v_2$, and $v_1'$ and $v_2'$ are $\uns$ in each component,
+then $\rho$ can only consist of $\triv/x$ for each variable $x$.  In
+this case, we return the identity renaming.
+
+Draw $d_1 = v_1 \combine v_1'$ and $d_2 = v_2 \combine v_2'$ like in
+Patrick's email, with vertical columns for the aspects in $v_1$, $v_1'$,
+$v_2'$, and then $v_2$ from left to right.  We say that the $v_1'$ and
+$v_2'$ aspects are ``internal'' and the $v_1$ and $v_2$ are external
+(they will be in the boundary of the result, but maybe connected up).
+
+Rule 2: if the given $d_1$ and $d_2$ each have a distinguished variable
+$x$ (split with half going in $v_1$ and the other half in $v_1'$) and
+$y$ (split with half going in $v_2$ and the other half in $v_2'$), and
+the renaming splits to include $y/x$, then we are joining the $x$ string
+and the $y$, so we want to identify the external $x$ and $y$ in the
+output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
+with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
+\combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.
+
+Rule 3: Two variables on the right are getting glued together by an
+internal line on the left.  Why it type checks: We have
+$\Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'}$ and $d_2 \combine (x\m
+\combine y\p) = v_2 \combine v_2'$.  However, we can't make a recursive
+call with this, because $d_2 \combine (x\m \combine y\p)$ is not
+$d$-context, so we first need to merge $x$ and $y$.  $x$ and $y$ might
+occur in either $v_2$ or $v_2'$, so it seems like we need to do a bunch
+of cases, to see where to do the substitution.  However, a slick way to
+handle this is to start with the renaming
+\[
+\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}
+\]
+and then split it along the known context splitting 
+$d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
+to get
+\begin{mathpar}
+d_2 \combine x\pm = v_3 \combine v_3' \and
+\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} \and
+\Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}
+\end{mathpar}
+This will push the appropriate part of $x/x$ and $x/y$ into the
+appropriate half.  Then   
+\begin{mathpar}
+\Psi^{\flip{v_3'}} \vdash \rho[\flip{\rho_3'}] : \Psi^{v_1'}
+\end{mathpar}
+so we can recur, getting 
+\begin{mathpar}
+\Psi^{d} \vdash \rho_0 : \Psi^{v_1 \combine v_3}
+\end{mathpar}
+Finally we compose with 
+\begin{mathpar}
+\Psi^{v_1 \combine v_3} \vdash 1_{v_1} \combine \rho_3 : \Psi^{v_1 \combine v_2}
+\end{mathpar}
+to get the result.
+
+FIXME: it seems arbitrary that we pick $x$ and not $y$ here?
+
+Rule 4: This is symmetric to rule 3, except here two variables on the
+left are getting glued together by an internal line on the right.  
+The code is basically dual, except we use $p_3'^{-1}$.  
+
+FIXME: how exactly does this preclude loops?
 
 \subsection*{Substitutions}
 
@@ -603,236 +739,8 @@ Using this, we should have
            {\Psi \cb (\Gamma \vdash M)[\sigma]}
 \end{mathpar}
 
+\subsection*{Cut For Types}
 
-\subsection*{Cut for Types (Equivalence relation)}
-
-We write $x \in \Psi$ to mean $\Psi$ contains $x \vcol r A$ for some
-non-$\uns$ $r$.  Under the prespposition that $\Psi^{v_1} \vdash \rho :
-\Psi^{v_2}$ (i.e. $\rho$ is an isomorphism between two parts of $\Psi$)
-and $x,y \in \Psi$ , we define the relation $x \samestring y [ \rho ]$,
-which means $x$ and $y$ are on the same string when the two parts of
-$\Psi$ are glued together by $\rho$.  We write $\rho(x,y)$ to mean $y/x$
-or $(y,z)/x$ or $(z,y)/x$ is one of the substitutions in $\rho$.
-
-\begin{mathpar}
-\infer{ }
-      { x \samestring x [ \rho ]}
-\and 
-\infer{ y \samestring x [ \rho ]}
-      { x \samestring y [ \rho ]}
-\and 
-\infer{ x \samestring y [ \rho ] \and 
-        y \samestring z [ \rho ] 
-      }
-      { x \samestring z [ \rho ]}
-\and
-\infer{ \rho(x,y) } 
-      { x \samestring y [ \rho ]}
-\end{mathpar}
-
-\begin{mathpar}
-\inferrule*[right=admissible?]
-           { d = d_1 \combine d_2 \and 
-             d_1 = v_1 \combine v_1' \and  
-             d_2 = v_2 \combine v_2' \\\\
-             \Psi^{\flip{v_1}} \types \Gamma_1 \ctx \and
-             \Psi^{v_1'} \types M \type \and
-             \Psi^{\flip{v_2}} \types (\Gamma_2 \types N) \ok \\\\
-             \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \and
-             (\forall x \in \Psi^{v_1' \combine v_2'}. \: \exists y \in \Psi^{v_1 \combine v_2}. \: x = y [ \rho ]) \\\\
-             \Psi^{d_1} \cb \Gamma_1 \vdash M \and 
-             \Psi^{d_2} \cb \Gamma_2, M[\rho] \vdash N \\\\
-             \Psi_0\types \rho_{0} : \Psi^{v_1 \combine v_2} \and
-             (\forall x,y \in \Psi^{v_1 \combine v_2}. \: x \samestring y [\rho] \: \supset \: \rho_0(x) = \rho_0(y)) \and
-           }
-           {\Psi_0^d \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
-\end{mathpar}
-
-The first three lines are mostly just the preconditions for the two
-sequents being cut together on the fourth line: $d_1$ and $d_2$ are two
-independent parts of $\Psi$, which each are split, with some resources
-going towards $M$ and the the leftovers going towards the rest of the
-sequent.  Because the cut formula $M$ occurs in two different contexts,
-we use a renaming $\rho$ to match up the variables.  $\rho$ must have
-the property it connects every ``inside'' variable in $\Psi^{v_1'
-  \combine v_2'}$ to one on the outside; this ensures the absence of
-loops (FIXME: check?).  On the fourth line we have the two sequents
-being cut together.  
-
-The result context of the cut is morally the $\rho$-equivalence-classes
-of $\Psi$, but since there is no canonical way to name them (when two
-``outside'' variables are paired, which one disappears?), we build in a
-renaming $\rho_0$, with the condition that it is well-defined on
-$\rho$-equivalence-classes.  In an implementation, a $\rho_0$ satisfying
-this condition could be inferred from $\rho$, using some convention for
-which variables are kept.
-
-\subsection*{Cut For Types (Unification)}
-
-Before we can state a cut rule, we introduce a new judgement and rules
-for deriving valid string diagram compositions. The new judgement has
-the form $\unif{\Psi^{d_1=v_1\combine v_1'}}{\Psi^{d_2 = v_2\combine
-    v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}$, under the presupposition that
-$d_1 \combine d_2$ is defined ($d_1$ and $d_2$ are independent) and $d_1
-= v_1 \combine v_1'$, $d_2 = v_2 \combine v_2'$ and $\Psi^{\flip{v_2'}}
-\types \rho:\Psi^{v_1'}$, and $\Psi^d \types \rho_0:\Psi^{v_1\combine
-  v_2}$. This should be read as stating that $\Psi^d$ is the result of
-composing $\Psi^{d_1}$ and $\Psi^{d_2}$ by gluing along $\rho$, and that
-the composition introduced no loops.  Formally, this judgement is a
-relation on $(\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho,d,\rho_0)$---$\Psi$
-occuring three times and the $=$ and $\combine$ and $\vdash$ in the
-judgement are just notation.
-
-The rules for this judgement are
-\begin{mathpar}
-  \inferrule{ }
-            {
-              \unif{\Psi^{d_1 = d_1 \combine \uns}}{\Psi^{d_2 = d_2 \combine \uns}}{\overline{\triv/x}}{({\Psi^{d_1 \combine d_2}} \vdash 1)}
-            }
-
-  \inferrule{
-    \unif{\Psi^{d_1 = v_1 \combine v_1'}}{\Psi^{d_2 = v_2 \combine v_2'}}{\rho}{(\Psi^d \vdash \rho_0)}
-  }{
-    \unif{\Psi^{(d_1\combine x\pm) = (v_1 \combine x^{\flip{b}}) \combine (v_1' \combine x^{b})}}
-         {\Psi^{(d_2\combine y\pm) = (v_2 \combine y^b) \combine (v_2' \combine y^{\flip{b}})}}
-         {(\rho \combine (y/x))}
-         {(\Psi^{d \combine x\pm} \vdash \rho_0 \combine (x/x) \combine (x/y))}
-  }
-
-  \inferrule{
-        (\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine
-    x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p)= v_2 \combine v_2'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}) \\\\
-        \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = v_3 \combine v_3'}}{\rho[\flip{\rho_3'}]}{(\Psi^d \vdash \rho_0)}
-  }{
-    \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
-         {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (v_2' \combine (x\p \combine y\m)))}}
-         {(\rho \combine (x,y)/z)}
-         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
-  }
-
-  \inferrule{
-%%      (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
-        (1_{d_1} \combine (x/x \combine x/y)) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\rho_3 , \rho_3') \\\\
-        \unif{\Psi^{(d_1 \combine x\pm)=v_3 \combine v_3'}}{\Psi^{(d_2 = v_2 \combine v_2')}}{\rho_3'^{-1}[\rho]}{(\Psi^d \vdash \rho_0)}
-  }{
-    \unif{\Psi^{d_1\combine x\pm\combine y\pm = (v_1 \combine (v_1' \combine (x\p \combine y\m)))}}
-         {\Psi^{d_2\combine z\pm = v_2 \combine (v_2' \combine z\pm)}}
-         {(\rho \combine z/x \combine z/y)}
-         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
-  }
-\end{mathpar}
-
-Reading the rules bottom-to-top as an algorithm for finding $d$ and
-$\rho_0$, to get the recursion to go through, it seems necessary to
-process the renaming $\rho$ in the conclusion by \emph{splitting} it,
-not by case-analyzing it as $\rho,\vec{x}/x$.  This way, the premises
-are in the same context $\Psi$ as the conclusion, but under different
-resources.  If we case-analyze as $\rho,\vec{x}/x$, then we would need
-to generalize the operation somehow, because the codomain of $\rho$
-would be different of a different length than its domain.  The judgement
-is therefore non-deterministic, because the same renaming can be split
-in many different ways.  Conjecture: all of the results are isomorphic.
-
-We write $b$ for $\ps$ or $\ms$.  We write $\Psi^{y^b} \types y/x :
-\Psi^{x^b}$ for the renaming given by $y/x$ along with $\triv/z$ for
-every other $z \in \Psi$ (formally, this has to be defined by induction
-on $\Psi$).
-
-Operationally, we think of $\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho$ as
-inputs, and $d,\rho_0$ as outputs.  FIXME: when can the rules fail?
-
-In the first rule, if the given splitting puts all the resources in
-$v_1$ and $v_2$, and $v_1'$ and $v_2'$ are $\uns$ in each component,
-then $\rho$ can only consist of $\triv/x$ for each variable $x$.  In
-this case, we return the identity renaming.
-
-Draw $d_1 = v_1 \combine v_1'$ and $d_2 = v_2 \combine v_2'$ like in
-Patrick's email, with vertical columns for the aspects in $v_1$, $v_1'$,
-$v_2'$, and then $v_2$ from left to right.  We say that the $v_1'$ and
-$v_2'$ aspects are ``internal'' and the $v_1$ and $v_2$ are external
-(they will be in the boundary of the result, but maybe connected up).
-
-Rule 2: if the given $d_1$ and $d_2$ each have a distinguished variable
-$x$ (split with half going in $v_1$ and the other half in $v_1'$) and
-$y$ (split with half going in $v_2$ and the other half in $v_2'$), and
-the renaming splits to include $y/x$, then we are joining the $x$ string
-and the $y$, so we want to identify the external $x$ and $y$ in the
-output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
-with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
-\combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.
-
-Rule 3: Two variables on the right are getting glued together by an
-internal line on the left.  Why it type checks: We have
-$\Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'}$ and $d_2 \combine (x\m
-\combine y\p) = v_2 \combine v_2'$.  However, we can't make a recursive
-call with this, because $d_2 \combine (x\m \combine y\p)$ is not
-$d$-context, so we first need to merge $x$ and $y$.  $x$ and $y$ might
-occur in either $v_2$ or $v_2'$, so it seems like we need to do a bunch
-of cases, to see where to do the substitution.  However, a slick way to
-handle this is to start with the renaming
-\[
-\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}
-\]
-and then split it along the known context splitting 
-$d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
-to get
-\begin{mathpar}
-d_2 \combine x\pm = v_3 \combine v_3' \and
-\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} \and
-\Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}
-\end{mathpar}
-This will push the appropriate part of $x/x$ and $x/y$ into the
-appropriate half.  Then   
-\begin{mathpar}
-\Psi^{\flip{v_3'}} \vdash \rho[\flip{\rho_3'}] : \Psi^{v_1'}
-\end{mathpar}
-so we can recur, getting 
-\begin{mathpar}
-\Psi^{d} \vdash \rho_0 : \Psi^{v_1 \combine v_3}
-\end{mathpar}
-Finally we compose with 
-\begin{mathpar}
-\Psi^{v_1 \combine v_3} \vdash 1_{v_1} \combine \rho_3 : \Psi^{v_1 \combine v_2}
-\end{mathpar}
-to get the result.
-
-FIXME: it seems arbitrary that we pick $x$ and not $y$ here?
-
-Rule 4: This is symmetric to rule 3, except here two variables on the
-left are getting glued together by an internal line on the right.  
-The code is basically dual, except we use $p_3'^{-1}$.  
-
-FIXME: how exactly does this preclude loops?
-
-\red{
-Original rules for comparison:
-\begin{mathpar}
-  \inferrule{ }{
-    \unif{\Psi^{d_1}}{\Psi^{d_2}}{(\ec)}{1_{\Psi^{d_1\combine d_2}}}
-  }
-  \\
-  \inferrule{
-    \unif{\Psi^{d_1}}{\Psi^{d_2}}{\rho}{\rho_0}
-  }{
-    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2\combine y\pm}}{(\rho,y/x)}{(\rho_0,x/x,x/y)}
-  }
-  \\
-  \inferrule{
-    \unif{\Psi^{d_1}}{\Psi^{d_2\combine x\pm}}{\rho}{\rho_0}
-  }{
-    \unif{\Psi^{d_1\combine z\pm}}{\Psi^{d_2\combine x\pm\combine y\pm}}{(\rho,(x,y)/z)}{\rho_0}
-  }
-  \\
-  \inferrule{
-    \unif{\Psi^{d_1\combine x\pm}}{\Psi^{d_2}}{\rho}{\rho_0}
-  }{
-    \unif{\Psi^{d_1\combine x\pm\combine y\pm}}{\Psi^{d_2\combine
-    z\pm}}{(\rho,z/x,z/y)}{\rho_0}
-  }
-\end{mathpar}
-}
-
-The cut rule is then
 \begin{mathpar}
 \inferrule*[right=admissible?]
            {d = d_1 \combine d_2 \\\\
@@ -844,23 +752,6 @@ The cut rule is then
            }
            {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \end{mathpar}
-
-%% For the premise to be well formed, it must be the case that
-%% \[
-%% \begin{array}{l}
-%% d_1 = v_1 \combine v_1' \\ 
-%% d_2 = v_2 \combine v_2' \\ 
-%% \Psi^{\flip{v_1}} \types \Gamma_1 \ctx \\ 
-%% \Psi^{v_1'} \types M \type \\ 
-%% \Psi^{v_2} \types (\Gamma_2 \vdash N) \ok \\
-%% \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \\
-%% \end{array}
-%% \]
-
-%% Therefore, $\Psi^{v_1 \combine v_2} \types
-%% (\Gamma_1,\Gamma_2 \vdash N) \ok$.  So the unification needs to produce
-%% a context $\Psi_0^d$ and a renaming $\Psi_0 \vdash \rho_0 : \Psi^{v_1
-%%   \combine v_2}$.
 
 \subsection*{Morphism types}
 
@@ -933,8 +824,22 @@ reducible?
     \Psi \cb \Gamma,M_1,M_2 \types N
   }{
     \Psi \cb \Gamma, M_1\otimes M_2 \types N
-  }\and
-  \inferrule{
+  }
+\end{mathpar}
+
+The right rule should be all substitutions/cuts into 
+\begin{mathpar}
+  \inferrule*[right=Tensor Right Axiom]
+             {d = (p_1 \combine \flip{p_1}) \combine (p_2 \combine \flip{p_2}) \and
+               \Psi^{p_1} \types M_1 \type \and
+               \Psi^{p_2} \types M_2 \type
+             }
+             {\Psi^d \cb M_1 , M_2 \types M_1 \otimes M_2}
+\end{mathpar}
+
+FIXME: this is what we had before; does this give that?
+\begin{mathpar}
+  \inferrule*[right= Tensor Right Rule]{
     d = d_1 \combine d_2 \\\\ 
     \Psi^{d_1} \types (\Gamma_1 \vdash M_1) \ok \\
     \Psi^{d_1} \cb \Gamma_1 \vdash M_1 \\\\
@@ -945,8 +850,6 @@ reducible?
   }\and
 \end{mathpar}
 
-FIXME: Needing to check that the sequents are well-formed is weird;
-think more about this.  
 
 \subsection*{Coend}
 
@@ -1165,6 +1068,12 @@ It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
 
 \end{mathpar}
 
+\begin{mathpar}
+\inferrule*[right=End Left Axiom]
+           {\Psi^p,x \pmcol A \types M \type}
+           {\Psi^{p \combine \flip{p}}, x \pmcol A \cb \End_{x:A} M \types M}
+\end{mathpar}
+
 \subsection*{Hom types (can we use a different name? Function types,
   Closure types? Internal hom types?)}
 
@@ -1183,8 +1092,22 @@ It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
   }{
     \Psi \cb \Gamma \types M\multimap N
   }
+\end{mathpar}
 
-  \inferrule{
+The left rule should be all substitutions/cuts with
+\begin{mathpar}
+  \inferrule*[right=Arrow Left Axiom]{
+    d = (p_1 \combine \flip{p_1}) \combine (p_2 \combine \flip{p_2})\\
+    \Psi^{p_1} \types M_1 \\ 
+    \Psi^{p_2} \types M_2 \\ 
+  }{
+    \Psi^d \cb M_1,M_1\multimap M_2 \types M_2
+  }
+\end{mathpar}
+
+Here's what we had before; is this enough?
+\begin{mathpar}
+  \inferrule*[right=Arrow Left Rule]{
     d = d_1 \combine d_2\\\\
     \Psi^{\flip{d_1}} \types (\Gamma_1 \vdash M_1) \ok \\ 
     \Psi^{\flip{d_1}} \cb \Gamma_1 \vdash M_1 \\\\
@@ -1194,7 +1117,6 @@ It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
     \Psi^d \cb \Gamma_1,\Gamma_2,M_1\multimap M_2 \types N
   }
 \end{mathpar}
-
 
 \end{document}
 
