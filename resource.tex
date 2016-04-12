@@ -1029,6 +1029,7 @@ Then we cut as follows:
 %% }
 %% \]
 
+\emph{FIXME: Patrick's derivation is here; update to new rule.}  
 We can derive the second form from the first using cut. To do this, we must first setup some context
 manipulations. Let $v_1\combine v_2=v_3\combine v_3'$ such that $\Psi^{\flip{v_3}}\types \Gamma\ctx$ and
 $\Psi^{v_3'}\types\coend^{w:A}M \type$, and let $\Psi^{p_1'}\types\rho_1':\Psi^{v_1'}$ and
@@ -1109,6 +1110,8 @@ M$ and $x \pmcol A \types N$.
   { \ec \types \coend^{z_1:C} M \types \coend^{x:A} N } 
 \end{mathpar}
 
+\subsubsection*{Example: prove old coend right rules from this one}
+
 \begin{mathpar}
   \inferrule*{ z\pmcol A \types \Gamma \ctx \and
                w\pmcol A \types M \type \\\\
@@ -1123,8 +1126,6 @@ M$ and $x \pmcol A \types N$.
              }
              { x \pmcol A \cb \Gamma \types \coend^{w:A} M }
 \end{mathpar}
-
-\subsubsection*{Example: prove old coend right rules from this one}
 
 \begin{mathpar}
   \inferrule*[right=admissible]
@@ -1145,8 +1146,6 @@ M$ and $x \pmcol A \types N$.
 \end{mathpar}
 It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
 [(a[y/u],a[x/u])/w]$, so that's another way to write the premise?
-
-
 
 \subsection*{End}
 
