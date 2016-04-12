@@ -924,10 +924,10 @@ reducible?
 
 \begin{mathpar}
   \inferrule{
-    d = d_1 \combine d_2 \\
-    \Psi^{d_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
+    v = v_1 \combine v_2 \\
+    \Psi^{v_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
   }{
-    \Psi^{d} \types M_1\otimes M_2\type
+    \Psi^{v} \types M_1\otimes M_2\type
   }\and
   \inferrule{
     \Psi \cb \Gamma,M_1,M_2 \types N
@@ -964,20 +964,22 @@ think more about this.
   }\and
 \end{mathpar}
 
-The right rule is trickier. Here is the most basic form, with no built-in substitutions.
-\begin{mathpar}
-  \inferrule{
-    \Psi^{d\combine x\p\combine y\m} \types (\Gamma\types\coend^{w:A} M) \ok \\\\
-    \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w]
-    }{
-    \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
-  }
+The right rule is essentially
+\begin{mathpar} 
+  \inferrule*[right=Coend Right Axiom]
+             {\Psi^p, x \pmcol A \vdash M \type
+             }
+             {
+               \Psi^{p \combine \flip p}, x \pmcol A \cb M \types \coend^{x:A} M
+             }
 \end{mathpar}
-
-With built in substitions, this becomes
-
+but because we want substitution and cut to be admissible, we close the
+rule up under them.  This gives
+\emph{FIXME: this is wrong relative to the above: context on $a$ should
+  be a $p$.}  
 \begin{mathpar}
-  \inferrule{ d = d_1 \combine d_2 \and 
+  \inferrule*[right=Coend Right Rule]
+            { d = d_1 \combine d_2 \and 
               d_1 = v_1 \combine v_1' \and 
               d_2 = v_2 \combine v_2' \\\\
               \Psi^{v_1 \combine v_2} \vdash (\Gamma \types \coend^{x:A} M) \ok \\\\
@@ -988,6 +990,44 @@ With built in substitions, this becomes
             }
             { \Psi_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0] }
 \end{mathpar}
+
+\subsubsection*{Example: Prove Coend Right Rule from Coend Right Axiom using
+  cut and substitution}
+
+To illustrate the idea, here is one direction of the co-Yoneda lemma.
+Suppose $a \pcol A \types M$, and we write $M(b)$ for $M[b/a]$.  
+Then we cut as follows:
+\[
+\inferrule{ x \pmcol A, y\pmcol A \cb M(x) \types M(x) \otimes \mor{A}(y,y) \\\\
+            z \pmcol A, w\pmcol A \cb (M(w) \otimes \mor{A}(w,z)) \types \coend^{w:A} M(w) \otimes \mor{A}(w,z)\\\\
+            x\pm, y\pm, z\pm, w\pm = (x\pm, y\pm) \combine (z\pm \combine w\pm)\\\\
+            x\pm \combine y\pm = x\m \combine (x\p \combine y\pm) \\\\
+            z\pm \combine w\pm = z\p \combine (z\m \combine w\pm) \\\\
+            \flip{z\p \combine (z\m \combine w\pm)} \types (w/x , (w,z)/y) : x\m \combine (x\p \combine y\pm)\\\\
+            \unif{x\pm,y\pm}{z\pm,w\pm}{(w/x , (w,z)/y)}{ (x\pm \vdash (x/x,x/z)) }
+          }
+          { x \pmcol A \cb M(x) \types \coend^{w:A} M(w) \otimes \mor{A}(w,x)}
+\]
+
+%% For example, the basic ``re-pairing'' right rule that we had before
+%% \begin{mathpar}
+%%   \inferrule*[right=admissible]
+%%              {
+%%                \Psi^{d\combine x\p\combine y\m} \types (\Gamma\types\coend^{w:A} M) \ok \\\\
+%%                \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w]
+%%              }{
+%%                \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
+%%              }
+%% \end{mathpar}
+%% is the following substitution/cut instance
+%% \[
+%% \inferrule{
+%%   \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w] \and
+%%   \Psi^{?},w \pmcol A \cb M \types \coend^{w:A}{M}
+%% }{
+%%   \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
+%% }
+%% \]
 
 We can derive the second form from the first using cut. To do this, we must first setup some context
 manipulations. Let $v_1\combine v_2=v_3\combine v_3'$ such that $\Psi^{\flip{v_3}}\types \Gamma\ctx$ and
@@ -1040,7 +1080,7 @@ Using this, we can derive
   }
 \end{mathpar}
 
-\subsubsection*{Examples}
+\subsubsection*{Example: Functoriality along a Map}
 
 Here's the functoriality along a map one.  Assume $z_1 \pmcol C \types
 M$ and $x \pmcol A \types N$.
@@ -1084,6 +1124,18 @@ M$ and $x \pmcol A \types N$.
              { x \pmcol A \cb \Gamma \types \coend^{w:A} M }
 \end{mathpar}
 
+\subsubsection*{Example: prove old coend right rules from this one}
+
+\begin{mathpar}
+  \inferrule*[right=admissible]
+             {
+               \Psi^{d\combine x\p\combine y\m} \types (\Gamma\types\coend^{w:A} M) \ok \\\\
+               \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w]
+             }{
+               \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
+             }
+\end{mathpar}
+
 \begin{mathpar}
   \inferrule*[right=derivable?]
              { u \pcol A \cb a : A \\
@@ -1093,6 +1145,7 @@ M$ and $x \pmcol A \types N$.
 \end{mathpar}
 It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
 [(a[y/u],a[x/u])/w]$, so that's another way to write the premise?
+
 
 
 \subsection*{End}
