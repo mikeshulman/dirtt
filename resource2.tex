@@ -315,16 +315,21 @@ The rules for this judgement are
   }
 
   \inferrule{
-        (\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine
-    x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p)= v_2 \combine v_2'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}) \\\\
-        \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = v_3 \combine v_3'}}{\rho[\flip{\rho_3'}]}{(\Psi^d \vdash \rho_0)}
+    ((\Psi_2 \combine \Psi_2' \combine x \pmcol A) \vdash (1 \combine
+    x/x\m \combine x/y\p) : (\Psi_2 \combine \Psi_2')) \equiv (\Psi_3 \vdash \rho_3 : \Psi_2) \combine (\Psi_3' \vdash \rho_3' : \Psi_2')\\\\
+    \unif{\Psi_1 \combine \Psi_1'}{\Psi_3 \combine \Psi_3'}{\rho[\flip{\rho_3'}]}{(\Delta_0 \vdash \rho_0)}
   }{
-    \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
-         {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (v_2' \combine (x\p \combine y\m)))}}
-         {(\rho \combine (x,y)/z)}
-         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+    \unif{\Psi_1 \combine (\Psi_1' \combine z \pmcol A)} %% {\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
+         {\Psi_2 \combine (\Psi_2' \combine x \pcol A \combine y \mcol A)}
+         {(\rho \combine x/z\m \combine y/z\p)}
+         {(\Delta_0 \vdash (1_{\Psi_1} \combine \rho_3)[\rho_0])}
   }
+\end{mathpar}
 
+
+\red{FIXME: got up to here}
+
+\begin{mathpar}
   \inferrule{
 %%      (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
         (1_{d_1} \combine (x/x \combine x/y)) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\rho_3 , \rho_3') \\\\
@@ -338,87 +343,89 @@ The rules for this judgement are
 \end{mathpar}
 \end{small}
 
-Reading the rules bottom-to-top as an algorithm for finding $d$ and
-$\rho_0$, to get the recursion to go through, it seems necessary to
-process the renaming $\rho$ in the conclusion by \emph{splitting} it,
-not by case-analyzing it as $\rho,\vec{x}/x$.  This way, the premises
-are in the same context $\Psi$ as the conclusion, but under different
-resources.  If we case-analyze as $\rho,\vec{x}/x$, then we would need
-to generalize the operation somehow, because the codomain of $\rho$
-would be different of a different length than its domain.  The judgement
-is therefore non-deterministic, because the same renaming can be split
-in many different ways.  Conjecture: all of the results are isomorphic.
+%% FIXME update description
 
-We write $b$ for $\ps$ or $\ms$.  We write $\Psi^{y^b} \types y/x :
-\Psi^{x^b}$ for the renaming given by $y/x$ along with $\triv/z$ for
-every other $z \in \Psi$ (formally, this has to be defined by induction
-on $\Psi$).
+%% Reading the rules bottom-to-top as an algorithm for finding $d$ and
+%% $\rho_0$, to get the recursion to go through, it seems necessary to
+%% process the renaming $\rho$ in the conclusion by \emph{splitting} it,
+%% not by case-analyzing it as $\rho,\vec{x}/x$.  This way, the premises
+%% are in the same context $\Psi$ as the conclusion, but under different
+%% resources.  If we case-analyze as $\rho,\vec{x}/x$, then we would need
+%% to generalize the operation somehow, because the codomain of $\rho$
+%% would be different of a different length than its domain.  The judgement
+%% is therefore non-deterministic, because the same renaming can be split
+%% in many different ways.  Conjecture: all of the results are isomorphic.
 
-Operationally, we think of $\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho$ as
-inputs, and $d,\rho_0$ as outputs.  FIXME: when can the rules fail?
+%% We write $b$ for $\ps$ or $\ms$.  We write $\Psi^{y^b} \types y/x :
+%% \Psi^{x^b}$ for the renaming given by $y/x$ along with $\triv/z$ for
+%% every other $z \in \Psi$ (formally, this has to be defined by induction
+%% on $\Psi$).
 
-In the first rule, if the given splitting puts all the resources in
-$v_1$ and $v_2$, and $v_1'$ and $v_2'$ are $\uns$ in each component,
-then $\rho$ can only consist of $\triv/x$ for each variable $x$.  In
-this case, we return the identity renaming.
+%% Operationally, we think of $\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho$ as
+%% inputs, and $d,\rho_0$ as outputs.  FIXME: when can the rules fail?
 
-Draw $d_1 = v_1 \combine v_1'$ and $d_2 = v_2 \combine v_2'$ like in
-Patrick's email, with vertical columns for the aspects in $v_1$, $v_1'$,
-$v_2'$, and then $v_2$ from left to right.  We say that the $v_1'$ and
-$v_2'$ aspects are ``internal'' and the $v_1$ and $v_2$ are external
-(they will be in the boundary of the result, but maybe connected up).
+%% In the first rule, if the given splitting puts all the resources in
+%% $v_1$ and $v_2$, and $v_1'$ and $v_2'$ are $\uns$ in each component,
+%% then $\rho$ can only consist of $\triv/x$ for each variable $x$.  In
+%% this case, we return the identity renaming.
 
-Rule 2: if the given $d_1$ and $d_2$ each have a distinguished variable
-$x$ (split with half going in $v_1$ and the other half in $v_1'$) and
-$y$ (split with half going in $v_2$ and the other half in $v_2'$), and
-the renaming splits to include $y/x$, then we are joining the $x$ string
-and the $y$, so we want to identify the external $x$ and $y$ in the
-output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
-with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
-\combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.
+%% Draw $d_1 = v_1 \combine v_1'$ and $d_2 = v_2 \combine v_2'$ like in
+%% Patrick's email, with vertical columns for the aspects in $v_1$, $v_1'$,
+%% $v_2'$, and then $v_2$ from left to right.  We say that the $v_1'$ and
+%% $v_2'$ aspects are ``internal'' and the $v_1$ and $v_2$ are external
+%% (they will be in the boundary of the result, but maybe connected up).
 
-Rule 3: Two variables on the right are getting glued together by an
-internal line on the left.  Why it type checks: We have
-$\Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'}$ and $d_2 \combine (x\m
-\combine y\p) = v_2 \combine v_2'$.  However, we can't make a recursive
-call with this, because $d_2 \combine (x\m \combine y\p)$ is not
-$d$-context, so we first need to merge $x$ and $y$.  $x$ and $y$ might
-occur in either $v_2$ or $v_2'$, so it seems like we need to do a bunch
-of cases, to see where to do the substitution.  However, a slick way to
-handle this is to start with the renaming
-\[
-\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}
-\]
-and then split it along the known context splitting 
-$d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
-to get
-\begin{mathpar}
-d_2 \combine x\pm = v_3 \combine v_3' \and
-\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} \and
-\Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}
-\end{mathpar}
-This will push the appropriate part of $x/x$ and $x/y$ into the
-appropriate half.  Then   
-\begin{mathpar}
-\Psi^{\flip{v_3'}} \vdash \rho[\flip{\rho_3'}] : \Psi^{v_1'}
-\end{mathpar}
-so we can recur, getting 
-\begin{mathpar}
-\Psi^{d} \vdash \rho_0 : \Psi^{v_1 \combine v_3}
-\end{mathpar}
-Finally we compose with 
-\begin{mathpar}
-\Psi^{v_1 \combine v_3} \vdash 1_{v_1} \combine \rho_3 : \Psi^{v_1 \combine v_2}
-\end{mathpar}
-to get the result.
+%% Rule 2: if the given $d_1$ and $d_2$ each have a distinguished variable
+%% $x$ (split with half going in $v_1$ and the other half in $v_1'$) and
+%% $y$ (split with half going in $v_2$ and the other half in $v_2'$), and
+%% the renaming splits to include $y/x$, then we are joining the $x$ string
+%% and the $y$, so we want to identify the external $x$ and $y$ in the
+%% output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
+%% with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
+%% \combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.
 
-FIXME: it seems arbitrary that we pick $x$ and not $y$ here?
+%% Rule 3: Two variables on the right are getting glued together by an
+%% internal line on the left.  Why it type checks: We have
+%% $\Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'}$ and $d_2 \combine (x\m
+%% \combine y\p) = v_2 \combine v_2'$.  However, we can't make a recursive
+%% call with this, because $d_2 \combine (x\m \combine y\p)$ is not
+%% $d$-context, so we first need to merge $x$ and $y$.  $x$ and $y$ might
+%% occur in either $v_2$ or $v_2'$, so it seems like we need to do a bunch
+%% of cases, to see where to do the substitution.  However, a slick way to
+%% handle this is to start with the renaming
+%% \[
+%% \Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}
+%% \]
+%% and then split it along the known context splitting 
+%% $d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
+%% to get
+%% \begin{mathpar}
+%% d_2 \combine x\pm = v_3 \combine v_3' \and
+%% \Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} \and
+%% \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}
+%% \end{mathpar}
+%% This will push the appropriate part of $x/x$ and $x/y$ into the
+%% appropriate half.  Then   
+%% \begin{mathpar}
+%% \Psi^{\flip{v_3'}} \vdash \rho[\flip{\rho_3'}] : \Psi^{v_1'}
+%% \end{mathpar}
+%% so we can recur, getting 
+%% \begin{mathpar}
+%% \Psi^{d} \vdash \rho_0 : \Psi^{v_1 \combine v_3}
+%% \end{mathpar}
+%% Finally we compose with 
+%% \begin{mathpar}
+%% \Psi^{v_1 \combine v_3} \vdash 1_{v_1} \combine \rho_3 : \Psi^{v_1 \combine v_2}
+%% \end{mathpar}
+%% to get the result.
 
-Rule 4: This is symmetric to rule 3, except here two variables on the
-left are getting glued together by an internal line on the right.  
-The code is basically dual, except we use $p_3'^{-1}$.  
+%% FIXME: it seems arbitrary that we pick $x$ and not $y$ here?
 
-FIXME: how exactly does this preclude loops?
+%% Rule 4: This is symmetric to rule 3, except here two variables on the
+%% left are getting glued together by an internal line on the right.  
+%% The code is basically dual, except we use $p_3'^{-1}$.  
+
+%% FIXME: how exactly does this preclude loops?
 
 \subsection*{Substitutions}
 
