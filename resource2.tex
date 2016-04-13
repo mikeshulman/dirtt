@@ -1,0 +1,1927 @@
+\documentclass{amsart}
+\usepackage{amssymb,amsmath,latexsym,stmaryrd,mathtools}
+\usepackage{cleveref}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\let\types\vdash % turnstile
+\def\cb{\mid} % context break
+\def\op{^{\mathrm{op}}}
+\def\p{^+} % variances on variables
+\def\m{^-}
+\newcommand\un{^\times}
+\let\mypm\pm
+\let\mymp\mp
+\def\pm{^\mypm}
+\def\mp{^\mymp}
+\def\ps{+} 
+\def\ms{-}
+\newcommand\uns{\times}
+\def\pms{\mypm}
+\def\jdeq{\equiv}
+\def\cat{\;\mathsf{cat}}
+\def\type{\;\mathsf{type}}
+\def\ctx{\;\mathsf{ctx}}
+\let\splits\rightrightarrows
+\def\flip#1{#1^*} % reverse the variances of all variables
+\def\dual#1{#1^\vee} % reverse variances *and* interchange \hat and \check
+\def\mor#1{\hom_{#1}}
+\def\id{\mathrm{id}}
+\def\ec{\cdot} % empty context
+\def\psplit{\overset{\mathsf{pair}}{\splits}}
+\def\iso{\cong}
+\def\tpair#1#2{#1\otimes #2}
+\def\cpair#1#2{\langle #1,#2\rangle}
+\def\tlet#1,#2:=#3in{\mathsf{let}\; \tpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\clet#1,#2:=#3in{\mathsf{let}\; \cpair{#1}{#2} \coloneqq #3 \;\mathsf{in}\;}
+\def\mix#1,#2 with #3 in{\mathsf{mix} {\scriptsize \begin{array}{c} \check{#1} \coloneqq \check{#3} \\ \hat{#2} \coloneqq \hat{#3} \end{array}  }\mathsf{in}\;}
+\def\pcol{\overset{\scriptscriptstyle +}{:}}
+\def\mcol{\overset{\scriptscriptstyle -}{:}}
+\def\pmcol{\overset{\scriptscriptstyle \pm}{:}}
+\def\mpcol{\overset{\scriptscriptstyle \mp}{:}}
+\def\uncol{\overset{\scriptscriptstyle \times}{:}}
+\def\ok{\;\mathsf{seq}}
+\newcommand\vcol[1]{\overset{\scriptscriptstyle #1}{:}}
+\newcommand\combine{\sqcup}
+\newcommand{\coend}{\begingroup\textstyle\int\endgroup}
+\newcommand{\End}{\begingroup\textstyle\int\endgroup}
+\newcommand{\Set}{\mathrm{Set}}
+\newcommand{\unsigned}[1]{#1^0}
+\newcommand{\joinvar}[1]{\left[#1\right]}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\gray}[1]{\textcolor{gray}{#1}}
+\newcommand\triv{\_}
+\newcommand\samestring{\leftrightarrow}
+\newcommand{\unif}[4]{#1\doteq #2\,\mathsf{ via }\,#3\cb #4}
+\mprset{flushleft}
+
+
+\title{A directed type theory for formal category theory}
+\author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
+\begin{document}
+\maketitle
+
+\begin{mathpar}
+\begin{array}{l}
+r :: = \ps \mid \ms \mid \pms  \\
+b :: = \ps \mid \ms \\
+\Psi,\Delta ::= \cdot \mid \Psi_1 \combine \Psi_2 \mid  x \vcol b A \\
+\\ 
+\Gamma ::= \cdot \mid \Gamma, M\\
+\end{array}
+\end{mathpar}
+
+We have four modifiers on variables (``resources''), $\ps$ (covariant),
+$\ms$ (contravariant), $\pms$ (two copies of the variable, one covariant
+and one contravariant), and $\uns$ (cannot be used at all).  We can flip a
+variance:
+\[
+\begin{array}{lll}
+\flip{\ps} & := & \ms \\
+\flip{\ms} & := & \ps \\
+\flip{\pms} & := & \pms \\
+\end{array}
+\]
+
+There is a partial operation of combining variances:
+\[
+\begin{array}{lll}
+\pms & = & \ps \combine \ms \\
+\pms & = & \ms \combine \ps \\
+\end{array}
+\]
+The operation $\combine$ is commutative by definition.
+
+We write $b$ for a resource that is either $\ps$ or $\ms$, and $d$ for a
+resource that is either $\pms$ or $\uns$.  Note that $\flip{b} \combine
+b$ is always defined and is a $d$.
+
+%% For its associativity, note that if $(r_1 \combine r_2) \combine r_3$ is defined, then at least one of $r_1,r_2,r_3$ must be $\uns$, since if $r_1\neq\uns\neq r_2$ then $r_1\combine r_2 = \pms$, hence $r_3$ must be $\uns$.
+%% Thus:
+%% \begin{itemize}
+%% \item If $r_1=\uns$, then $(\uns \combine r_2) \combine r_3 = r_2 \combine r_3 = \uns \combine (r_2\combine r_3)$.
+%% \item If $r_2=\uns$, then $(r_1 \combine \uns) \combine r_3 = r_1 \combine r_3 = r_1 \combine (\uns\combine r_3)$.
+%% \item If $r_3=\uns$, then $(r_1 \combine r_2) \combine \uns = r_1 \combine r_2 = r_1 \combine (r_2\combine \uns)$.
+%% \end{itemize}
+%% So in all cases if $(r_1 \combine r_2) \combine r_3$ is defined, then so is $r_1 \combine (r_2\combine r_3)$, and they are equal.
+%% Therefore, we can unambiguously write $r_1 \combine r_2 \combine r_3$.
+
+We think of $\Gamma$ as an unordered list of assumptions, and since it
+is purely linear, we will use context splitting instead of resource
+counting.  
+
+Judgements:
+
+\begin{itemize}
+
+\item $A \cat$
+
+\item $\Psi \ctx$
+
+\item $\Psi \types a : A$
+
+\item $\Psi \types M \type$
+
+\item $\Psi \types \Gamma \ctx$
+
+\item $\Psi \types (\Gamma \vdash M) \ok$
+
+\item $\Delta \cb \Gamma \vdash M$, presupposes 
+ $\Psi \types (\Gamma \vdash M) \ok$.  
+
+\end{itemize}
+
+Note that we allow dead variables $x \uncol A$ in $\Delta$ so that we
+can assume that all the contexts in a rule are the same variables but
+with different resources, because we can weaken.  
+
+\subsection*{Category Contexts}
+
+Category contexts $\Psi$ are defined inductively-recursively with a
+relation $x \vcol r A \in \Psi$, which means that the variable $x$ is
+bound with type $A$ and with resource including $r$ in $\Psi$ (by
+``including,'' we mean that, for example, $x \vcol{\pm} A \in (x \pcol A
+\combine x \mcol A)$, and $x \vcol{\p} A \in$ in that context).
+
+\begin{mathpar}
+\inferrule{ }{\ec \ctx}
+
+\inferrule{ }{(x \vcol b A) \ctx}
+
+\inferrule{ \Psi_1 \ctx \and \Psi_2 \ctx \\\\
+            (\forall x,r_1,r_2,A_1,A_2. \: (x \vcol {r_1} A_1) \in \Psi_1
+            \text{ and } (x \vcol {r_2} A_2 \in \Psi_2)
+            \text{ implies } A_1 = A_2 \text{ and } \exists r. r = r_1 \combine r_2)
+          }
+          {\Psi_1 \combine \Psi_2 \ctx}
+\end{mathpar}
+The combination of two contexts is defined when any variable that is in
+both occurs with the same type and combinable resources, which means one
+of $r_1,r_2$ is $\ps$ and the other the is $\ms$.
+
+Membership is defined by recursion:
+\[
+\begin{array}{lll}
+x \vcol b A \in (x \vcol {b'} A') & \text{ iff } & b = b' \text{ and } A = A' \\
+x \vcol r A \in {(\Psi_1 \combine \Psi_2)} & \text{ iff } & 
+x \vcol{r} A \in \Psi_1, \text{ or } x \vcol{r} A \in \Psi_2, \text{ or }\\
+& & (x \vcol{r_1} A \in \Psi_1) \text{ and } (x \vcol{r_2} A \in \Psi_2) \text{ and } r = r_1 \combine r_2
+\end{array}
+\]
+
+We write $x \pmcol A$ for $(x \pcol A) \combine (x \mcol A)$.
+
+\paragraph{Congruence}
+
+We define a congruence generated by
+\begin{mathpar}
+\inferrule{ }
+          { \Psi_1 \combine \Psi_2 \equiv \Psi_2 \combine \Psi_1}
+\qquad
+\inferrule{ }
+          { (\Psi_1 \combine \Psi_2) \combine \Psi_3 \equiv \Psi_1 \combine (\Psi_2 \combine \Psi_3)}
+\qquad
+\inferrule{ }
+          { \cdot \combine \Psi \equiv \Psi}
+\qquad
+\inferrule{ }
+          { \Psi \combine \cdot \equiv \Psi}
+\end{mathpar}
+
+FIXME: check that (1) one side is well-formed iff the other is, and (2)
+$x \vcol v A \in \Psi_1$ iff 
+$x \vcol v A \in \Psi_2$ when $\Psi_1 \equiv \Psi_2$.  
+
+All future judgements are defined on equivalence classes of contexts.  
+
+\paragraph{Flipping}
+
+We can define 
+\begin{mathpar}
+\inferrule*[right=admissible]
+           {\Psi \ctx}
+           { \flip{\Psi} \ctx
+           }
+
+x \vcol r A \in {\flip \Psi} \text{ iff } x \vcol {\flip{r}} A \in \Psi 
+\end{mathpar}
+by
+\[
+\begin{array}{l}
+\flip{\cdot} = \cdot \\
+\flip{(x \vcol b A)} = x \vcol {\flip b} A \\
+\flip{(\Psi_1 \combine \Psi_2)} = {\flip{\Psi_1}} \combine {\flip{\Psi_2}} \\
+\end{array}
+\]
+This satisfies $\flip{(\flip \Psi)} = \Psi$.  
+
+\subsection*{Context Isomorphisms}
+
+\begin{mathpar}
+\inferrule{ }
+          {\cdot \vdash \cdot : \cdot}
+\and
+\inferrule{ }
+          { x \vcol b A \vdash x/y^b : y \vcol b A}
+\and 
+\inferrule{ \Psi_1 \vdash \rho_1 : \Psi_1'  \\
+            \Psi_2 \vdash \rho_2 : \Psi_2' \\
+           }
+          { \Psi_1 \combine \Psi_2 \vdash (\rho_1 \combine \rho_2) : \Psi_1' \combine \Psi_2'}
+\end{mathpar}
+
+\paragraph{Congruence}
+
+In the judgement $\Psi \vdash \rho : \Psi'$, $\Psi$ and $\Psi'$ are
+considered up to $\equiv$, and we define the same congruence on
+renamings:
+\begin{mathpar}
+\inferrule{ }
+          { \rho_1 \combine \rho_2 \equiv \rho_2 \combine \rho_1}
+\qquad
+\inferrule{ }
+          { (\rho_1 \combine \rho_2) \combine \rho_3 \equiv \rho_1 \combine (\rho_2 \combine \rho_3)}
+\qquad
+\inferrule{ }
+          { \cdot \combine \rho \equiv \rho}
+\qquad
+\inferrule{ }
+          { \rho \combine \cdot \equiv \rho}
+\end{mathpar}
+
+
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           { }
+           {\Psi \vdash 1_\Psi : \Psi }
+\and
+\inferrule*[right=admissible?]
+           {\Psi \vdash \rho' : \Psi' \and
+            \Psi' \vdash \rho : \Psi''}
+           {\Psi \vdash \rho[\rho'] : \Psi'' }
+\and
+\inferrule*[right=admissible?]
+           {\Psi \vdash \rho' : \Psi'}
+           {\Psi' \vdash \rho'^{-1} : \Psi}
+\and 
+\inferrule*[right=admissible?]
+           {\Psi \vdash \rho : \Psi'}
+           {\flip{\Psi} \vdash \flip{\rho} : \flip{\Psi'} }
+\end{mathpar}
+
+\paragraph{Splitting} Given $\Psi \vdash \rho : \Psi_1' \combine \Psi_2'$, 
+there exist unique (up to $\equiv$) $\Psi_1$ and $\Psi_2$ and $\rho_1$
+and $\rho_2$ such that $\Psi \equiv \Psi_1 \combine \Psi_2$ and $\Psi_1
+\vdash \rho_1 : \Psi_1'$ and $\Psi_2 \vdash \rho_2 : \Psi_2'$ and
+$\rho_1 \combine \rho_2 \equiv \rho$.  FIXME: write this out formally,
+but basically just $AC$ things to the correct side.
+
+\subsection*{Unification of Renamings}
+
+We introduce a new judgement and rules for deriving valid string diagram
+compositions. The new judgement has the form 
+\[
+\unif{(\Psi_1 \combine \Psi_1')} {(\Psi_2 \combine \Psi_2')} {\rho} {(\Delta_0 \vdash \rho_0)}
+\]
+under the presupposition that there exist $\Delta_1$ and $\Delta_2$ and
+$\Delta$ such that $\Delta_1 = \Psi_1 \combine \Psi_1'$ and $\Delta_2 =
+\Psi_2 \combine \Psi_2'$ and $\Delta = \Delta_1 \combine \Delta_2$
+(i.e. $\Psi_1 \combine \Psi_1'$ exists and is a $\pms$-context, the same
+for $\Psi_2 \combine \Psi_2'$, and these are independent) and
+$\flip{\Psi_2'} \types \rho : \Psi_1'$ and $\Delta_0 \vdash \rho_0 :
+\Psi_1 \combine \Psi_2$.  This should be read as stating that $\Delta_0$
+is the result of composing $\Delta_1$ and $\Delta_2$ by gluing along
+$\rho$, and that the composition introduced no loops.
+
+%% Formally, this judgement is a
+%% relation on $(\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho,d,\rho_0)$---$\Psi$
+%% occuring three times and the $=$ and $\combine$ and $\vdash$ in the
+%% judgement are just notation.
+
+The rules for this judgement are
+\begin{small}
+\begin{mathpar}
+  \inferrule{ }
+            {
+              \unif{(\Psi_1 \combine \cdot)}{(\Psi_2 \combine \cdot)}{\cdot}{({\Psi_1 \combine \Psi_2} \vdash 1)}
+            }
+
+  \inferrule{
+    \unif{(\Psi_1 \combine \Psi_1')}{(\Psi_2 \combine \Psi_2')}{\rho}{(\Delta_0 \vdash \rho_0)}
+  }{
+    \unif{((\Psi_1 \combine {x \vcol {\flip b} A}) \combine (\Psi_1' \combine {x \vcol b A}))}
+         {((\Psi_2 \combine {y \vcol {b} A}) \combine (\Psi_2' \combine {y \vcol {\flip b} A}))}
+         {(\rho \combine (y/x^b))}
+         {(\Delta_0 \combine x \pmcol A \vdash \rho_0 \combine (x/x^{\flip{b}}) \combine (x/y^{b}))}
+  }
+
+  \inferrule{
+        (\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine
+    x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p)= v_2 \combine v_2'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}) \\\\
+        \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{(d_2\combine x\pm) = v_3 \combine v_3'}}{\rho[\flip{\rho_3'}]}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
+         {\Psi^{d_2\combine x\pm\combine y\pm = (v_2 \combine (v_2' \combine (x\p \combine y\m)))}}
+         {(\rho \combine (x,y)/z)}
+         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+  }
+
+  \inferrule{
+%%      (\Psi^{d_1 \combine x\pm} \vdash (1_{d_1} \combine (x/x \combine x/y)) : \Psi^{d_1 \combine (x\m \combine y\p)}) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\Psi^{v_3} \vdash \rho_3 : \Psi^{v_1} , \Psi^{v_3'} \vdash \rho_3' : \Psi^{v_1'}) \\\\
+        (1_{d_1} \combine (x/x \combine x/y)) =^{(d_2 \combine x\m \combine y\p) = v_1 \combine v_1'} (\rho_3 , \rho_3') \\\\
+        \unif{\Psi^{(d_1 \combine x\pm)=v_3 \combine v_3'}}{\Psi^{(d_2 = v_2 \combine v_2')}}{\rho_3'^{-1}[\rho]}{(\Psi^d \vdash \rho_0)}
+  }{
+    \unif{\Psi^{d_1\combine x\pm\combine y\pm = (v_1 \combine (v_1' \combine (x\p \combine y\m)))}}
+         {\Psi^{d_2\combine z\pm = v_2 \combine (v_2' \combine z\pm)}}
+         {(\rho \combine z/x \combine z/y)}
+         {(\Psi^d \vdash (1_{v_1} \combine \rho_3)[\rho_0])}
+  }
+\end{mathpar}
+\end{small}
+
+Reading the rules bottom-to-top as an algorithm for finding $d$ and
+$\rho_0$, to get the recursion to go through, it seems necessary to
+process the renaming $\rho$ in the conclusion by \emph{splitting} it,
+not by case-analyzing it as $\rho,\vec{x}/x$.  This way, the premises
+are in the same context $\Psi$ as the conclusion, but under different
+resources.  If we case-analyze as $\rho,\vec{x}/x$, then we would need
+to generalize the operation somehow, because the codomain of $\rho$
+would be different of a different length than its domain.  The judgement
+is therefore non-deterministic, because the same renaming can be split
+in many different ways.  Conjecture: all of the results are isomorphic.
+
+We write $b$ for $\ps$ or $\ms$.  We write $\Psi^{y^b} \types y/x :
+\Psi^{x^b}$ for the renaming given by $y/x$ along with $\triv/z$ for
+every other $z \in \Psi$ (formally, this has to be defined by induction
+on $\Psi$).
+
+Operationally, we think of $\Psi,d_1,v_1,v_1',d_2,v_2,v_2',\rho$ as
+inputs, and $d,\rho_0$ as outputs.  FIXME: when can the rules fail?
+
+In the first rule, if the given splitting puts all the resources in
+$v_1$ and $v_2$, and $v_1'$ and $v_2'$ are $\uns$ in each component,
+then $\rho$ can only consist of $\triv/x$ for each variable $x$.  In
+this case, we return the identity renaming.
+
+Draw $d_1 = v_1 \combine v_1'$ and $d_2 = v_2 \combine v_2'$ like in
+Patrick's email, with vertical columns for the aspects in $v_1$, $v_1'$,
+$v_2'$, and then $v_2$ from left to right.  We say that the $v_1'$ and
+$v_2'$ aspects are ``internal'' and the $v_1$ and $v_2$ are external
+(they will be in the boundary of the result, but maybe connected up).
+
+Rule 2: if the given $d_1$ and $d_2$ each have a distinguished variable
+$x$ (split with half going in $v_1$ and the other half in $v_1'$) and
+$y$ (split with half going in $v_2$ and the other half in $v_2'$), and
+the renaming splits to include $y/x$, then we are joining the $x$ string
+and the $y$, so we want to identify the external $x$ and $y$ in the
+output.  Plugging in the two sides of $x$ for $x$ and $y$ by merging
+with the renaming $\Psi^{x\pm = x^{\flip{b}} \combine x^b} \vdash (x/x
+\combine x/y) : \Psi^{x^{\flip b} \combine y^{b}}$ does this.
+
+Rule 3: Two variables on the right are getting glued together by an
+internal line on the left.  Why it type checks: We have
+$\Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'}$ and $d_2 \combine (x\m
+\combine y\p) = v_2 \combine v_2'$.  However, we can't make a recursive
+call with this, because $d_2 \combine (x\m \combine y\p)$ is not
+$d$-context, so we first need to merge $x$ and $y$.  $x$ and $y$ might
+occur in either $v_2$ or $v_2'$, so it seems like we need to do a bunch
+of cases, to see where to do the substitution.  However, a slick way to
+handle this is to start with the renaming
+\[
+\Psi^{d_2 \combine x\pm} \vdash (1_{d_2} \combine (x/x \combine x/y)) : \Psi^{d_2 \combine (x\m \combine y\p)}
+\]
+and then split it along the known context splitting 
+$d_2 \combine (x\m \combine y\p) = v_2 \combine v_2'$.
+to get
+\begin{mathpar}
+d_2 \combine x\pm = v_3 \combine v_3' \and
+\Psi^{v_3} \vdash \rho_3 : \Psi^{v_2} \and
+\Psi^{v_3'} \vdash \rho_3' : \Psi^{v_2'}
+\end{mathpar}
+This will push the appropriate part of $x/x$ and $x/y$ into the
+appropriate half.  Then   
+\begin{mathpar}
+\Psi^{\flip{v_3'}} \vdash \rho[\flip{\rho_3'}] : \Psi^{v_1'}
+\end{mathpar}
+so we can recur, getting 
+\begin{mathpar}
+\Psi^{d} \vdash \rho_0 : \Psi^{v_1 \combine v_3}
+\end{mathpar}
+Finally we compose with 
+\begin{mathpar}
+\Psi^{v_1 \combine v_3} \vdash 1_{v_1} \combine \rho_3 : \Psi^{v_1 \combine v_2}
+\end{mathpar}
+to get the result.
+
+FIXME: it seems arbitrary that we pick $x$ and not $y$ here?
+
+Rule 4: This is symmetric to rule 3, except here two variables on the
+left are getting glued together by an internal line on the right.  
+The code is basically dual, except we use $p_3'^{-1}$.  
+
+FIXME: how exactly does this preclude loops?
+
+\subsection*{Substitutions}
+
+The technically easiest thing is to consider total substitutions (a
+substitution plugs in for all of the variables in a context).  I think
+we could do a single-variable substitution version instead, which would
+be nicer to use, because there wouldn't be a bunch of identity
+substitutions running around, but I wanted to work this out first.
+
+For convenience, we use a notion of ``inhabitant of a type at resource
+$r$'', i.e. where we have variance on the right, $\Psi \types \vec{a} \vcol r
+A$, where $\vec{a}$ is 0, 1, or 2 terms. 
+
+\begin{mathpar}
+\inferrule{ }
+          {\Psi^\uns \types \triv \uncol A}
+\and
+\inferrule{ \Psi \types a : A }
+          {\Psi \types a \pcol A}
+\and
+\inferrule{ \Psi^{v^*} \types a : A }
+          {\Psi^{v} \types a \mcol A}
+\and
+\inferrule{ v = v_1 \combine v_2 \\ \Psi^{v_1^*} \types a_1 : A \\ \Psi^{v_2} \types a_2 : A}
+          {\Psi^{v} \types (a_1,a_2) \pmcol A}
+\end{mathpar}
+
+Using this, the rules for substitutions are
+\begin{mathpar}
+\inferrule{ }
+          {\Psi^{\uns} \vdash \cdot : \cdot}
+\and
+\inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
+            \Psi^{v_2} \vdash \vec{a} \vcol r A \\
+             v = {v_1} \combine v_2
+           }
+           {\Psi^{v} \vdash (\theta,\vec{a}/x) : (\Psi',x \vcol r A)}
+\end{mathpar}
+
+For example, the following rule is derivable, and is the analogue of the
+$(\check{a}/\check{x},\hat{a}/\hat{x})$ substitution in the other
+version.  
+\begin{mathpar}
+\inferrule*[right=derivable]
+           {\Psi^{v'} \vdash \theta : \Psi'  \\
+             \Psi^{p} \vdash a : A \\
+             v = {v'} \combine {(\flip{p} \combine p)} \\
+           }
+           {\Psi^{v} \vdash (\theta,(a,a)/x) : (\Psi',x \pmcol A)}
+\end{mathpar}
+On the other hand, a substitution $(\theta,(a,b)/x)$ is like
+$(a/\check{x},b/\hat{x})$.
+
+\subsubsection*{Splitting} Suppose we have a rule like
+
+\begin{mathpar}
+\inferrule*{v' = v_1' \combine v_2'  \\ 
+            \Psi'^{v_1'} \vdash J_1 \\
+            \Psi'^{v_2'} \vdash J_2
+           }
+           { {\Psi'}^{v'} \vdash J }
+\end{mathpar}
+and we want to substitute ${\Psi}^{v} \types \theta : \Psi'$ into it.
+We need to find a $v = v_1 \combine v_2$ and $\theta_1$ and
+$\theta_2$ with $\Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}$ and
+$\Psi^{v_2} \vdash \theta_2 : \Psi'^{v_2'}$ to push the substitution
+inside.  
+
+\begin{mathpar}
+\inferrule*[right=admissible]
+           {v' = v_1' \combine v_2'  \\ 
+            {\Psi}^{v} \types \theta : {\Psi'}^{v'}
+           }
+           { v = v_1 \combine v_2\\
+             \Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}\\
+             \Psi^{v_2} \vdash \theta_2 : {\Psi'}^{v_2'}
+           }
+\end{mathpar}
+We write $\theta = \theta_1 \combine \theta_2$ for this operation when the
+other arguments are clear from context.  
+
+We will need a corresponding operation on terms:
+\begin{mathpar}
+\inferrule*[right=admissible]
+           {r' = r_1' \combine r_2' \\ 
+             \Psi^{v_2} \vdash t \vcol{r'} A
+           }
+          { v_2 = {v_{21}} \combine v_{22} \\ 
+            \Psi^{v_{21}} \vdash \vec{a}_1 \vcol{r_1'} A\\
+            \Psi^{v_{21}} \vdash \vec{a}_2 \vcol{r_2'} A\\
+          }
+\end{mathpar}
+
+Here is the essence of the definition:
+\[
+\begin{array}{l}
+\cdot = \cdot \combine \cdot \\
+(\theta,\vec{a}/x) = (\theta_1,\vec{a}_1/x) \combine (\theta_2,\vec{a}_2/x) \text{ when } \theta = \theta_1 \combine \theta_2
+\text{ and } \vec{a} = \vec{a}_1 \combine \vec{a}_2 \\
+\\ 
+\vec{a} = (\vec{a} \combine \triv) \text{ if the splitting is } r = r \sqcup \uns\\
+\vec{a} = (\triv \combine \vec{a}) \text{ if the splitting is } r = \uns \sqcup r\\
+(a_1,a_2) = (a_1 \combine a_2) \text{ if the splitting is } \pms = \ms \sqcup \ps\\
+(a_1,a_2) = (a_2 \combine a_1) \text{ if the splitting is } \pms = \ps \sqcup \ms\\
+\end{array}
+\]
+
+What follows is a long-winded explanation of why this type checks.  
+
+If $\Psi'$ is $\cdot$, then the substitution must be $\cdot$, and $v' =
+v_1' \combine v_2'$ is $\cdot = \cdot \combine \cdot$, so we want
+\begin{mathpar}
+\uns = \uns \combine \uns \and \inferrule*{ }{\cdot \cdot \combine \cdot}
+\end{mathpar}
+
+Suppose the $\Psi'$ in the theorem is of the form $\Psi', x \vcol r' A$,
+and the substitution is of the form $\theta,\vec{a}/x$, where in every case we
+have 
+\begin{mathpar}
+v = {v_1} \combine {v_2} \\
+\Psi^{v_1} \types \theta : \Psi' \\
+\Psi^{v_2} \vdash \vec{a} \vcol {r'} A
+\end{mathpar}
+If $(v',r')$ is the resource vector for the $\Psi',x \vcol{r'} A$, then we
+have a splitting as
+\[
+(v',r') = (v_1',r_1') \combine (v_2',r_2')
+\]
+so in particular $v' = v_1' \combine v_2'$.  Therefore, by splitting
+$\theta$ with $v' = v_1' \combine v_2'$ we get
+\begin{mathpar}
+\theta = \theta_1 \combine \theta_2 \\
+v_1 = v_{11} \combine v_{12}\\
+\Psi^{v_{11}} \vdash \theta_1 : {\Psi'}^{v_1'}\\
+\Psi^{v_{12}} \vdash \theta_2 : {\Psi'}^{v_2'}\\
+\end{mathpar}
+
+By term splitting, we have
+\begin{mathpar}
+\vec{a} = \vec{a}_1 \sqcup \vec{a}_2 \\
+v_2 = {v_{21}} \combine v_{22} \\ 
+\Psi^{v_{21}} \vdash \vec{a}_1 \vcol{r_1'} A\\
+\Psi^{v_{21}} \vdash \vec{a}_2 \vcol{r_2'} A\\
+\end{mathpar}
+
+So we construct 
+\begin{mathpar}
+(\theta,\vec{a}/x) = (\theta_1,\vec{a}_1/x) \combine (\theta_2,\vec{a}_2/x) \\
+v = (v_{11} \combine v_{21}) \combine (v_{21} \combine v_{22}) \\
+\Psi^{(v_{11} \combine v_{21})} \vdash (\theta_1,\vec{a}_1/x) : (\Psi'^{v_1'},x \vcol{r_1'} A)\\
+\Psi^{(v_{21} \combine v_{22})} \vdash (\theta_1,\vec{a}_2/x) : (\Psi'^{v_2'},x \vcol{r_2'} A)
+\end{mathpar}
+where we use associativity and commutativity, we will have 
+$v = v_1 \combine v_2 = (v_{11} \combine v_{12}) \combine ({v_{21}} \combine {v_{22}})
+= (v_{11} \combine {v_{21}}) \combine ({v_{12} \combine v_{22}})$.  
+
+Next, we define the term splitting operation by cases on how $r'$ splits:
+\begin{itemize}
+\item Case $r' = r' \combine \uns$.  In this case return $v_2 = v_2
+  \combine \uns$ and $t \splits (t,\triv)$.
+\item Case $r' = \uns \combine r'$.  In this case return $v_2 = \uns \combine v_2$ and $t \splits (\triv,t)$.
+
+\item Case $\pms = \ps \combine \ms$. In this case we have $v_2 =
+  {v_{21}} \combine {v_{22}}$, where $\Psi^{v_{21}^*} \vdash a_1 : A$
+  and $\Psi^{v_{22}} \vdash a_2 : A$, so we can return 
+  $v_2 = {v_{21}} \combine {v_{22}}$
+  and define $(a_1,a_2) = a_1 \combine a_2$.
+
+\item Case $\pms = \ps \combine \ms$. In this case we have $v_2 =
+  {v_{21}} \combine {v_{22}}$, where $\Psi^{v_{21}^*} \vdash a_1 : A$
+  and $\Psi^{v_{22}} \vdash a_2 : A$, so we can return 
+  $v_2 = {v_{22}} \combine {v_{21}}$
+  and define $(a_1,a_2) = a_2 \combine a_1$.
+\end{itemize}
+
+\subsubsection*{Flipping}
+
+Suppose we have a rule like
+\[
+\inferrule{\Psi'^* \vdash J_1}
+          {\Psi' \vdash J}
+\]
+and we want to push a substitution $\Psi \vdash \theta : \Psi'$ into it.
+We need to define $\flip{\Psi} \vdash \flip{\theta} : \flip{\Psi'}$,
+i.e. the action of the opposite functor from cat to cat on morphism.
+For the auxilary notion of terms with a variance on the right, we need
+the corresponding principle that $\Psi \types t \vcol r A$ implies
+$\flip{\Psi} \types \flip{t} \vcol {\flip r} A$.  
+
+This is defined as follows:
+\[
+\begin{array}{l}
+\flip{\cdot} = \cdot\\
+\flip{(\theta,t/x)} = \flip{\theta},\flip{t}/x\\
+\\
+\flip{a} = a \text{ when $r'$ is $\ps$ or $\ms$} \\
+\flip{(a_1,a_2)} = (a_2,a_1) \text{ when $r'$ is $\pms$} \\
+\end{array}
+\]
+
+For the first case, we use the fact that $\flip{\uns} = \uns$.  
+
+For the second, we have
+\begin{mathpar}
+\Psi^{v_1} \vdash \theta : \Psi' \and 
+\Psi^{v_2} \vdash t \vcol r A  \and
+v = {v_1} \combine v_2
+\end{mathpar}
+so $\flip{v} = \flip{v_1} \combine \flip{v_2}$ (FIXME: state this as a
+lemma), and by the IH $\Psi^{\flip{v_1}} \vdash \theta : \flip{\Psi'}$,
+and by the term lemma, $\Psi^{\flip{v_2}} \vdash t \vcol {\flip r} A$.
+so $\flip{{\Psi^v}} \types (\flip{\theta},\flip{r}) : \flip{(\Psi', x
+  \vcol r A)}$.
+
+For terms, we use $\flip{\uns} = \uns$ in the first case, and
+$\flip{(\flip{r})} = r$ in the $\ps$ and $\ms$ cases.  
+For the final case, we use $\flip{v} = \flip{v_1} \combine \flip{v_2}$
+and commutativity and involution.  
+
+\subsubsection*{Merging}
+
+We should also have an inverse operation
+\begin{mathpar}
+\inferrule*[right=admissible]
+           { v = v_1 \combine v_2\\
+             v' = v_1' \combine v_2'  \\ 
+             \Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}\\
+             \Psi^{v_2} \vdash \theta_2 : {\Psi'}^{v_2'}
+           }
+           {
+            {\Psi}^{v} \types \theta_1 \combine \theta_2 : {\Psi'}^{v'}
+           }
+\end{mathpar}
+That it is inverse means that if $\theta = \theta_1 \combine \theta_2$
+(referring to the splitting operation defined above) then $\theta_1
+\combine \theta_2$ (referring to the merging operation defined here) is
+equal to the original $\theta$, and that merging $\theta_1$ and
+$\theta_2$ and then splitting it gives back the same $\theta_1$ and
+$\theta_2$.  Because of this, using the same notation for splitting and
+merging is justified.  FIXME: It might be better to define
+splitting/merging as a single judgement that is proved functional in
+both directions (with the $v$ splitting an input for one and an output
+for the other).  
+
+
+
+
+\subsection*{Type Contexts}
+
+\begin{mathpar}
+  \inferrule{
+  }{
+    \Psi\un \types \ec \ctx
+  }
+  \and
+  \inferrule{
+    \Psi^{v_1} \types \Gamma \ctx\\
+    \Psi^{v_2} \types M \type\\
+    v = {v_1} \combine v_2
+  }{
+    \Psi^{v} \types \Gamma,M \ctx
+  }
+\\
+\end{mathpar}
+
+\subsection*{Sequent Well-formedness}
+
+\begin{mathpar}
+  \inferrule{
+    \Psi^{v_1^*} \types \Gamma \ctx\\
+    \Psi^{v_2} \types M \type\\
+    v = v_1 \combine v_2
+  }{
+    \Psi^{v} \types (\Gamma \vdash M) \ok
+  }
+\\ 
+\end{mathpar}
+
+\subsection*{Identity Rules}
+
+\begin{mathpar}
+\inferrule{ }
+          {\Psi_1\un,x \pcol A,\Psi_2\un \vdash x : A}
+
+\inferrule{\Psi^{p} \types N \type }
+          {\Psi^{(\flip{p} \combine p)} \cb N \types N}
+\\
+\end{mathpar}
+
+\subsection*{Substitution for Categories}
+
+In the next two rules, let $J$ be $a : A$ or $\Gamma \ctx$ or $M \type$
+or $(\Gamma \vdash M) \ok$.
+
+\begin{mathpar}
+
+\inferrule*[right=admissible?]
+           {\Psi' \types J \\
+            \Psi \types \rho : \Psi'
+           }
+           {\Psi \vdash J[\rho]}
+
+\inferrule*[right=admissible?]
+           {\Psi' \types J \\
+            \Psi \types \theta : \Psi'
+           }
+           {\Psi \vdash J[\theta]}
+           \\
+\end{mathpar}
+
+We write $\sigma$ for a special sort of substitution, whose source and
+target must both have only $\pms$ and $\uns$ variables (i.e. $\Psi^d
+\vdash \sigma : \Psi'^{d'}$).  Note that this is a subclass of the
+substitutions defined above (every $\sigma$ is a $\theta$).  
+\begin{mathpar}
+\inferrule{ } 
+          {\Psi^\times \vdash \cdot : \cdot}
+
+\inferrule{\Psi \vdash \sigma : \Psi'}
+          {\Psi \vdash \sigma,\triv/x : \Psi', x \uncol A}
+
+\inferrule{d = d_1 \combine (\flip{p} \combine p) \\
+           \Psi^{d_1} \vdash \sigma : \Psi' \\ 
+           \Psi^p \vdash a : A
+          }
+          {\Psi^d \vdash \sigma, (a,a)/x : \Psi', x \pmcol A}
+\end{mathpar}
+Using this, we should have
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {\Psi' \cb \Gamma \vdash M \\
+            \Psi \types \sigma : \Psi'
+           }
+           {\Psi \cb (\Gamma \vdash M)[\sigma]}
+\end{mathpar}
+
+\subsection*{Cut For Types}
+
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {d = d_1 \combine d_2 \and
+            d_1 = v_1 \combine v_1' \and
+            d_2 = v_2 \combine v_2' \\\\
+            \Psi^{v_1'} \types M \type \and
+            \Psi^{\flip{v_2'}} \types \rho : \Psi^{v_1'} \and
+            \Psi^{v_1} \types \Gamma_1 \ctx \and 
+            \Psi^{v_2} \types (\Gamma_2 \types N) \ok \\\\
+            \Psi^{d_1} \cb \Gamma_1 \vdash M \and 
+            \Psi^{d_2} \cb \Gamma_2,M[\rho] \vdash N \and 
+            \\\\
+            \unif{\Psi^{d_1=v_1\combine v_1'}}{\Psi^{d_2 = v_2 \combine v_2'}}{\rho}{(\Psi_0 \vdash \rho_0)} \\
+           }
+           {\Psi_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
+\end{mathpar}
+
+\subsection*{Morphism types}
+
+\begin{mathpar}
+\inferrule{ \Psi^{\flip{v_1}} \types a_1 : A \and  
+            \Psi^{v_2} \types a_2 : A \and
+            v = v_1 \combine v_2
+          }
+          {\Psi^{v} \types \mor A(a_1,a_2) \type}
+\end{mathpar}
+
+\begin{mathpar}
+\inferrule*[right=Hom Right Axiom]
+          { }
+          {x :\pm A \cb \ec \types \mor{A}(x,x) }
+\and 
+  \inferrule*[right=Hom Left Axiom]
+             {
+               \Psi^{d}, x \pmcol A \cb (\Gamma \vdash M) [ x/y ]\\ 
+             }
+             {\Psi^d, x \pmcol A, y\pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
+\end{mathpar}
+
+\begin{mathpar}
+\inferrule{\Psi^{p} \types a : A }
+          {\Psi^{(\flip{p} \combine p)} \cb \ec \types \mor{A}(a,a) }
+
+\inferrule{d = {d_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\
+           \Psi^{d_1}, x \mcol A, y \pcol A \types (\Gamma \vdash M) \ok \\
+           \Psi^{p_1} \vdash a_1 : A \\
+           \Psi^{p_2} \vdash a_2 : A \\
+           \Psi^{d_1}, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ 
+           }
+          {\Psi^d \cb (\Gamma, \mor{A}(x,y) \types M)[ (a,a)/x\pm , (b,b)/y\pm] }
+\end{mathpar}
+
+Two-sided without a substitution:
+\begin{mathpar}
+\inferrule*[right=derivable?]
+           {\Psi, x \mcol A, y \pcol A \types (\Gamma \vdash M) \ok \\
+            \Psi, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ }
+           {\Psi, x \pmcol A, y \pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
+\end{mathpar}
+Officially, the total substitution in the premise should be 
+$(\Gamma \vdash M) [1_\Delta,x/x,x/y]$ but by convention we will leave
+off the identity parts.  
+
+Based rules:
+\begin{mathpar}
+\inferrule*[right=admissible using cut?]
+           {d = {d_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
+            \Psi^{(d_1 \combine \flip{p_1})},x \pcol A \types (\Gamma \vdash M) \ok \\\\
+            \Psi^{p_1} \vdash {a_1} : A \\\\
+            \Psi^{p_2} \vdash {a_2} : A \\\\
+            \Psi^{(d_1 \combine \flip{p_1} \combine {p_1})} \cb (\Gamma \vdash M)[a_1/x] }
+          {\Psi^{d} \cb (\Gamma, \mor{A} (a_1,x) \vdash M)[a_2/x]}
+
+\inferrule*[right=admissible using cut?]
+           {d = {v_1} \combine {({\flip {p_1}} \combine p_1)} \combine {({\flip {p_2}} \combine p_2)} \\\\
+            \Psi^{(d_1 \combine \flip{p_2})},x \mcol A \types (\Gamma \vdash M) \ok \\\\
+            \Psi^{p_1} \vdash {a_1} : A \\\\
+            \Psi^{p_2} \vdash {a_2} : A \\\\
+            \Psi^{(d_1 \combine \flip{p_2} \combine {p_2})} \cb (\Gamma \vdash M)[a_2/x] }
+           {\Psi^{d} \cb (\Gamma, \mor{A} (x,a_2) \vdash M)[a_1/x]}
+
+%% \inferrule{\Delta \cb (\Gamma \vdash M) [ \theta, a/\hat{x} ] \\ (\hat{x} \# a)}
+%%           {\Delta,x \pmcol A \cb (\Gamma, \mor{A}(a,\check x) \vdash M)[\theta,x \csplit \check x , \hat x]}
+\\
+\end{mathpar}
+
+TODO: think about the derivations of these using cut.  are the cuts
+reducible?  
+
+\subsection*{Tensor}
+
+\begin{mathpar}
+  \inferrule{
+    v = v_1 \combine v_2 \\
+    \Psi^{v_1} \types M_1\type \\ \Psi^{v_2} \types M_2\type
+  }{
+    \Psi^{v} \types M_1\otimes M_2\type
+  }\and
+  \inferrule{
+    \Psi \cb \Gamma,M_1,M_2 \types N
+  }{
+    \Psi \cb \Gamma, M_1\otimes M_2 \types N
+  }
+\end{mathpar}
+
+The right rule should be all substitutions/cuts into 
+\begin{mathpar}
+  \inferrule*[right=Tensor Right Axiom]
+             {d = (p_1 \combine \flip{p_1}) \combine (p_2 \combine \flip{p_2}) \and
+               \Psi^{p_1} \types M_1 \type \and
+               \Psi^{p_2} \types M_2 \type
+             }
+             {\Psi^d \cb M_1 , M_2 \types M_1 \otimes M_2}
+\end{mathpar}
+
+FIXME: this is what we had before; does this give that?
+\begin{mathpar}
+  \inferrule*[right= Tensor Right Rule]{
+    d = d_1 \combine d_2 \\\\ 
+    \Psi^{d_1} \types (\Gamma_1 \vdash M_1) \ok \\
+    \Psi^{d_1} \cb \Gamma_1 \vdash M_1 \\\\
+    \Psi^{d_2} \types (\Gamma_2 \vdash M_2) \ok \\
+    \Psi^{d_2} \cb \Gamma_2 \vdash M_2
+  }{
+    \Psi^{d} \cb \Gamma_1,\Gamma_2 \types M_1\otimes M_2
+  }\and
+\end{mathpar}
+
+
+\subsection*{Coend}
+
+\begin{mathpar}
+  \inferrule{
+    \Psi, x \pmcol A \types M \type \\
+    }{
+    \Psi \types \coend^{x:A} M \type
+  }
+
+  \inferrule{
+    \Psi, x \pmcol A \cb \Gamma, M \types N
+    }{
+    \Psi \cb \Gamma,\coend^{x:A} M \types N
+  }\and
+\end{mathpar}
+
+The right rule is essentially
+\begin{mathpar} 
+  \inferrule*[right=Coend Right Axiom]
+             {\Psi^p, x \pmcol A \vdash M \type
+             }
+             {
+               \Psi^{p \combine \flip p}, x \pmcol A \cb M \types \coend^{x:A} M
+             }
+\end{mathpar}
+but because we want substitution and cut to be admissible, we close the
+rule up under them.  This gives
+\emph{FIXME: this is wrong relative to the above: context on $a$ should
+  be a $p$.}  
+\begin{mathpar}
+  \inferrule*[right=Coend Right Rule]
+            { d = d_1 \combine d_2 \and 
+              d_1 = v_1 \combine v_1' \and 
+              d_2 = v_2 \combine v_2' \\\\
+              \Psi^{v_1 \combine v_2} \vdash (\Gamma \types \coend^{x:A} M) \ok \\\\
+              \Psi^{v_1'} \vdash a : A \and 
+              \Psi^{\flip{v_2'}} \vdash \rho : \Psi^{v_1'} \\\\
+              \Psi^{d} \cb \Gamma \types M[(a[\rho],a)/w] \\\\
+              \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{d_2=v_2 \combine v_2'}}{\rho}{(\Psi_0,\rho_0)}
+            }
+            { \Psi_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0] }
+\end{mathpar}
+
+\subsubsection*{Example: Prove Coend Right Rule from Coend Right Axiom using
+  cut and substitution}
+
+To illustrate the idea, here is one direction of the co-Yoneda lemma.
+Suppose $a \pcol A \types M$, and we write $M(b)$ for $M[b/a]$.  
+Then we cut as follows:
+\[
+\inferrule{ x \pmcol A, y\pmcol A \cb M(x) \types M(x) \otimes \mor{A}(y,y) \\\\
+            z \pmcol A, w\pmcol A \cb (M(w) \otimes \mor{A}(w,z)) \types \coend^{w:A} M(w) \otimes \mor{A}(w,z)\\\\
+            x\pm, y\pm, z\pm, w\pm = (x\pm, y\pm) \combine (z\pm \combine w\pm)\\\\
+            x\pm \combine y\pm = x\m \combine (x\p \combine y\pm) \\\\
+            z\pm \combine w\pm = z\p \combine (z\m \combine w\pm) \\\\
+            \flip{z\p \combine (z\m \combine w\pm)} \types (w/x , (w,z)/y) : x\m \combine (x\p \combine y\pm)\\\\
+            \unif{x\pm,y\pm}{z\pm,w\pm}{(w/x , (w,z)/y)}{ (x\pm \vdash (x/x,x/z)) }
+          }
+          { x \pmcol A \cb M(x) \types \coend^{w:A} M(w) \otimes \mor{A}(w,x)}
+\]
+
+%% For example, the basic ``re-pairing'' right rule that we had before
+%% \begin{mathpar}
+%%   \inferrule*[right=admissible]
+%%              {
+%%                \Psi^{d\combine x\p\combine y\m} \types (\Gamma\types\coend^{w:A} M) \ok \\\\
+%%                \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w]
+%%              }{
+%%                \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
+%%              }
+%% \end{mathpar}
+%% is the following substitution/cut instance
+%% \[
+%% \inferrule{
+%%   \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w] \and
+%%   \Psi^{?},w \pmcol A \cb M \types \coend^{w:A}{M}
+%% }{
+%%   \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
+%% }
+%% \]
+
+\emph{FIXME: Patrick's derivation is here; update to new rule.}  
+We can derive the second form from the first using cut. To do this, we must first setup some context
+manipulations. Let $v_1\combine v_2=v_3\combine v_3'$ such that $\Psi^{\flip{v_3}}\types \Gamma\ctx$ and
+$\Psi^{v_3'}\types\coend^{w:A}M \type$, and let $\Psi^{p_1'}\types\rho_1':\Psi^{v_1'}$ and
+$\Psi^{p_3'}\types\rho_3':\Psi^{v_3'}$ be renamings to $p$ contexts. The following rule should be
+admissable. FIXME: check.
+
+\begin{mathpar}
+  \inferrule{
+    d = d_1 \combine d_2 \and
+    d_1 = v_1 \combine v_1' \and
+    d_2 = v_2 \combine v_2' \\\\
+    v_1\combine v_2=v_3\combine v_3' \and
+    \Psi^{p_1'}\types\rho_1':\Psi^{v_1'} \and
+    \Psi^{p_3'}\types\rho_3':\Psi^{v_3'} \\\\
+    \unif{\Psi^{d_1=v_1 \combine v_1'}}{\Psi^{d_2=v_2 \combine v_2'}}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \unif{\Psi^{d=v_3\combine(v_3'\combine v_1'\combine v_2')}}
+      {\Psi^{p_3'\combine(\flip{p_3'}\combine p_1'\combine\flip {p_1'})}}
+      {(\rho^{-1}[\rho_1']\combine\rho_1'\combine\rho_3')}
+      {(\Psi_0,(1_{\Psi^{v_3}}\combine\rho_3'^{-1})[\rho_0])}
+  }
+\end{mathpar}
+
+Using this, we can derive
+
+\begin{mathpar}
+  \tiny
+  \inferrule{
+    \Psi^d \cb \Gamma \types M[(a[\rho],a)/w]
+    \and
+    \inferrule*{
+      \Psi^{v_1'}\types a:A
+      \and
+      \inferrule*{
+        \inferrule{ }{
+          \Psi^{p_3'\combine\flip{p_3'}\combine x\pm\combine y\pm} \cb M[\rho_3'\combine((x,y)/w)]
+            \types M[\rho_3'\combine(x,y)/w)]
+          }
+        }{
+        \Psi^{p_3'\combine\flip{p_3'}\combine z\pm} \cb M[\rho_3'\combine ((z,z)/w)] \types
+          (\coend^{w:A}M)[\rho_3']
+      }
+      }{
+      \Psi^{p_3'\combine\flip{p_3'}\combine p_1'\combine\flip{p_1'}} \cb
+        M[\rho_3'\combine((a[\rho_1'],a[\rho_1'])/w)] \types (\coend^{w:A}M)[\rho_3']
+    }
+    }{
+    \Psi_0 \cb (\Gamma\types\coend^{w:A}M)[\rho_0]
+  }
+\end{mathpar}
+
+\subsubsection*{Example: Functoriality along a Map}
+
+Here's the functoriality along a map one.  Assume $z_1 \pmcol C \types
+M$ and $x \pmcol A \types N$.
+
+\begin{mathpar}
+  \inferrule{
+  \inferrule{
+    \inferrule{
+      (z_1\pm,z_2\pm) = z_1\pm \combine z_2\pm \and
+      z_1\pm = z_1\m \combine z_1\p \and 
+      z_2\pm = z_2\p \combine z_2\m \\\\
+      {z_1 \mcol C, z_2 \pcol C \types (M[(z_2,z_1)/z] \types \coend^{x:A} N) \ok} \\\\
+      z_1 \pcol C \types a : A \and 
+      \flip{(z_2\m)} \types z_2/z_1 : z_1\p\\\\
+      %% z_1\pm = z^\pm \combine v_1' \and 
+      %% d_2 = v_2 \combine v_2' \and
+      %% d' = d_1 \combine d_2 \\\\
+      z_1\pmcol C,z_2\pmcol C \cb M[(z_2, z_1)/z] \types N[(a[z_2/z_1], a)/w]\\\\
+      \unif{\Psi^{z_1\pm}}{\Psi^{z_2\pm}}{z_2/z_1}{(z_1\pm \vdash (z_1/z_1,z_1/z_2))}
+    }{
+      z_1 \pmcol C, z_2 \uncol C \types M \types \coend^{w:A} N
+    }
+  }{
+    z_2 \uncol C \types \coend^{z_1:C} M \types \coend^{x:A} N
+  }}
+  { \ec \types \coend^{z_1:C} M \types \coend^{x:A} N } 
+\end{mathpar}
+
+\subsubsection*{Example: prove old coend right rules from this one}
+
+\begin{mathpar}
+  \inferrule*{ z\pmcol A \types \Gamma \ctx \and
+               w\pmcol A \types M \type \\\\
+               x\pm,y\pm = x\pm \combine y\pm \and
+               x\pm = x\m \combine x\p \and
+               y\pm = y\p \combine y\m \\\\
+               x\m,y\p \types (\Gamma[(y,x)/z] \types \coend^{w:A} M)\ok \\\\
+               x\p \vdash x : A \and 
+               \flip{(y\m)} \vdash y/x : x\p \\\\
+               x \pmcol A, y \pmcol A \cb \Gamma[(y,x)/z] \types M[(y,x)/w] \\\\
+               \unif{{x\pmcol A}}{{y\pmcol A}}{y/x}{(x\pmcol A, (x/x,x/y))}
+             }
+             { x \pmcol A \cb \Gamma \types \coend^{w:A} M }
+\end{mathpar}
+
+\begin{mathpar}
+  \inferrule*[right=admissible]
+             {
+               \Psi^{d\combine x\p\combine y\m} \types (\Gamma\types\coend^{w:A} M) \ok \\\\
+               \Psi^{d\combine x\pm\combine y\pm} \cb \Gamma \types M[(x,y)/w]
+             }{
+               \Psi^{d\combine z\pm} \cb (\Gamma \types \coend^{w:A} M)[z/x,z/y]
+             }
+\end{mathpar}
+
+\begin{mathpar}
+  \inferrule*[right=derivable?]
+             { u \pcol A \cb a : A \\
+               \Psi, x \pmcol A, y \pmcol A \cb (\Gamma \types M) [(x,y)/z] [(a,a)/w] [ (y,x) / u ] 
+             }
+             { \Psi , z \pmcol A \cb \Gamma \types \coend^{w:A} M}
+\end{mathpar}
+It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
+[(a[y/u],a[x/u])/w]$, so that's another way to write the premise?
+
+\subsection*{End}
+
+\begin{mathpar}
+
+  \inferrule{
+    \Psi, x \pmcol A \types M \type \\
+    }{
+    \Psi \types \End_{x:A} M \type
+  }
+
+  \inferrule{
+    \Psi, x \pmcol A \cb \Gamma \types M
+    }{
+    \Psi \cb \Gamma \types \coend_{x:A} M
+  }\and
+
+\end{mathpar}
+
+\begin{mathpar}
+\inferrule*[right=End Left Axiom]
+           {\Psi^p,x \pmcol A \types M \type}
+           {\Psi^{p \combine \flip{p}}, x \pmcol A \cb \End_{x:A} M \types M}
+\end{mathpar}
+
+\subsection*{Hom types (can we use a different name? Function types,
+  Closure types? Internal hom types?)}
+
+(I find the name confusing when there is something else notated $\mor{A}$).  
+
+\begin{mathpar}
+  \inferrule{
+    v = v_1 \combine v_2 \\
+    \Psi^{\flip{v_1}} \types M_1\type \\ \Psi^{v_2} \types M_2\type
+  }{
+    \Psi^v \types M_1 \multimap M_2 \type
+  }
+
+  \inferrule{
+    \Psi \cb \Gamma, M \types N
+  }{
+    \Psi \cb \Gamma \types M\multimap N
+  }
+\end{mathpar}
+
+The left rule should be all substitutions/cuts with
+\begin{mathpar}
+  \inferrule*[right=Arrow Left Axiom]{
+    d = (p_1 \combine \flip{p_1}) \combine (p_2 \combine \flip{p_2})\\
+    \Psi^{p_1} \types M_1 \\ 
+    \Psi^{p_2} \types M_2 \\ 
+  }{
+    \Psi^d \cb M_1,M_1\multimap M_2 \types M_2
+  }
+\end{mathpar}
+
+Here's what we had before; is this enough?
+\begin{mathpar}
+  \inferrule*[right=Arrow Left Rule]{
+    d = d_1 \combine d_2\\\\
+    \Psi^{\flip{d_1}} \types (\Gamma_1 \vdash M_1) \ok \\ 
+    \Psi^{\flip{d_1}} \cb \Gamma_1 \vdash M_1 \\\\
+    \Psi^{d_2} \types (\Gamma_2,M_2 \vdash N) \ok \\ 
+    \Psi^{d_2} \cb \Gamma_2,M_2 \vdash N \\ 
+  }{
+    \Psi^d \cb \Gamma_1,\Gamma_2,M_1\multimap M_2 \types N
+  }
+\end{mathpar}
+
+\end{document}
+
+\section{Introduction}
+\label{sec:introduction}
+
+We describe a two-level theory with two kinds of contexts and types.
+The first level, whose types we call \textbf{categories}, is a simple linear type theory with an involutive modality, represented judgmentally by assigning variances to variables in the context.
+Thus, for instance, a typical term judgment would look like
+\[ x \pcol A, y\mcol B, z \pcol C \types t:D \]
+As usual, linearity means that all the rules maintain the invariant that each variable in the context is used exactly once in the conclusion.
+In particular, there are no contraction and weakening rules; but we do allow an unrestricted (and usually implicit) exchange rule.
+We often write $\Psi$ for contexts of category-variables marked with variances (``\textbf{psi}gned contexts''), and we write $\flip\Psi$ for the analogous context with all variances reversed; thus $\flip{(x\pcol A, y\mcol B)} = (x\mcol A, y\pcol B)$.
+
+Substitution into a variable of variance ``$-$'' (a ``contravariant variable'') reverses variances.
+For instance, we have
+\begin{mathpar}
+  \inferrule{x\pcol A, y \mcol B \types f(x,y):C \\ z\mcol C \types g(z):D}{x\mcol A, y\pcol B \types g(f(x,y)):D}
+\end{mathpar}
+If necessary, we may write $\flip{f(x,y)}$ to denote the term $f(x,y)$ with all the variances of its variables reversed; of course this is not by itself a valid term, but only something that can be substituted for a contravariant variable.
+
+The second level is a more complicated sort of linear type theory, whose types we call \textbf{types} (or sometimes \textbf{sets} or \textbf{modules}), and that depends ``quadratically'' on the first level (in a sense made precise below).
+Its basic type judgment is
+\[ \Psi \types M \type \]
+That is, each type depends on some collection of category-variables, with variance.
+
+The basic term judgment for types is
+\[ \Delta \cb \Gamma \types M \]
+Here $\Gamma$ is a context of type-variables and $M$ is a type.
+Unlike the first level, we formulate this second level as a sequent calculus, and instead of including terms in the judgments we regard the derivations themselves as the (normal-form) terms.
+Later on we may introduce an equational theory, a term calculus, a third layer of logic with equality, or other techniques.
+This sequent calculus is also structurally linear, with no contraction or weakening, but with unrestricted exchange.
+
+The interesting thing happens in the context $\Delta$, which is a list of category-variables \emph{without} variances on which the types in $\Gamma$ and $M$ can depend.
+This dependence is ``quadratic'' in the following sense: all the rules maintain the invariant that each variable in $\Delta$ appears \emph{twice} in $\Gamma$ and $M$, and that the two occurrences have opposite variance (where the variance of $\Gamma$ is flipped relative to $M$).
+In fact, to be more precise, the actual dependence of $\Gamma$ and $M$ is on a category-context \emph{with} variances that is obtained from $\Delta$ by splitting each variable into two with opposite variance.
+The implementation will, of course, use de Brujin indices; when writing judgments with named variables, if $x:A$ is a variable in $\Delta$ we write $\hat{x}\pcol A$ and $\check{x}\mcol A$ for the two corresponding signed variables that must appear in $\Gamma$ and $M$ (exactly once each).
+
+If $\Psi$ is a signed context, we write $\unsigned{\Psi}$ for the unsigned context obtained by discarding the variances, and also any hats or checks on the variables.
+And if the variables in $\Psi$ have hats and checks (which technically means that it was obtained as part of a splitting an unsigned context), we write $\dual\Psi$ for the signed context obtained by reversing the variances \emph{and} interchanging hats and checks.
+In particular, we always have $\unsigned{\Psi} = \unsigned{(\dual\Psi)}$. % and $\unsigned{\Psi} \splits \Psi,\dual\Psi$.
+
+With this notation, we can express the variable dependence conditions as follows:
+\begin{center}
+  $\Delta\cb\Gamma\types N$ requires as preconditions that
+  $\begin{array}{c}
+     \Delta = \unsigned{\Psi}\\
+     \Psi, \dual\Psi \cong \Psi_1,\Psi_2\\
+     \flip{\Psi_1} \types \Gamma \ctx\\
+     \Psi_2 \types M \type
+  \end{array}$
+\end{center}
+As above, the notation $\flip{\Psi_1}$ means that we reverse the variances of the variables in $\Psi_1$ (without changing the hats and checks).
+%and $\Delta\splits \Psi_1,\Psi_2$ means that each variable $x$ in the unsigned context $\Delta$ becomes a pair $\hat x, \check x$ of opposite variance in the signed context $\Psi_1,\Psi_2$.
+For example, if $\Delta = (x:A)$ then we could have $\Psi = (\hat x\pcol A)$, so that $\dual\Psi = (\check x\mcol A)$; we could then take $\Psi_1 = (\check x\mcol A)$ and $\Psi_2=(\hat x\pcol A)$, so that $\flip\Psi_1 = (\check x\pcol A)$ and so a well-formed judgement could have $\check x \pcol A \types \Gamma \ctx$ and $\hat x \pcol A \types A \type$.
+Note that that $\check{x}$ is allowed to occur covariantly in $\Gamma$, which counts as a negative occurrence overall, because $\Gamma$ is itself in a contravariant position.
+
+To express rules more readably, we introduce the following combined judgment
+\begin{equation}
+  \inferrule{\flip{\Psi_1} \types \Gamma\ctx \\ \Psi_2 \types N\type}{\Psi_1,\Psi_2 \types \Gamma\ctx, N\type}\label{eq:ctx-type}
+\end{equation}
+
+As always, concatenation of contexts is implicitly done up to permutation of variables.
+Thus, the preconditions for $\Delta\cb\Gamma\types N$ to make sense can alternatively be written as $\Delta = \unsigned{\Psi}$ where $\Psi,\dual{\Psi} \types \Gamma\ctx, N\type$.
+
+If $\hat{x}$ appears in $M$ and $\check{x}$ appears in $\Gamma$, as above, then our judgment might look like this:
+\[ x:A \cb N(\check x) \types M(\hat x) \]
+In this case we are simply talking about a morphism of types ``over the category $A$'' --- in semantic terms, a natural transformation.
+The dual case when $\check{x}$ appears in $M$ and $\hat{x}$ appears in $\Gamma$ simply represents a natural transformation between \emph{contravariant} functors rather than between covariant ones.
+With this case in mind, one might say that we resolve the problem of ``dependent linear type theory'' by stipulating that both the context and the conclusion of a ``linearly dependent judgment'' must \emph{separately} depend ``linearly'' on the same variables.
+
+However, it is the additional freedom to allow $\hat{x}$ and $\check{x}$ to \emph{both} appear in $M$ and neither in $\Gamma$, or vice versa, that gives us the ability to express formal versions of nontrivial facts about category theory.
+Semantically, these judgments correspond to what are sometimes called \emph{extraordinary natural transformations}, or simply \emph{extranatural transformations}.
+For example, each category $A$ will have a type of morphisms that is contravariant in its first variable and covariant in its second:
+\[ x\mcol A, y\pcol A \types \mor A(x,y) \type \]
+To express the \emph{composition} of such morphisms then requires an ``extranaturality judgment'':
+\[ x:A, y:A, z:A \cb \mor A(\hat x, \check y), \mor A(\hat y, \check z) \types \mor A(\check x, \hat z) \]
+The \emph{identity} morphism judgment is similarly extranatural on the other side:
+\[ x:A \cb \ec \types \mor A(\check x,\hat x) \]
+
+% More formally, context splitting is defined by the following possibilities:
+% \begin{mathpar}
+% \inferrule{ }{\cdot \splits \cdot,\cdot}\\
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\check x \mcol A,\hat x \pcol A),\Psi_2}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits \Psi_1,(\Psi_2,\check x \mcol A,\hat x \pcol A)}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
+% \inferrule{\Delta \splits \Psi_1,\Psi_2}
+%           {\Delta, x:A \splits (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
+% \end{mathpar}
+
+% Frequently our rules have a $\unsigned{\Psi}$ in the conclusion where $\Psi$ and/or $\dual{\Psi}$ occur in the premises; when read upwards this means that part of the unsigned context $\Delta$ in the conclusion is identified with $\unsigned{\Psi}$ and hence gets split into $\Psi$ and $\flip{\Psi}$; but this is a special ``paired'' sort of splitting, where of the two variables $\hat x$ and $\check x$ arising from any variable $x$ in $\Delta$, one must be in $\Psi_1$ and one in $\Psi_2$:
+
+% \begin{mathpar}
+% \inferrule{ }{\ec \psplit \ec,\ec}\\
+% \inferrule{\Delta \psplit \Psi_1,\Psi_2}
+%           {\Delta, x:A \psplit (\Psi_1\check x \mcol A),(\Psi_2,\hat x \pcol A)}\and
+% \inferrule{\Delta \psplit \Psi_1,\Psi_2}
+%           {\Delta, x:A \psplit (\Psi_1,\hat x \pcol A),(\Psi_2,\check x \mcol A)}
+% \end{mathpar}
+
+% Note that when $\Delta \psplit \Psi_1,\Psi_2$, we have $\dual{\Psi_1} = \Psi_2$ and $\Delta = \unsigned{\Psi_1} = \unsigned{\Psi_2}$.
+
+If $a$ is a category-term in context $\Psi$, we will write $\dual{a}$ for the result of interchanging hats and checks in $a$.
+This is ``in context $\dual{\Psi}$'' but of course it is not well-typed on its own; like $\flip{a}, $its purpose is to be substituted into a contravariant variable.
+See, for instance, the substitution rule below.
+
+
+\section{Basic rules and type formers}
+\label{sec:rules}
+
+\subsection{Structural rules}
+\label{sec:structural-rules}
+
+The basic structural rules for context formation are unsurprising, given our linearity restriction:
+\begin{mathpar}
+  \inferrule{
+  }{
+    \ec \types \ec \ctx
+  }
+  \and
+  \inferrule{
+    \Psi_1 \types \Gamma \ctx\\
+    \Psi_2 \types M \type\\
+  }{
+    \Psi_1,\Psi_2 \types \Gamma,M \ctx
+  }
+\end{mathpar}
+
+For the moment, we are hoping to describe a cut-free sequent calculus with an admissible cut rule, and also admissible substitution for category-variables.
+We postpone describing exactly what the cut rule will look like, since it is somewhat complicated, but we can state the intended identity rule at this point:
+\begin{mathpar}
+  \inferrule{
+    \Psi \types M \type\\
+  }{
+    \unsigned{\Psi} \cb M[\dual{\Psi}/\Psi] \types M
+  }
+\end{mathpar}
+For example, we might have
+\begin{mathpar}
+  \inferrule{
+    x\pcol A, y\mcol B, z\pcol C \types M(x,y,z)\type\\
+  }{
+    x:A, y:B, z:C \cb M(\check x, \hat y, \check z) \types M(\hat x, \check y, \hat z)
+  }
+\end{mathpar}
+The substitution rule for category-variables (which we also intend to be admissible) will be
+\begin{mathpar}
+  \inferrule{
+    \Psi \types a:A \\
+    \Delta,x:A \cb \Gamma \types M \\
+  }{
+    \Delta,\unsigned\Psi \cb \Gamma[a/\hat x,\dual{a}/\check x] \types M[a/\hat x,\dual{a}/\check x]
+  }
+\end{mathpar}
+Of course, by quadraticality, each of $\hat x$ and $\check x$ appears exactly once in $\Gamma$ and $M$ combined. 
+We may abbreviate a substitution $M[a/\hat x,\dual{a}/\check x]$ by $M[a/x]$.
+
+Now we are ready to start giving the rules for some type formers.
+Since we want substitution into category-variables to be admissible, many rules must incorporate a substitution; but they are easier to understand before that substitution has been incorporated.
+Thus, we often give both versions.
+In the version without substitutions, we also generally omit the judgments of well-formedness of the types and contexts.
+Note that the version with substitutions included can usually be derived fairly automatically from the other.
+
+
+\subsection{Morphism types}
+\label{sec:morphism-types}
+
+We begin with the morphism types.
+The formation and right rules are straightforward given the expected variance:
+\begin{mathpar}
+  \inferrule{A\cat}{x\mcol A, y\pcol A \types \mor A(x,y) \type}\and
+  \inferrule{A\cat}{x: A \cb \ec \types \mor A(\check x,\hat x)}\and
+\end{mathpar}
+When we incorporate substitutions, these become:
+\begin{mathpar}
+  \inferrule{A\cat \\ \Psi_1\types a:A \\ \Psi_2 \types b:A}{\flip{\Psi_1},\Psi_2 \types \mor A(a,b) \type}\and
+  % \inferrule{\Psi \types a:A \\ \Delta\psplit \Psi,\Psi'}{\Delta \cb \ec \types \mor A(a,a)}\and
+  \inferrule{
+  	\Psi \types a:A \\
+  }{
+  	\unsigned\Psi \cb \ec \types \mor A(\dual a,a)
+  }
+\end{mathpar}
+There are three versions of the left rule.
+The first ``two-sided'' one is a ``directed'' analogue of the elimination rule for equality due to Lawvere and Martin-L\"of:
+\begin{mathpar}
+  \inferrule{
+    \Delta,x:A \cb \Gamma[\hat x/\hat y] \types M[\hat x/\hat y]
+  }{
+    \Delta,x:A,y:A\cb \Gamma,\mor A(\hat x, \check y) \types M
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi,\hat x\pcol A,\check x \mcol A \types \Gamma\ctx, M\type\\
+    \Psi_a \types a:A \\
+    \Psi_b \types b:B \\
+    \unsigned\Psi,x:A \cb \Gamma \types M
+  }{
+    \unsigned{\Psi},\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[\dual{a}/\check x,\dual{b}/\hat{x}],\mor A(a,b)
+    \types M[\dual{a}/\check x,\dual{b}/\hat{x}]
+  }\and
+\end{mathpar}
+Note that although we write substitutions in both $\Gamma$ and $M$, the linearity means that each variable such as $\hat x$ or $\check x$ can only occur in one of the two.
+
+For instance, we can use this rule to define composition of morphisms:
+\begin{equation}
+  \inferrule{\inferrule{\inferrule{x\pcol A\types x:A}{x:A\cb \ec \types \mor A(\check x, \hat x)}}
+    {x:A,y:A \cb \mor A(\hat x, \check y) \types \mor A(\check x, \hat y)}}
+  {x:A, y:A, z:A \cb \mor A(\hat x, \check y), \mor A(\hat y, \check z) \types \mor A(\check x, \hat z)}\label{eq:composition}
+\end{equation}
+Starting from the bottom we have the left rule on $y,z$, then the left rule again on $x,y$, then the right rule on $x$.
+Note that ${x:A,y:A \cb \mor A(\hat x, \check y) \types \mor A(\check x, \hat y)}$ is an instance of the identity rule, so if we had that rule postulated we could stop there; but if identity is to be admissible then it would reduce to the above complete derivation.
+
+Similarly, we have the functorial action of any judgment $x\pcol A \types f(x):B$:
+\begin{equation}
+  \label{eq:functor}
+  \inferrule{\inferrule{x\pcol A \types f(x):B}
+    {x:A \cb \ec \types \mor B(f(\check x),f(\hat x))}}
+  {x:A, y:A \cb \mor A(\hat x, \check y) \types \mor B(f(\check x),f(\hat y))}
+\end{equation}
+
+We also consider ``one-sided'' left rules for morphism types (directed analogues of the Paulin-Morhing rule for identity types):
+\begin{mathpar}
+  \inferrule{\Delta\cb \Gamma[\dual b/\check x] \types M[\dual b/\check x]}{\Delta,x:A\cb \Gamma,\mor A(\hat x, \dual b) \types M}\and
+  \inferrule{\Delta\cb \Gamma[a/\hat x] \types M[a/\hat x]}{\Delta,x:A\cb \Gamma,\mor A(a, \check x) \types M}\and
+\end{mathpar}
+And with substitutions:
+\begin{mathpar}
+  \inferrule{
+    \Psi,\dual\Psi,\Psi_b,u\mcol A \types \Gamma\ctx, M\type\\
+    \Psi_a \types a:A\\
+    \unsigned\Psi, \unsigned{\Psi_b} \cb \Gamma[\dual b/ u] \types M[\dual b/ u]
+  }{
+    \unsigned{\Psi},\unsigned{\Psi_b},\unsigned{\Psi_a}\cb \Gamma[\dual a/ u],\mor A(a, \dual b) \types M[\dual a/ u]
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi,\dual{\Psi_a},v\pcol A \types \Gamma\ctx, M\type\\
+    \Psi_b \types b:B\\
+    \unsigned\Psi, \unsigned{\Psi_a}\cb \Gamma[a/v] \types M[a/v]
+  }{
+    \unsigned\Psi,\unsigned{\Psi_a},\unsigned{\Psi_b}\cb \Gamma[b/v],\mor A(a, \dual b) \types M[b/v]
+  }\and
+\end{mathpar}
+
+Either of these implies the two-sided rule, just as the Paulin-Morhing rule implies the Martin-L\"of one.
+The converse implication in full dependent type theory requires a universe, so we probably don't expect it to hold here.
+I think we will probably want the one-sided rules (but there ought to be some compatibility between them, so that when they both apply they give the same result).
+Note that they can be regarded as the two Yoneda lemmas, one for covariant functors and one for contravariant functors.
+
+With morphism types, we can make the categories into a 2-category: the morphisms are judgments $x:A \types b:B$, and the 2-cells from $b$ to $b'$ are the judgments $x:A \cb \ec \types \mor B(b,b')$.
+The identity 2-cell is the $\mor B$-right rule, while the composite of 2-cells (along a morphism) can be obtained from~\eqref{eq:composition} once we have a cut rule.
+Prewhiskering of a 2-cell is a substitution, while postwhiskering is a cut with~\eqref{eq:functor}.
+
+\subsection{Tensor}
+\label{sec:tensor}
+
+The rules for the plain (or ``non-binding'') tensor are very similar to those in ordinary linear logic.
+
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+  }{
+    \Psi_M,\Psi_N \types M\otimes N\type
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi \types (\Gamma,M,N)\ctx, C\type \\
+    \unsigned\Psi \cb \Gamma,M,N \types C
+  }{
+    \unsigned\Psi \cb \Gamma, M\otimes N \types C
+  }\and
+  \inferrule{
+    \Psi_M,\dual{\Psi_M} \types \Gamma_M\ctx, M\type \\
+    \Psi_N,\dual{\Psi_N} \types \Gamma_N\ctx, N\type \\\\
+    \unsigned{\Psi_M} \cb \Gamma_M \types M \\
+    \unsigned{\Psi_N} \cb \Gamma_N \types N
+  }{
+    \unsigned{\Psi_M},\unsigned{\Psi_N} \cb \Gamma_M,\Gamma_N \types M\otimes N
+  }\and
+\end{mathpar}
+
+\subsection{Coend type}
+\label{sec:coend}
+
+The coend type is significantly trickier than either of the examples we've considered so far.
+It can be thought of as a sort of ``quadratic $\Sigma$-type'' that binds a category-variable $x$ in both covariant and contravariant positions at the same time.
+This intuition is sufficient for the formation and left rules.
+
+\begin{mathpar}
+  \inferrule{
+    \Psi, \hat x\pcol A, \check x\mcol A \types M \type \\
+    }{
+    \Psi \types \coend^{x:A} M \type
+  }\and
+  \inferrule{
+    \Psi,\dual\Psi,\hat x\pcol A,\check x\mcol A \types (\Gamma,M) \ctx, C\type\\
+    \unsigned\Psi, x:A \cb \Gamma, M \types C
+    }{
+    \unsigned\Psi \cb \Gamma, \coend^{x:A} M \types C
+  }\and
+\end{mathpar}
+However, the right rule is trickier to state correctly.
+In order to get the necessary generality, we need to allow the right rule to ``decouple'' the two occurrences of $x$ that are bound in the coend.
+Our first approximation to the rule might therefore be:
+\begin{equation}\label{eq:coend-right-firsttry}
+  \inferrule{
+    \Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+  }{
+    \Delta, z : A \cb \Gamma \types \coend^{w:A} M
+  }
+\end{equation}
+% or equivalently
+% \begin{equation}
+%   \inferrule{
+%     \Delta, x : A, y : A \cb \Gamma \types M
+%   }{
+%     \Delta, z : A \cb \Gamma[\check z / \check x, \hat z / \hat y] \types \coend^{w:A} M[\check z / \check x , \hat w / \hat x, \check w / \check y , \hat z / \hat y]
+%   }
+% \end{equation}
+That is, to construct an element of $\coend^{w:A} M$, we choose some other variable $z$ that may appear in $M$ or in the context, and we alter the pairings
+\[
+  \begin{array}{ccc}
+    \hat w &\leftrightarrow& \check w\\\\
+    \check z &\leftrightarrow& \hat z
+  \end{array}
+  \quad\text{to become instead}\quad
+  \begin{array}{ccc}
+    \hat x && \check y\\
+    \updownarrow && \updownarrow \\
+    \check x && \hat y
+  \end{array}
+\]
+The simplest case of this is when $\hat z$ and $\check z$ both occur in the context $\Gamma$.
+In this case, it can be used to derive a functoriality result for coends:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      x:A,y:A \cb M(\hat y, \check x) \types N(\check y, \hat x)
+    }{
+      z:A \cb M(\hat z, \check z) \types \coend^{w:A} N(\check w, \hat w)
+    }}{
+    \ec \cb \coend^{z:A} M(\hat z, \check z) \types \coend^{w:A} N(\check w, \hat w)
+  }
+\end{mathpar}
+(Hmm, should the \emph{bound} occurrences of $z$ on the final line still have their variances reversed because of being in contravariant position in the context?  That seems wrong\dots)
+The case when $\hat z$ or $\check z$ appears in $M$ instead is required, for instance, to derive the backwards direction of the co-Yoneda lemma.
+The forwards direction is easy using the left rules for tensor and coend:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \inferrule{ }{x:A \cb M(\check x) \types M(\hat x)}
+    }{
+      x:A,y:A \cb M(\check y) \otimes \hom_A(\hat y,\check x) \types M(\hat x)
+    }
+  }{
+    x:A \cb \coend^{y:A} M(\check y) \otimes \hom_A(\hat y,\check x) \types M(\hat x)
+  }
+\end{mathpar}
+But the backwards direction requires the right rule for both, and in the case of the coend we have $\hat z$ appearing in the type being coended rather than in the context:
+\begin{mathpar}
+  \inferrule{
+    \inferrule*{
+      \inferrule{ }{x:A \cb M(\check x) \types M(\hat x)}\\
+      \inferrule{ }{y:A\cb \cdot \types \hom_A(\check y,\hat y)}
+    }{
+      x:A,y:A \cb M(\check x) \types M(\hat x) \otimes \hom_A(\check y,\hat y)
+    }
+  }{
+     z:A \cb M(\check z) \types \coend^{w:A} M(\hat w)\otimes \hom_A(\check w,\hat z)
+  }\and
+\end{mathpar}
+To prove that these are inverses requires either extensive manipulation of cut-eliminations or a term calculus, so we postpone it until later.
+
+However,~\eqref{eq:coend-right-firsttry} is insufficient (even before we worry about adding substitutions).
+For one thing, it doesn't seem to suffice to prove a more general functoriality of coends in which the category also varies along a functor $f:C\to A$; we would like to argue as follows:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      x:C,y:C \cb M(\hat y, \check x) \types N(f(\check y), f(\hat x))
+    }{
+      z:C \types M(\hat z, \check z) \types  \coend^{w:A} N(\check w, \hat w)
+    }
+  }{
+    \ec \types \coend^{z:C} M(\hat z, \check z) \types \coend^{w:A} N(\check w, \hat w)
+  }
+\end{mathpar}
+but the first step is not justified by the right rule we have now, since $\check w$ and $\hat w$ have been replaced not by $\check y$ and $\hat x$ but by functions of them.
+A rule that allows this is
+\begin{equation}\label{eq:coend-right-secondtry}
+  \inferrule{
+    u\pcol C \types a:A\\\\
+    \Delta, x : C, y : C \cb \Gamma[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , a[\hat x/u] / \hat w, a[\check y/u] / \check w , \hat y / \hat z]
+  }{
+    \Delta, z : C \cb \Gamma \types \coend^{w:A} M
+  }
+\end{equation}
+Of course, in general we want to allow $a$ to depend on more than one variable, in which case $C$ needs to be replaced everywhere by a whole context.
+\begin{equation}\label{eq:coend-right}
+  \inferrule{
+    \Psi_1,\dual{\Psi_1},\Psi_2,\dual{\Psi_2} \cong \Psi_\Gamma, \Psi_M\\
+    \flip{\Psi_\Gamma} \types \Gamma \ctx\\
+    \Psi_M, \hat w\pcol A, \check w \mcol A \types M \type \\\\
+    \Psi_2 \types a:A\\
+    \Psi_x\cong \Psi_y\cong\Psi_2\\\\
+    \unsigned{\Psi_1}, \unsigned\Psi_x, \unsigned{\Psi_y} \cb \Gamma[\dual\Psi_x / \dual{\Psi_2}, \Psi_y / \Psi_2] \types M[\dual{\Psi_x} / \dual{\Psi_2} , a[\Psi_x/\Psi_2] / \hat w, \dual{a[\Psi_y/\Psi_2]} / \check w , \Psi_y / \Psi_2]
+  }{
+    \unsigned{\Psi_1}, \unsigned{\Psi_2} \cb \Gamma \types \coend^{w:A} M
+  }
+\end{equation}
+(We are unable to use the single-judgment version~\eqref{eq:ctx-type} of the preconditions, since we need to ensure that $\hat w$ and $\check w$ appear in $M$ rather than in $\Gamma$.)
+Note that an extra generalization has also happened automatically: unlike $\hat z$ and $\check z$, each of which can appear in only one of $\Gamma$ and $M$, the variables in $\Psi_2$ and $\dual{\Psi_2}$ could each be distributed with some in $\Gamma$ and some in $M$.
+Furthermore, this rule now seems to include substitions already, so we don't need to incorporate them by a further step.
+
+It seems to me that this rule~\eqref{eq:coend-right} is basically equivalent to Patrick's rule, below, if we (1) identify $\Psi_2$ with $\Psi_x$, so that only half of the substitutions need to happen, (2) make the substitutions not involving $a$ happen in the conclusion rather than the premises, and (3) break up the contexts by where the variables appear so that we aren't writing no-op substitutions.
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \iso \Delta'_a \\
+    \Delta_a \psplit (\flip{\Phi_\Gamma},\Phi_M),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Phi_\Gamma',\flip{\Phi_M'}) \\
+    \Delta \splits \Psi_M,\flip{\Psi_{\Gamma}} \\\\
+    \Psi_a \types a:A \\
+    \Psi_{\Gamma},\Phi_\Gamma,\Phi_\Gamma' \types \Gamma\ctx \\
+    \Psi_M,\Phi_M,\Phi_M',\hat x\pcol A,\check x\mcol A \types M\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma \types M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x]
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+  }\and
+  \inferrule{
+    \Phi_\Gamma \iso \Phi_\Gamma' \\
+    \Phi_M \iso \Phi_M' \\
+    \Phi_\Gamma, \flip{\Phi_M} \types a:A \\\\
+    \Psi_{\Gamma},\Phi_\Gamma,\flip{{\Phi_\Gamma'}} \types \Gamma\ctx \\\\
+    \Psi_M,\Phi_M,\flip{{\Phi_M'}},\hat x\pcol A,\check x\mcol A \types M\type \\\\
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M},\unsigned{{\Phi_\Gamma'}}, \unsigned{{\Phi_M'}} \cb \Gamma \types M[a/\hat x,a[\Phi_\Gamma'/\Phi_\Gamma, \Phi_M'/\Phi_M]/\check x]
+  }{
+    \joinvar{\Psi_M, \flip{\Psi_\Gamma}},\unsigned{\Phi_\Gamma}, \unsigned{\Phi_M} \cb \Gamma[\Phi_\Gamma/\Phi_\Gamma'] \types \coend^{x:A} M[\Phi_M/\Phi_M']
+  }\and
+\end{mathpar}
+
+
+\subsection{Binding tensor types}
+\label{sec:tensor-types}
+
+The binding tensor $M\otimes_{x:A} N$ can be defined as $\coend^{x:A} M\otimes N$.
+More generally, for a context $\Psi=(x_1:A_1,\dots,x_n:A_n)$ we can write $M\otimes_{\Psi} N$ for $\coend^{x_1:A_1} \cdots \coend^{x_n:A_n} M\otimes N$.
+The following rules for this derived type former should then be admissible.
+On the other hand, the non-binding tensor should be derivable from the binding one by tensoring over the empty context, and the coend should be derivable by tensoring over $(\hat x\pcol A,\check x\mcol A)$ with $\mor A$.
+
+\red{Left off updating to $\unsigned{\Psi}$ and $\Psi,\dual\Psi \types \Gamma\ctx, M\type$ here.}
+
+The formation rule for the tensor type:
+\begin{mathpar}
+  \inferrule{\Psi_M, \Psi \types M\type \\
+    \Psi_N, \flip{\Psi} \types N\type}
+  {\Psi_M, \Psi_N \types M \otimes_\Psi N\type}\and
+\end{mathpar}
+The left rule
+\begin{mathpar}
+  \inferrule{\Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\flip{\Psi_N},\Psi_C \\
+    \Delta' \psplit \flip{\Psi},\Psi \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M,\Psi \types M\type \\
+    \Psi_N,\flip{\Psi} \types N\type \\ \Psi_C \types C\type \\\\
+    \Delta, \Delta' \cb \Gamma,M,N \types C}
+  {\Delta \cb \Gamma, M\otimes_\Psi N \types C}\and
+\end{mathpar}
+and right rule
+\begin{mathpar}
+  \inferrule{\Delta_a \psplit \flip{\Psi_a},\Psi_a \\ \Delta_M \splits \Psi_M,\flip{\Psi_{\Gamma_M}} \\
+    \Delta_N \splits \Psi_N,\flip{\Psi_{\Gamma_N}} \\\\
+    \Psi_a \types a:A \\
+    \Psi_{\Gamma_M},\Psi_a^{\pm} \types \Gamma_M\ctx \\
+    \Psi_{\Gamma_N},\Psi_a^{\mp} \types \Gamma_N\ctx \\\\
+    \Psi_M,x\pmcol A \types M\type \\ \Psi_N,x\mpcol A \types N\type \\\\
+    \Delta_M,\Delta_a \cb \Gamma_M \types M[a/x] \\
+    \Delta_N,\Delta_a \cb \Gamma_N \types N[a/x]}
+  {\Delta_M,\Delta_N,\Delta_a \cb \Gamma_M,\Gamma_N \types M\otimes_{x:A} N}\and
+\end{mathpar}
+
+
+\subsection{End type}
+Formation rule:
+\begin{mathpar}
+  \inferrule{
+    \Psi,\hat x\pcol A,\check x\mcol A \types M \type \\
+    }{
+    \Psi \types \End_{x:A} M \type
+  }\and
+\end{mathpar}
+Right rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma}, \Psi_M \\\\
+    \Psi_\Gamma \types \Gamma \ctx \\
+    \Psi_M,\hat x\pcol A,\check x\mcol A \types M \type \\
+    \Delta, x:A \cb \Gamma \types M
+    }{
+    \Delta \cb \Gamma \types \coend_{x:A} M
+  }\and
+\end{mathpar}
+Left rule:
+\begin{mathpar}
+  \inferrule{
+    \Delta_a \iso \Delta'_a \\\\
+    \Delta_a \psplit (\flip{\Psi_1},\flip{\Psi_2},\Psi_3),\Psi_a \\
+    \Delta'_a \psplit \flip{\Psi_a'},(\Psi_1',\Psi_2',\flip{\Psi_3'}) \\
+    \Delta \splits \flip{\Psi_{\Gamma}},\flip{\Psi_M},\Psi_C \\\\
+    \Psi_a \types a:A \\ \Psi_{\Gamma},\Psi_1,\Psi_1' \types \Gamma\ctx \\
+    \Psi_M,\Psi_2,\Psi'_2,\hat x\pcol A,\check x\mcol A \types M\type \\
+    \Psi_C,\Psi_3,\Psi'_3 \types C\type \\\\
+    \Delta,\Delta_a,\Delta'_a \cb \Gamma, M[a/\hat x,a[\flip{\Psi_a'}/\Psi_a]/\check x] \types C
+  }{
+    \Delta,\Delta_a \cb \Gamma[\Psi_1/\Psi'_1], \coend_{x:A}M[\Psi_2/\Psi'_2] \types C[\Psi_3/\Psi'_3]
+  }\and
+\end{mathpar}
+
+\subsubsection{Older stuff}
+The left rule can based on the function
+\begin{equation*}
+	[\coend_x \coend_y (F(x^-, x^+, y^-, y^+) \to G(x^-, y^+))] \to \coend_{z}[(\coend_w F(z^-, w^+, w^-, z^+)) \to G(z^- , z^+)]
+\end{equation*}
+where $F: A \times A\op \times A \times A\op \to \Set$ and $G : A\op \times A \to \Set$, defined by
+\begin{equation}
+	\lambda h.\lambda z.\lambda k.h(z, z, k(z))
+\end{equation}
+which should be in the end as we have only passed $z$ to ends. Then it becomes
+\begin{mathpar}
+	\inferrule{
+		\Delta, x : A, y : A \cb \Gamma[\check x / \check z , \hat y / \hat z], M[\check x / \check z , \hat x / \hat w , \check x / \check w , \hat y / \hat z] \types C[\check x / \check z , \hat y / \hat z]
+	}{
+		\Delta, z : A \cb \Gamma, \coend_{w : A} M \types C
+	}
+\end{mathpar}
+
+\subsection{Hom types}
+\label{sec:hom-types}
+
+The type former for the (non-binding) hom type is
+\begin{mathpar}
+  \inferrule{
+    \Psi_M \types M\type \\ \Psi_N \types N\type
+  }{
+    \flip{\Psi_M},\Psi_N \types M\multimap N\type
+  }
+\end{mathpar}
+with right rule
+\begin{mathpar}
+  \inferrule{
+    \Delta \splits \flip{\Psi_\Gamma},\flip{\Psi_M},\Psi_N \\\\
+    \Psi_\Gamma \types \Gamma\ctx \\ \Psi_M \types M\type \\ \Psi_N \types N\type \\\\
+    \Delta \cb \Gamma, M \types N
+  }{
+    \Delta \cb \Gamma \types M\multimap N
+  }
+\end{mathpar}
+and left rule
+\begin{mathpar}
+  \inferrule{
+    \Delta_1 \splits \flip{\Psi_{\Gamma_1}},\Psi_M \\
+    \Delta_2 \splits \flip{\Psi_{\Gamma_2}},\flip{\Psi_N},\Psi_C \\\\
+    \Psi_{\Gamma_1} \types \Gamma_1\ctx \\ \Psi_{\Gamma_2} \types \Gamma_2\ctx \\\\
+    \Psi_M \types M\type \\ \Psi_N \types N\type\\ \Psi_C \types C\type \\\\
+    \Delta_1 \cb \Gamma_1 \types M \\ \Delta_2 \cb \Gamma_2,N \types C
+  }{
+    \Delta_1,\Delta_2 \cb \Gamma_1,\Gamma_2,M\multimap N \types C
+  }
+\end{mathpar}
+
+\subsection{The type classifier}
+\label{sec:type-classifier}
+
+
+\section{Category formers}
+\label{sec:category-formers}
+
+\subsection{Opposites}
+\label{sec:opposites}
+
+\subsection{Tensor products}
+\label{sec:tensor-products}
+
+\subsection{Exponentials}
+\label{sec:exponentials}
+
+\subsection{Collages}
+\label{sec:collages}
+
+
+
+\section{Terms}
+
+For now, the rules for terms are written without substitutions incorporated.
+We just take care that for variables mentioned explicitly in the contexts of the conclusion, it would make sense to substitute any reasonable term for them wherever they occur in the term being defined.
+
+\subsection{Morphism types}
+\begin{mathpar}
+  \inferrule{ }{x:A \cb \ec \types \id(x):\mor A(\check x,\hat x)}\and
+  \inferrule{
+    \Delta,z:A \cb \Gamma[\hat z/\hat y,\check z/\check x] \types m:M[\hat z/\hat y,\check z/\check x]
+  }{
+    \Delta,x:A,y:A \cb \Gamma,f:\mor A(\hat x, \check y) \types J(x.y.M,z,m; x, y, f):M
+  }\textsc{(2-sided)}\and
+  J(x.y.M,z,m;x,x,\id(x))\jdeq m\and
+  J(x.y.M,z,m[z/x,z/y,\id(z)/f];x,y,f)\jdeq m
+\end{mathpar}
+
+We will show that the following one-sided elimination rules are actually admissable.
+\begin{mathpar}
+  \inferrule{\Delta\cb \Gamma \types m:M[a/\hat x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(a, \check x) \types \hat J(m;x,f) :M}\textsc{(covariant)}\and
+  \inferrule{\Delta\cb \Gamma \types m:M[b/\check x]}
+  {\Delta,x:A\cb \Gamma,f:\mor A(\hat x, b) \types \check J(m;x,f):M}\textsc{(contravariant)}\\
+  \hat J(m;a,\id(a)) \jdeq m\and
+  \hat J(m[a/x,\id(a)/f];x,f) \jdeq m \\
+  \check J(m;b,\id(b)) \jdeq m \and
+  \check J(m[b/x,\id(b)/f];x,f) \jdeq m
+\end{mathpar}
+
+The derivation of the covariant rule is as follows:
+\begin{mathpar}
+  \inferrule{
+    \Delta \cb \Gamma \types t : M[a/\hat x] \and
+    \inferrule*{
+      x:A \cb m:M \types m:M
+    }{
+      x:A,y:A \cb m:M, f:\hom A(\hat x,\check y) \types J(x.y.M,x,m;x,y,f) : M[\hat y/\hat x]
+    }
+  }{
+    \Delta,y:A \cb \Gamma, f:\mor A(a,\check y) \types J(x.y.M,a,t;a,y,f) : M[\hat y/\hat x]
+  }
+\end{mathpar}
+Thus we define $\hat J(m;x,f) \jdeq J(x.y.M,a,m;a,x,f)$. The computation rules are easy to check.
+
+\subsection{The rest}
+Tensor types:
+\begin{mathpar}
+  \inferrule{
+    \Delta_M \cb \Gamma_M \types t_m:M \\
+    \Delta_N \cb \Gamma_N \types t_n:N
+  }{
+    \Delta_M,\Delta_N \cb \Gamma_M,\Gamma_N \types \tpair{t_m}{t_n} : M\otimes N
+  }\and
+  \inferrule{
+    \Delta \cb \Gamma,m:M,n:N \types c:C
+  }{
+    \Delta \cb \Gamma,t:M\otimes N \types (\tlet m,n := t in c) : C
+  }\and
+  (\tlet m,n := \tpair{t_m}{t_n} in c) \jdeq c[t_m/m,t_n/n]\and
+  (\tlet m,n := t in c[\tpair{m}{n}/z])\jdeq c[t/z]
+\end{mathpar}
+Coend types:
+\begin{mathpar}
+  % \inferrule{
+  %   \Delta,x:A,x':A \cb \Gamma \types t_m : M[\check x'/\check x]
+  % }{
+  %   \Delta,y:A \cb \Gamma[y/x'] \types \cpair{y}{t_m[y/x,y/x']} : \coend^{x:A} M[y/x']
+  % }\and
+  % (\clet x,m := \cpair{y}{t_m} in c) \jdeq c[y/x,t_m/m]\and
+  % (\clet x,m := t in c[\cpair{x}{m}/z]) \jdeq c[t/z] 
+  \inferrule{
+    \Delta, x : A, y : A \cb \Gamma[\check x / \check z, \hat y / \hat z] \types m: M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+  }{
+    \Delta, z : A \cb \Gamma \types (\mix x,y with z in m): \coend^{w:A} M
+  }\and
+  \inferrule{
+    \Psi_C \types C \type \\
+    \Delta, w:A \cb \Gamma, m:M \types c : C
+    }{
+    \Delta \cb \Gamma, t:\coend^{w:A} M \types (\clet w,m := t in c) : C
+  }\and
+\end{mathpar}
+Note that both the left rule and the right rule bind variables!
+The term $(\mix x,y with z in m)$  binds $x:A$ and $y:A$ in $m$, while the term $(\clet w,m := t in c)$ binds $w:A$ and $m:M$ in $c$.
+Also there is some sort of ``renaming in the context'' going on as we pass across the \textsf{mix}, since the $\Gamma$ above the line is also a substitution instance.
+
+However, I (Mike) can't figure out what the computation rule should say, for reasons that make me wonder whether a term calculus is doomed to failure.
+Going back to the principal cut for the coend type, there are actually several different possible such cuts:
+\begin{mathpar}
+  \inferrule{\inferrule{
+		\Delta', x : A, y : A \cb \Gamma'[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	}{
+		\Delta', z : A \cb \Gamma' \types \coend^{w:A} M
+	} \\ \inferrule{
+    \Delta, w:A \cb \Gamma, M \types C
+    }{
+    \Delta \cb \Gamma, \coend^{w:A} M \types C
+  }}{\Delta,\Delta',(z:A)? \cb \Gamma,\Gamma' \types C}
+\end{mathpar}
+depending on how the occurrences of $\hat z$ and $\check z$ are distributed through $\Gamma'$ and $M$.
+\begin{itemize}
+\item If both are in $\Gamma'$, then $z\notin\Delta$, so $z:A$ remains in the context of the conclusion separate from $\Delta,\Delta'$.
+\item If both are in $M$, then we must have $z\in \Delta$, and the cut is disallowed because it forms a variable loop.
+\item If one is in $M$ and one in $\Gamma'$, then one must also be in $\Gamma$ and we have $z\in \Delta$, so $z:A$ doesn't need to appear separately in the context of the conclusion.
+\end{itemize}
+In each case I can see how to reduce the cut, namely to the obvious
+\begin{mathpar}
+  \inferrule{\Delta', x : A, y : A \cb \Gamma'[\check x / \check z, \hat y / \hat z] \types M[\check x / \check z , \hat x / \hat w, \check y / \check w , \hat y / \hat z]
+	\\
+        \Delta, w:A \cb \Gamma, M \types C}
+      {\Delta,\Delta',(z:A)? \cb \Gamma,\Gamma' \types C}
+\end{mathpar}
+but this latter cut involves nontrivial category-variable manipulation because it's ``contracting a string'', and I can't figure out how to represent that by substitution.
+In particular, the category-variables $x,y$ appearing in one of the premises disappear in the conclusion and I don't see how to represent that disappearance in terms of ``substituting'' something for them.
+But possibly I'm just being dense.
+
+Perhaps the solution is that the notion of ``substitution'' has to involve a more careful ``matching up of variables'' according to a loop-free string picture.
+See the example below.
+
+Proof of co-Yoneda lemma, starting with one direction:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \inferrule{
+        \inferrule{ }{
+          x:A \cb n:N(\check x) \types n:N(\hat x)
+        }
+        }{
+        x:A,y:A \cb n:N(\check x), t:\hom_A(\hat x,\check y) \types \hat J(n,y,f):N(\hat y)
+      }
+      }{
+      x:A,y:A \cb t:N(\check x)\otimes\hom_A(\hat x,\check y) \types
+        (\tlet n,f := t in \hat J(n,y,f)):N(\hat y)
+      }
+    }{
+    y:A \cb q:\coend^{x:A} N(\check x)\otimes\hom_A(\hat x,\check y) \types
+      (\clet x,t := q in (\tlet n,f := t in \hat J(n,y,f))):N(\hat y)
+    }
+\end{mathpar}
+I think that we have to use the covariant $J$ here, because when $n$ depends on a variable in the context we can't ``bind'' it with $x.n$ in the two-sided $J$.
+Now the other direction:
+\begin{mathpar}
+  \inferrule{
+    \inferrule{
+      \inferrule{ }{
+        x:A \cb n:N(\check x) \types n:N(\hat x)
+      } \\
+      \inferrule{ }{
+        z:A \cb \ec \types \id(z):\hom_A(\check z,\hat z)
+      }
+      }{
+      x:A,z:A \cb n:N(\check x) \types \tpair{n}{\id(z)} : N(\hat x)\otimes\hom_A(\check z,\hat z)
+    }
+    }{
+    y:A \cb n:N(\check y) \types \left({\mix x,z with y in \tpair{n}{\id(z)}}\right) : \coend^{w:A}N(\hat w)\otimes\hom_A(\check w,\hat y)
+  }
+\end{mathpar}
+It remains to check that they are inverse.
+Supposing the obvious reduction rule
+ \[ \left(\clet w,m := \left({\mix x,y with z in n}\right) in c\right) \jdeq c[m/n], \]
+and given $n':N(\check x)$, we have
+\begin{align*}
+  &\left(\clet x,t := \left({\mix x,z with y in \tpair{n'}{\id(z)}}\right) in (\tlet n,f := t in \hat J(n,y,f))\right)\\
+  &\jdeq (\tlet n,f := \tpair{n'}{\id(z)} in \hat J(n,y,f))\\
+  &\jdeq \hat J(n',x,\id(x))\\
+  &\jdeq n'
+\end{align*}
+This looks good superficially, but let's think about what it actually means.
+In the second line, the types are something like
+\begin{mathpar}
+  n : N(\check w)\and
+  f : \mor A(\hat w, \check y)\and
+  n':N(\check x)\and
+  \id(z) : \mor A(\check z, \hat z) \\
+  \tpair{n}{f} : N(\check w) \otimes \mor A(\hat w, \check y) \and
+  \tpair{n'}{\id(z)} : N(\check x) \otimes \mor A(\check z, \hat z)
+\end{mathpar}
+So the ``$\tlet n,f := \tpair{n'}{\id(z)} in$'', which represents a principal cut of tensor-right against tensor-left, actually involves a nontrivial stringy variable matchup, with only one string even though there are 4 variables.
+Thus when it reduces, the variables $w$ and $z$ disappear.
+
+Similarly, the third term $\hat J(n',x,\id(x))$ also represents a stringy cut, in which the variable $y$ is getting identified with an $x$ and reducing away.
+Right now it's hard for me to believe in the term calculus with so much variable manipulation being hidden.
+
+\end{document}
