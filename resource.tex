@@ -802,7 +802,30 @@ Two-sided without a substitution:
 \end{mathpar}
 Officially, the total substitution in the premise should be 
 $(\Gamma \vdash M) [1_\Delta,x/x,x/y]$ but by convention we will leave
-off the identity parts.  
+off the identity parts.
+
+There are four cases of the hom left rules, depending on how the variables $x$ and $y$ split between
+$\Gamma$ and $M$. It seems possible that these four cases will take different forms after closing
+under cut. For instance, in the case when $x$ and $y$ are both in $\Gamma$, the right rule with
+built in cut appears to be (FIXME: it is probably possible to rewrite this without needing a
+morphism of type contexts):
+\begin{mathpar}
+  \inferrule{
+    \Psi^{\flip{v_1}} \types \Gamma \ctx \\
+    \Psi^{v_1'},x\pcol A,y\mcol A \types \Gamma_1 \ctx \\\\
+    \Psi^{v_2'} \types M \type \\
+    \Psi^{v_3} \types a_1:A \\
+    \Psi^{\flip{v_3'}} \types a_2:A \\\\
+    d_1 = v_1 \combine v_1' \combine v_3 \combine v_3' \\
+    d_2 = v_2 \combine v_2' \\\\
+    \Psi^{d_1} \cb \Gamma \types \Gamma_1[a_1/x,a_2/y] \\
+    \Psi^{d_2},x\pmcol A \cb \Gamma_1[\rho,x/y] \types M \\\\
+    \Psi^{\flip{v_2}} \types \rho:\Psi^{v_1'} \\
+    \unif{\Psi^{d_1=(v_1\combine v_3\combine v_3')\combine v_1'}}{\Psi^{d_2=v_2'\combine v_2}}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+  }
+\end{mathpar}
 
 Based rules:
 \begin{mathpar}
@@ -1093,10 +1116,7 @@ It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
            {\Psi^{p \combine \flip{p}}, x \pmcol A \cb \End_{x:A} M \types M}
 \end{mathpar}
 
-\subsection*{Hom types (can we use a different name? Function types,
-  Closure types? Internal hom types?)}
-
-(I find the name confusing when there is something else notated $\mor{A}$).  
+\subsection*{Function types}
 
 \begin{mathpar}
   \inferrule{
