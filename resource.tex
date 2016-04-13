@@ -761,12 +761,26 @@ Using this, we should have
 \subsection*{Morphism types}
 
 \begin{mathpar}
-\inferrule{ \Psi^{\flip{v_1}} \types a : A \and  
-            \Psi^{v_2} \types b : A \and
+\inferrule{ \Psi^{\flip{v_1}} \types a_1 : A \and  
+            \Psi^{v_2} \types a_2 : A \and
             v = v_1 \combine v_2
           }
-          {\Psi^{v} \types \mor A(a,b) \type}
+          {\Psi^{v} \types \mor A(a_1,a_2) \type}
+\end{mathpar}
 
+\begin{mathpar}
+\inferrule*[right=Hom Right Axiom]
+          { }
+          {x :\pm A \cb \ec \types \mor{A}(x,x) }
+\and 
+  \inferrule*[right=Hom Left Axiom]
+             {
+               \Psi^{d}, x \pmcol A \cb (\Gamma \vdash M) [ x/y ]\\ 
+             }
+             {\Psi^d, x \pmcol A, y\pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
+\end{mathpar}
+
+\begin{mathpar}
 \inferrule{\Psi^{p} \types a : A }
           {\Psi^{(\flip{p} \combine p)} \cb \ec \types \mor{A}(a,a) }
 
@@ -1086,10 +1100,10 @@ It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
 
 \begin{mathpar}
   \inferrule{
-    d = d_1 \combine d_2 \\
-    \Psi^{\flip{d_1}} \types M_1\type \\ \Psi^{d_2} \types M_2\type
+    v = v_1 \combine v_2 \\
+    \Psi^{\flip{v_1}} \types M_1\type \\ \Psi^{v_2} \types M_2\type
   }{
-    \Psi^d \types M_1 \multimap M_2 \type
+    \Psi^v \types M_1 \multimap M_2 \type
   }
 
   \inferrule{
