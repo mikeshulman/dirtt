@@ -790,7 +790,7 @@ Using this, we should have
            \Psi^{p_2} \vdash a_2 : A \\
            \Psi^{d_1}, x \pmcol A \cb (\Gamma \vdash M) [x/y]\\ 
            }
-          {\Psi^d \cb (\Gamma, \mor{A}(x,y) \types M)[ (a,a)/x\pm , (b,b)/y\pm] }
+          {\Psi^d \cb (\Gamma, \mor{A}(x,y) \types M)[ (a_1,a_1)/x\pm , (a_2,a_2)/y\pm] }
 \end{mathpar}
 
 Two-sided without a substitution:
@@ -805,17 +805,15 @@ $(\Gamma \vdash M) [1_\Delta,x/x,x/y]$ but by convention we will leave
 off the identity parts.
 
 There are four cases of the hom left rules, depending on how the variables $x$ and $y$ split between
-$\Gamma$ and $M$. It seems possible that these four cases will take different forms after closing
-under cut. For instance, in the case when $x$ and $y$ are both in $\Gamma$, the right rule with
-built in cut appears to be (FIXME: it is probably possible to rewrite this without needing a
-morphism of type contexts):
+$\Gamma$ and $M$. Below are versions of three of these four cases with a built in cut on the left
+(FIXME: it is probably possible to rewrite this without needing a morphism of type contexts):
 \begin{mathpar}
   \inferrule{
     \Psi^{\flip{v_1}} \types \Gamma \ctx \\
-    \Psi^{v_1'},x\pcol A,y\mcol A \types \Gamma_1 \ctx \\\\
-    \Psi^{v_2'} \types M \type \\
+    \Psi^{v_1'},x\pcol A,y\mcol A \types \Gamma_1 \ctx \\
+    \Psi^{v_2'} \types M \type \\\\
     \Psi^{v_3} \types a_1:A \\
-    \Psi^{\flip{v_3'}} \types a_2:A \\\\
+    \Psi^{\flip{v_3'}} \types a_2:A \\
     d_1 = v_1 \combine v_1' \combine v_3 \combine v_3' \\
     d_2 = v_2 \combine v_2' \\\\
     \Psi^{d_1} \cb \Gamma \types \Gamma_1[a_1/x,a_2/y] \\
@@ -823,7 +821,33 @@ morphism of type contexts):
     \Psi^{\flip{v_2}} \types \rho:\Psi^{v_1'} \\
     \unif{\Psi^{d_1=(v_1\combine v_3\combine v_3')\combine v_1'}}{\Psi^{d_2=v_2'\combine v_2}}{\rho}{(\Psi_0,\rho_0)}
     }{
-    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+    \Psi_0 \cb (\Gamma,\mor{A}(x,y) \types M)[\rho_0,a_1/x,a_2/y]
+  } \and
+  \inferrule{
+    \Psi^{\flip{v_1}} \types \Gamma \ctx \\
+    \Psi^{v_1'},x\pcol A \types \Gamma_1 \ctx \\
+    \Psi^{v_2'},y\pcol A \types M \type \\\\
+    \Psi^{v_3} \types a_1:A \\
+    \Psi^{p_2} \types a_2:A \\
+    d_1 = v_1 \combine v_1' \combine v_3 \\
+    d_2 = v_2 \combine v_2' \\\\
+    \Psi^{d_1} \cb \Gamma \types \Gamma_1[a_1/x] \\
+    \Psi^{d_2},x\pmcol A \cb \Gamma_1[\rho] \types M[x/y] \\\\
+    \Psi^{\flip{v_2}} \types \rho:\Psi^{v_1'} \\
+    \unif{\Psi^{d_1=(v_1\combine v_3)\combine v_1'}}{\Psi^{d_2=v_2'\combine v_2}}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \Psi_0,\Psi^{p_2\combine\flip{p_2}} \cb (\Gamma,\mor{A}(x,y) \types M)[\rho_0,a_1/x,(a_2,a_2)/y]
+  } \and
+  \inferrule{
+    \Psi^{\flip{v_1}} \types \Gamma \ctx \\
+    \Psi^{v_1'},x\mcol A, y\pcol A \types M \type \\\\
+    \Psi^{p_1} \vdash a_1 : A \\
+    \Psi^{p_2} \vdash a_2 : A \\
+    d = v_1\combine v_1' \\\\
+    \Psi^{d},x\pmcol A \cb \Gamma \types M[x/y] \\
+    }{
+    \Psi^{d\combine p_1\combine\flip{p_1}\combine p_2\combine\flip{p_2}}
+      \cb (\Gamma, \mor{A}(x,y) \types M)[(a_1,a_1)/x, (a_2,a_2)/y]
   }
 \end{mathpar}
 
