@@ -52,6 +52,7 @@
 \newcommand\triv{\_}
 \newcommand\samestring{\leftrightarrow}
 \newcommand{\unif}[4]{#1\doteq #2\,\mathsf{ via }\,#3\cb #4}
+\newcommand\complete{\pm}
 \mprset{flushleft}
 
 
@@ -59,6 +60,8 @@
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
 \begin{document}
 \maketitle
+
+\section{Overview}
 
 \begin{mathpar}
 \begin{array}{l}
@@ -105,9 +108,7 @@ b$ is always defined and is a $d$.
 %% So in all cases if $(r_1 \combine r_2) \combine r_3$ is defined, then so is $r_1 \combine (r_2\combine r_3)$, and they are equal.
 %% Therefore, we can unambiguously write $r_1 \combine r_2 \combine r_3$.
 
-We think of $\Gamma$ as an unordered list of assumptions, and since it
-is purely linear, we will use context splitting instead of resource
-counting.  
+We think of $\Gamma$ as an unordered list of assumptions.  
 
 Judgements:
 
@@ -126,15 +127,13 @@ Judgements:
 \item $\Psi \types (\Gamma \vdash M) \ok$
 
 \item $\Delta \cb \Gamma \vdash M$, presupposes 
- $\Psi \types (\Gamma \vdash M) \ok$.  
+ $\Delta \types (\Gamma \vdash M) \ok$.  
 
 \end{itemize}
 
-Note that we allow dead variables $x \uncol A$ in $\Delta$ so that we
-can assume that all the contexts in a rule are the same variables but
-with different resources, because we can weaken.  
+\section{Category Language}
 
-\subsection*{Category Contexts}
+\subsection{Category Contexts}
 
 Category contexts $\Psi$ are defined inductively-recursively with a
 relation $x \vcol r A \in \Psi$, which means that the variable $x$ is
@@ -161,7 +160,7 @@ of $r_1,r_2$ is $\ps$ and the other the is $\ms$.
 Membership is defined by recursion:
 \[
 \begin{array}{lll}
-x \vcol b A \in (x \vcol {b'} A') & \text{ iff } & b = b' \text{ and } A = A' \\
+x \vcol r A \in (x \vcol {b} A') & \text{ iff } & r = b \text{ and } A = A' \\
 x \vcol r A \in {(\Psi_1 \combine \Psi_2)} & \text{ iff } & 
 x \vcol{r} A \in \Psi_1, \text{ or } x \vcol{r} A \in \Psi_2, \text{ or }\\
 & & (x \vcol{r_1} A \in \Psi_1) \text{ and } (x \vcol{r_2} A \in \Psi_2) \text{ and } r = r_1 \combine r_2
@@ -169,6 +168,13 @@ x \vcol{r} A \in \Psi_1, \text{ or } x \vcol{r} A \in \Psi_2, \text{ or }\\
 \]
 
 We write $x \pmcol A$ for $(x \pcol A) \combine (x \mcol A)$.
+
+We write $\Delta$ for a context where every variable is $\pms$ ($\forall
+x \vcol{b} A \in \Delta, x \vcol{\flip{b}} A \in \Delta$), and $\Phi$
+for a context where no variable is $\pms$ ($\forall x \vcol{b} A \in
+\Phi, \neg (x \vcol{\flip{b}} A \in \Phi)$).  Note that $\Phi \combine
+\flip{\Phi}$ is always well-formed and is a $\Delta$; we write
+$\Phi\complete$ for this.  
 
 \paragraph{Congruence}
 
@@ -214,7 +220,7 @@ by
 \]
 This satisfies $\flip{(\flip \Psi)} = \Psi$.  
 
-\subsection*{Context Isomorphisms}
+\subsection{Context Isomorphisms}
 
 \begin{mathpar}
 \inferrule{ }
@@ -249,6 +255,8 @@ renamings:
 \end{mathpar}
 
 
+\paragraph{Admissible Rules}
+
 \begin{mathpar}
 \inferrule*[right=admissible?]
            { }
@@ -275,7 +283,7 @@ and $\rho_2$ such that $\Psi \equiv \Psi_1 \combine \Psi_2$ and $\Psi_1
 $\rho_1 \combine \rho_2 \equiv \rho$.  FIXME: write this out formally,
 but basically just $AC$ things to the correct side.
 
-\subsection*{Unification of Renamings}
+\subsection{Unification of Renamings}
 
 We introduce a new judgement and rules for deriving valid string diagram
 compositions. The new judgement has the form 
@@ -425,266 +433,309 @@ The rules for this judgement are
 
 %% FIXME: how exactly does this preclude loops?
 
-\subsection*{Substitutions}
-
-The technically easiest thing is to consider total substitutions (a
-substitution plugs in for all of the variables in a context).  I think
-we could do a single-variable substitution version instead, which would
-be nicer to use, because there wouldn't be a bunch of identity
-substitutions running around, but I wanted to work this out first.
-
-For convenience, we use a notion of ``inhabitant of a type at resource
-$r$'', i.e. where we have variance on the right, $\Psi \types \vec{a} \vcol r
-A$, where $\vec{a}$ is 0, 1, or 2 terms. 
+\subsection{Substitutions}
 
 \begin{mathpar}
 \inferrule{ }
-          {\Psi^\uns \types \triv \uncol A}
+          {\cdot \vdash \cdot : \cdot}
 \and
-\inferrule{ \Psi \types a : A }
-          {\Psi \types a \pcol A}
-\and
-\inferrule{ \Psi^{v^*} \types a : A }
-          {\Psi^{v} \types a \mcol A}
-\and
-\inferrule{ v = v_1 \combine v_2 \\ \Psi^{v_1^*} \types a_1 : A \\ \Psi^{v_2} \types a_2 : A}
-          {\Psi^{v} \types (a_1,a_2) \pmcol A}
+\inferrule{ \Psi^b \vdash a : A}
+          { \Psi \vdash a/x^b : x \vcol b A}
+\and 
+\inferrule{ \Psi_1 \vdash \rho_1 : \Psi_1'  \\
+            \Psi_2 \vdash \rho_2 : \Psi_2' \\
+           }
+          { \Psi_1 \combine \Psi_2 \vdash (\theta_1 \combine \theta_2) : \Psi_1' \combine \Psi_2'}
 \end{mathpar}
 
-Using this, the rules for substitutions are
+\paragraph{Congruence}
+
+In the judgement $\Psi \vdash \theta : \Psi'$, $\Psi$ and $\Psi'$ are
+considered up to $\equiv$, and we define the same congruence on
+substitutions:
 \begin{mathpar}
 \inferrule{ }
-          {\Psi^{\uns} \vdash \cdot : \cdot}
-\and
-\inferrule{\Psi^{v_1} \vdash \theta : \Psi'  \\
-            \Psi^{v_2} \vdash \vec{a} \vcol r A \\
-             v = {v_1} \combine v_2
+          { \theta_1 \combine \theta_2 \equiv \theta_2 \combine \theta_1}
+\qquad
+\inferrule{ }
+          { (\theta_1 \combine \theta_2) \combine \theta_3 \equiv \theta_1 \combine (\theta_2 \combine \theta_3)}
+\qquad
+\inferrule{ }
+          { \cdot \combine \theta \equiv \theta}
+\qquad
+\inferrule{ }
+          { \theta \combine \cdot \equiv \theta}
+\end{mathpar}
+
+\paragraph{Admissible Rules}
+
+In this notation, every renaming $\rho$ is a substitution $\theta$ with
+the same structure.  
+
+\begin{mathpar}
+\inferrule*[right=admissible?]
+           {\Psi \vdash \rho' : \Psi' \and
+            \Psi' \vdash \rho : \Psi''}
+           {\Psi \vdash \theta[\theta'] : \Psi'' }
+\and 
+\inferrule*[right=admissible?]
+           {\Psi \vdash \theta : \Psi'}
+           {\flip{\Psi} \vdash \flip{\theta} : \flip{\Psi'} }
+\end{mathpar}
+
+\paragraph{Splitting} Given $\Psi \vdash \theta : \Psi_1' \combine \Psi_2'$, 
+there exist unique (up to $\equiv$) $\Psi_1$ and $\Psi_2$ and $\theta_1$
+and $\theta_2$ such that $\Psi \equiv \Psi_1 \combine \Psi_2$ and $\Psi_1
+\vdash \theta_1 : \Psi_1'$ and $\Psi_2 \vdash \theta_2 : \Psi_2'$ and
+$\theta_1 \combine \theta_2 \equiv \theta$.  
+
+%% For example, the following rule is derivable, and is the analogue of the
+%% $(\check{a}/\check{x},\hat{a}/\hat{x})$ substitution in the other
+%% version.  
+%% \begin{mathpar}
+%% \inferrule*[right=derivable]
+%%            {\Psi^{v'} \vdash \theta : \Psi'  \\
+%%              \Psi^{p} \vdash a : A \\
+%%              v = {v'} \combine {(\flip{p} \combine p)} \\
+%%            }
+%%            {\Psi^{v} \vdash (\theta,(a,a)/x) : (\Psi',x \pmcol A)}
+%% \end{mathpar}
+%% On the other hand, a substitution $(\theta,(a,b)/x)$ is like
+%% $(a/\check{x},b/\hat{x})$.
+
+%% \subsubsection*{Flipping}
+
+%% Suppose we have a rule like
+%% \[
+%% \inferrule{\Psi'^* \vdash J_1}
+%%           {\Psi' \vdash J}
+%% \]
+%% and we want to push a substitution $\Psi \vdash \theta : \Psi'$ into it.
+%% We need to define $\flip{\Psi} \vdash \flip{\theta} : \flip{\Psi'}$,
+%% i.e. the action of the opposite functor from cat to cat on morphism.
+%% For the auxilary notion of terms with a variance on the right, we need
+%% the corresponding principle that $\Psi \types t \vcol r A$ implies
+%% $\flip{\Psi} \types \flip{t} \vcol {\flip r} A$.  
+
+%% This is defined as follows:
+%% \[
+%% \begin{array}{l}
+%% \flip{\cdot} = \cdot\\
+%% \flip{(\theta,t/x)} = \flip{\theta},\flip{t}/x\\
+%% \\
+%% \flip{a} = a \text{ when $r'$ is $\ps$ or $\ms$} \\
+%% \flip{(a_1,a_2)} = (a_2,a_1) \text{ when $r'$ is $\pms$} \\
+%% \end{array}
+%% \]
+
+%% For the first case, we use the fact that $\flip{\uns} = \uns$.  
+
+%% For the second, we have
+%% \begin{mathpar}
+%% \Psi^{v_1} \vdash \theta : \Psi' \and 
+%% \Psi^{v_2} \vdash t \vcol r A  \and
+%% v = {v_1} \combine v_2
+%% \end{mathpar}
+%% so $\flip{v} = \flip{v_1} \combine \flip{v_2}$ (FIXME: state this as a
+%% lemma), and by the IH $\Psi^{\flip{v_1}} \vdash \theta : \flip{\Psi'}$,
+%% and by the term lemma, $\Psi^{\flip{v_2}} \vdash t \vcol {\flip r} A$.
+%% so $\flip{{\Psi^v}} \types (\flip{\theta},\flip{r}) : \flip{(\Psi', x
+%%   \vcol r A)}$.
+
+%% For terms, we use $\flip{\uns} = \uns$ in the first case, and
+%% $\flip{(\flip{r})} = r$ in the $\ps$ and $\ms$ cases.  
+%% For the final case, we use $\flip{v} = \flip{v_1} \combine \flip{v_2}$
+%% and commutativity and involution.  
+
+\subsection{Category Terms}
+
+\begin{mathpar}
+
+\inferrule{ }
+          {x \pcol A \vdash x : A}
+
+\inferrule{\Psi' \types a : A \\
+            \Psi \types \rho : \Psi'
            }
-           {\Psi^{v} \vdash (\theta,\vec{a}/x) : (\Psi',x \vcol r A)}
-\end{mathpar}
-
-For example, the following rule is derivable, and is the analogue of the
-$(\check{a}/\check{x},\hat{a}/\hat{x})$ substitution in the other
-version.  
-\begin{mathpar}
-\inferrule*[right=derivable]
-           {\Psi^{v'} \vdash \theta : \Psi'  \\
-             \Psi^{p} \vdash a : A \\
-             v = {v'} \combine {(\flip{p} \combine p)} \\
+           {\Psi \vdash a[\rho] : A}
+\qquad
+\inferrule{\Psi' \types J \\
+            \Psi \types \theta : \Psi'
            }
-           {\Psi^{v} \vdash (\theta,(a,a)/x) : (\Psi',x \pmcol A)}
+           {\Psi \vdash a[\theta] :A }
 \end{mathpar}
-On the other hand, a substitution $(\theta,(a,b)/x)$ is like
-$(a/\check{x},b/\hat{x})$.
 
-\subsubsection*{Splitting} Suppose we have a rule like
+\section{Explicit Substitution Rules}
+
+\begin{figure}[h]
 
 \begin{mathpar}
-\inferrule*{v' = v_1' \combine v_2'  \\ 
-            \Psi'^{v_1'} \vdash J_1 \\
-            \Psi'^{v_2'} \vdash J_2
+%% context and sequent formation
+  \inferrule{
+  }{
+    \ec \types \ec \ctx
+  }
+  \qquad
+  \inferrule{
+    \Psi_1 \types \Gamma \ctx\\
+    \Psi_2 \types M \type\\
+  }{
+    {\Psi_1} \combine \Psi_2 \types \Gamma,M \ctx
+  }
+  \qquad
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx\\
+    {\Psi_2}\types M \type\\
+  }{
+    \Psi_1 \combine \Psi_2 \types (\Gamma \vdash M) \ok
+  }
+
+%% substitution
+\inferrule{\Psi' \types J \\
+            \Psi \types \rho : \Psi'
            }
-           { {\Psi'}^{v'} \vdash J }
-\end{mathpar}
-and we want to substitute ${\Psi}^{v} \types \theta : \Psi'$ into it.
-We need to find a $v = v_1 \combine v_2$ and $\theta_1$ and
-$\theta_2$ with $\Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}$ and
-$\Psi^{v_2} \vdash \theta_2 : \Psi'^{v_2'}$ to push the substitution
-inside.  
-
-\begin{mathpar}
-\inferrule*[right=admissible]
-           {v' = v_1' \combine v_2'  \\ 
-            {\Psi}^{v} \types \theta : {\Psi'}^{v'}
+           {\Psi \vdash J[\rho]}
+\quad
+\inferrule{\Psi' \types J \\
+            \Psi \types \theta : \Psi'
            }
-           { v = v_1 \combine v_2\\
-             \Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}\\
-             \Psi^{v_2} \vdash \theta_2 : {\Psi'}^{v_2'}
+           {\Psi \vdash J[\theta]}
+\quad
+(J = \Gamma \ctx, M \type, (\Gamma \vdash M) \ok) 
+
+%% identity and substitution
+\inferrule{\Phi \types N \type }
+          {\Phi\complete \cb N \types N}
+\qquad
+\inferrule{{\Phi'}\complete  \cb \Gamma \vdash M \\
+            \Phi \types \theta : \Phi'
            }
-\end{mathpar}
-We write $\theta = \theta_1 \combine \theta_2$ for this operation when the
-other arguments are clear from context.  
+           {\Phi\complete \cb (\Gamma \vdash M)[\flip{\theta} \combine \theta]}
 
-We will need a corresponding operation on terms:
-\begin{mathpar}
-\inferrule*[right=admissible]
-           {r' = r_1' \combine r_2' \\ 
-             \Psi^{v_2} \vdash t \vcol{r'} A
+%% morphism types
+\inferrule{ (\Delta_1 \combine \Delta_2) \ctx \and
+            \Delta_1 = \Psi_1 \combine \Psi_1' \and
+            \Delta_2 = \Psi_2 \combine \Psi_2' \\\\
+            \Psi_1' \types M \type \and
+            \flip{\Psi_2'} \types \rho : \Psi_1' \and
+            \Psi_1 \types \Gamma_1 \ctx \and 
+            \Psi_2 \types (\Gamma_2 \types N) \ok \\\\
+            \Delta_1 \cb \Gamma_1 \vdash M \and 
+            \Delta_2 \cb \Gamma_2,M[\rho] \vdash N \and 
+            \\\\
+            \unif{\Psi_1 \combine \Psi_1'}{\Psi_2 \combine \Psi_2'}{\rho}{(\Delta_0 \vdash \rho_0)} \\
            }
-          { v_2 = {v_{21}} \combine v_{22} \\ 
-            \Psi^{v_{21}} \vdash \vec{a}_1 \vcol{r_1'} A\\
-            \Psi^{v_{21}} \vdash \vec{a}_2 \vcol{r_2'} A\\
-          }
-\end{mathpar}
-
-Here is the essence of the definition:
-\[
-\begin{array}{l}
-\cdot = \cdot \combine \cdot \\
-(\theta,\vec{a}/x) = (\theta_1,\vec{a}_1/x) \combine (\theta_2,\vec{a}_2/x) \text{ when } \theta = \theta_1 \combine \theta_2
-\text{ and } \vec{a} = \vec{a}_1 \combine \vec{a}_2 \\
-\\ 
-\vec{a} = (\vec{a} \combine \triv) \text{ if the splitting is } r = r \sqcup \uns\\
-\vec{a} = (\triv \combine \vec{a}) \text{ if the splitting is } r = \uns \sqcup r\\
-(a_1,a_2) = (a_1 \combine a_2) \text{ if the splitting is } \pms = \ms \sqcup \ps\\
-(a_1,a_2) = (a_2 \combine a_1) \text{ if the splitting is } \pms = \ps \sqcup \ms\\
-\end{array}
-\]
-
-What follows is a long-winded explanation of why this type checks.  
-
-If $\Psi'$ is $\cdot$, then the substitution must be $\cdot$, and $v' =
-v_1' \combine v_2'$ is $\cdot = \cdot \combine \cdot$, so we want
-\begin{mathpar}
-\uns = \uns \combine \uns \and \inferrule*{ }{\cdot \cdot \combine \cdot}
-\end{mathpar}
-
-Suppose the $\Psi'$ in the theorem is of the form $\Psi', x \vcol r' A$,
-and the substitution is of the form $\theta,\vec{a}/x$, where in every case we
-have 
-\begin{mathpar}
-v = {v_1} \combine {v_2} \\
-\Psi^{v_1} \types \theta : \Psi' \\
-\Psi^{v_2} \vdash \vec{a} \vcol {r'} A
-\end{mathpar}
-If $(v',r')$ is the resource vector for the $\Psi',x \vcol{r'} A$, then we
-have a splitting as
-\[
-(v',r') = (v_1',r_1') \combine (v_2',r_2')
-\]
-so in particular $v' = v_1' \combine v_2'$.  Therefore, by splitting
-$\theta$ with $v' = v_1' \combine v_2'$ we get
-\begin{mathpar}
-\theta = \theta_1 \combine \theta_2 \\
-v_1 = v_{11} \combine v_{12}\\
-\Psi^{v_{11}} \vdash \theta_1 : {\Psi'}^{v_1'}\\
-\Psi^{v_{12}} \vdash \theta_2 : {\Psi'}^{v_2'}\\
-\end{mathpar}
-
-By term splitting, we have
-\begin{mathpar}
-\vec{a} = \vec{a}_1 \sqcup \vec{a}_2 \\
-v_2 = {v_{21}} \combine v_{22} \\ 
-\Psi^{v_{21}} \vdash \vec{a}_1 \vcol{r_1'} A\\
-\Psi^{v_{21}} \vdash \vec{a}_2 \vcol{r_2'} A\\
-\end{mathpar}
-
-So we construct 
-\begin{mathpar}
-(\theta,\vec{a}/x) = (\theta_1,\vec{a}_1/x) \combine (\theta_2,\vec{a}_2/x) \\
-v = (v_{11} \combine v_{21}) \combine (v_{21} \combine v_{22}) \\
-\Psi^{(v_{11} \combine v_{21})} \vdash (\theta_1,\vec{a}_1/x) : (\Psi'^{v_1'},x \vcol{r_1'} A)\\
-\Psi^{(v_{21} \combine v_{22})} \vdash (\theta_1,\vec{a}_2/x) : (\Psi'^{v_2'},x \vcol{r_2'} A)
-\end{mathpar}
-where we use associativity and commutativity, we will have 
-$v = v_1 \combine v_2 = (v_{11} \combine v_{12}) \combine ({v_{21}} \combine {v_{22}})
-= (v_{11} \combine {v_{21}}) \combine ({v_{12} \combine v_{22}})$.  
-
-Next, we define the term splitting operation by cases on how $r'$ splits:
-\begin{itemize}
-\item Case $r' = r' \combine \uns$.  In this case return $v_2 = v_2
-  \combine \uns$ and $t \splits (t,\triv)$.
-\item Case $r' = \uns \combine r'$.  In this case return $v_2 = \uns \combine v_2$ and $t \splits (\triv,t)$.
-
-\item Case $\pms = \ps \combine \ms$. In this case we have $v_2 =
-  {v_{21}} \combine {v_{22}}$, where $\Psi^{v_{21}^*} \vdash a_1 : A$
-  and $\Psi^{v_{22}} \vdash a_2 : A$, so we can return 
-  $v_2 = {v_{21}} \combine {v_{22}}$
-  and define $(a_1,a_2) = a_1 \combine a_2$.
-
-\item Case $\pms = \ps \combine \ms$. In this case we have $v_2 =
-  {v_{21}} \combine {v_{22}}$, where $\Psi^{v_{21}^*} \vdash a_1 : A$
-  and $\Psi^{v_{22}} \vdash a_2 : A$, so we can return 
-  $v_2 = {v_{22}} \combine {v_{21}}$
-  and define $(a_1,a_2) = a_2 \combine a_1$.
-\end{itemize}
-
-\subsubsection*{Flipping}
-
-Suppose we have a rule like
-\[
-\inferrule{\Psi'^* \vdash J_1}
-          {\Psi' \vdash J}
-\]
-and we want to push a substitution $\Psi \vdash \theta : \Psi'$ into it.
-We need to define $\flip{\Psi} \vdash \flip{\theta} : \flip{\Psi'}$,
-i.e. the action of the opposite functor from cat to cat on morphism.
-For the auxilary notion of terms with a variance on the right, we need
-the corresponding principle that $\Psi \types t \vcol r A$ implies
-$\flip{\Psi} \types \flip{t} \vcol {\flip r} A$.  
-
-This is defined as follows:
-\[
-\begin{array}{l}
-\flip{\cdot} = \cdot\\
-\flip{(\theta,t/x)} = \flip{\theta},\flip{t}/x\\
+           {\Delta_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \\
-\flip{a} = a \text{ when $r'$ is $\ps$ or $\ms$} \\
-\flip{(a_1,a_2)} = (a_2,a_1) \text{ when $r'$ is $\pms$} \\
-\end{array}
-\]
+\inferrule{ }
+          {x \mcol A \combine y\pcol A \types \mor A(x,y) \type}
+\qquad
+\inferrule{ }
+          {x :\pm A \cb \ec \types \mor{A}(x,x) }
 
-For the first case, we use the fact that $\flip{\uns} = \uns$.  
-
-For the second, we have
-\begin{mathpar}
-\Psi^{v_1} \vdash \theta : \Psi' \and 
-\Psi^{v_2} \vdash t \vcol r A  \and
-v = {v_1} \combine v_2
-\end{mathpar}
-so $\flip{v} = \flip{v_1} \combine \flip{v_2}$ (FIXME: state this as a
-lemma), and by the IH $\Psi^{\flip{v_1}} \vdash \theta : \flip{\Psi'}$,
-and by the term lemma, $\Psi^{\flip{v_2}} \vdash t \vcol {\flip r} A$.
-so $\flip{{\Psi^v}} \types (\flip{\theta},\flip{r}) : \flip{(\Psi', x
-  \vcol r A)}$.
-
-For terms, we use $\flip{\uns} = \uns$ in the first case, and
-$\flip{(\flip{r})} = r$ in the $\ps$ and $\ms$ cases.  
-For the final case, we use $\flip{v} = \flip{v_1} \combine \flip{v_2}$
-and commutativity and involution.  
-
-\subsubsection*{Merging}
-
-We should also have an inverse operation
-\begin{mathpar}
-\inferrule*[right=admissible]
-           { v = v_1 \combine v_2\\
-             v' = v_1' \combine v_2'  \\ 
-             \Psi^{v_1} \vdash \theta_1 : {\Psi'}^{v_1'}\\
-             \Psi^{v_2} \vdash \theta_2 : {\Psi'}^{v_2'}
+\inferrule {\Phi \combine x \pcol A \types M \type}
+           {\Phi\pm \combine x \pmcol A \combine y \pmcol A\cb M,\mor{A}(x,y) \types M[y/x]
            }
-           {
-            {\Psi}^{v} \types \theta_1 \combine \theta_2 : {\Psi'}^{v'}
+\qquad
+\inferrule {\Phi \combine y \mcol A \types M \type}
+           {\Phi\pm \combine x \pmcol A \combine y \pmcol A\cb M,\mor{A}(x,y) \types M[x/y]
            }
+
+%% tensor
+\inferrule{
+  \Psi_1 \types M_1\type \\ \Psi_2 \types M_2\type
+}{
+  (\Psi_1 \combine \Psi_2) \types M_1\otimes M_2\type
+}
+\qquad
+\inferrule{
+  \Psi \cb \Gamma,M_1,M_2 \types N
+}{
+  \Psi \cb \Gamma, M_1\otimes M_2 \types N
+}
+\qquad
+\inferrule
+    {\Phi_1 \types M_1 \type \and
+      \Phi_2 \types M_2 \type
+    }
+    {\Phi_1 \combine \Phi_2 \cb M_1 , M_2 \types M_1 \otimes M_2}
+
+%% coend
+\inferrule{
+    \Psi \combine x \pmcol A \types M \type \\
+    }{
+    \Psi \types \coend^{x:A} M \type
+   }
+\qquad
+\inferrule{
+  \Delta \combine x \pmcol A \cb \Gamma, M \types N
+}{
+  \Delta \cb \Gamma,\coend^{x:A} M \types N
+}
+\qquad
+\inferrule{\Phi\combine x \pmcol A \vdash M \type}
+          {
+            \Phi\complete \combine x \pmcol A \cb M \types \coend^{x:A} M
+          }
+
+%% end
+\inferrule{\Psi \combine x \pmcol A \types M \type \\
+    }{
+    \Psi \types \End_{x:A} M \type
+  }
+\qquad
+\inferrule{
+  \Psi \combine x \pmcol A \cb \Gamma \types M
+}{
+  \Psi \cb \Gamma \types \coend_{x:A} M
+}
+\qquad
+\inferrule{\Phi \combine x \pmcol A \types M \type}
+          {\Phi\complete \combine x \pmcol A \cb \End_{x:A} M \types M}
+
+%% hom
+\inferrule{
+  \flip{\Psi_1} \types M_1\type \\ \Psi_2 \types M_2\type
+  }{
+    \Psi_1 \combine \Psi_2 \types M_1 \multimap M_2 \type
+  }
+\qquad
+  \inferrule{
+    \Delta \cb \Gamma, M \types N
+  }{
+    \Delta \cb \Gamma \types M\multimap N
+  }
+\qquad
+\inferrule{
+  \flip{\Phi_1} \types M_1 \type \\ 
+  \Phi_2 \types M_2 \type \\ 
+  }{
+    \Phi_1\complete,\Phi_2\complete \cb M_1,M_1\multimap M_2 \types M_2
+  }
 \end{mathpar}
-That it is inverse means that if $\theta = \theta_1 \combine \theta_2$
-(referring to the splitting operation defined above) then $\theta_1
-\combine \theta_2$ (referring to the merging operation defined here) is
-equal to the original $\theta$, and that merging $\theta_1$ and
-$\theta_2$ and then splitting it gives back the same $\theta_1$ and
-$\theta_2$.  Because of this, using the same notation for splitting and
-merging is justified.  FIXME: It might be better to define
-splitting/merging as a single judgement that is proved functional in
-both directions (with the $v$ splitting an input for one and an output
-for the other).  
+
+\end{figure}
+
+
+\end{document}
 
 
 
+\section{Other Versions}
 
 \subsection*{Type Contexts}
 
 \begin{mathpar}
   \inferrule{
   }{
-    \Psi\un \types \ec \ctx
+    \ec \types \ec \ctx
   }
   \and
   \inferrule{
-    \Psi^{v_1} \types \Gamma \ctx\\
-    \Psi^{v_2} \types M \type\\
-    v = {v_1} \combine v_2
+    \Psi_1 \types \Gamma \ctx\\
+    \Psi_2 \types M \type\\
   }{
-    \Psi^{v} \types \Gamma,M \ctx
+    {\Psi_1} \combine \Psi_2 \types \Gamma,M \ctx
   }
 \\
 \end{mathpar}
@@ -693,11 +744,10 @@ for the other).
 
 \begin{mathpar}
   \inferrule{
-    \Psi^{v_1^*} \types \Gamma \ctx\\
-    \Psi^{v_2} \types M \type\\
-    v = v_1 \combine v_2
+    \flip{\Psi_1} \types \Gamma \ctx\\
+    {\Psi_2}\types M \type\\
   }{
-    \Psi^{v} \types (\Gamma \vdash M) \ok
+    \Psi_1 \combine \Psi_2 \types (\Gamma \vdash M) \ok
   }
 \\ 
 \end{mathpar}
@@ -706,10 +756,10 @@ for the other).
 
 \begin{mathpar}
 \inferrule{ }
-          {\Psi_1\un,x \pcol A,\Psi_2\un \vdash x : A}
+          {x \pcol A \vdash x : A}
 
-\inferrule{\Psi^{p} \types N \type }
-          {\Psi^{(\flip{p} \combine p)} \cb N \types N}
+\inferrule{\Phi \types N \type }
+          {\flip \Phi \combine \Phi \cb N \types N}
 \\
 \end{mathpar}
 
@@ -720,14 +770,12 @@ or $(\Gamma \vdash M) \ok$.
 
 \begin{mathpar}
 
-\inferrule*[right=admissible?]
-           {\Psi' \types J \\
+\inferrule*{\Psi' \types J \\
             \Psi \types \rho : \Psi'
            }
            {\Psi \vdash J[\rho]}
 
-\inferrule*[right=admissible?]
-           {\Psi' \types J \\
+\inferrule*{\Psi' \types J \\
             \Psi \types \theta : \Psi'
            }
            {\Psi \vdash J[\theta]}
