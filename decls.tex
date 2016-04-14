@@ -111,8 +111,8 @@
 % Bold: \bA is \mathbf{A}
 \def\definebold#1{\ea\gdef\csname b#1\endcsname{\ensuremath{\mathbf{#1}}\xspace}}
 \foreachLetter{1}{27}{\definebold}
-% Blackboard Bold: \lA is \mathbb{A}
-\def\definebb#1{\ea\gdef\csname l#1\endcsname{\ensuremath{\mathbb{#1}}\xspace}}
+% Blackboard Bold: \bbA is \mathbb{A}
+\def\definebb#1{\ea\gdef\csname bb#1\endcsname{\ensuremath{\mathbb{#1}}\xspace}}
 \foreachLetter{1}{27}{\definebb}
 % Fraktur: \ka is \mathfrak{a} (except when it's \kappa, see below), \kA is \mathfrak{A}
 \def\definefrak#1{\ea\gdef\csname k#1\endcsname{\ensuremath{\mathfrak{#1}}\xspace}}
@@ -151,7 +151,7 @@
 % different.
 \def\autofmt@n#1\autofmt@end{\mathrm{#1}}
 \def\autofmt@b#1\autofmt@end{\mathbf{#1}}
-\def\autofmt@l#1#2\autofmt@end{\mathbb{#1}\mathsf{#2}}
+\def\autofmt@d#1#2\autofmt@end{\mathbb{#1}\mathsf{#2}}
 \def\autofmt@c#1#2\autofmt@end{\mathcal{#1}\mathit{#2}}
 \def\autofmt@s#1#2\autofmt@end{\mathscr{#1}\mathit{#2}}
 \def\autofmt@f#1\autofmt@end{\mathsf{#1}}
@@ -165,7 +165,7 @@
 \def\autofmt@k#1\autofmt@end{\check{#1}}
 
 % Defining multi-letter commands.  Use this like so:
-% \autodefs{\bSet\cCat\cCAT\kBicat\lProf}
+% \autodefs{\bSet\cCat\cCAT\kBicat\dProf}
 \def\auto@drop#1{}
 \def\autodef#1{\ea\ea\ea\@autodef\ea\ea\ea#1\ea\auto@drop\string#1\autodef@end}
 \def\@autodef#1#2#3\autodef@end{%

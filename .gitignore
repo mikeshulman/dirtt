@@ -151,6 +151,9 @@ pythontex-files-*/
 *.bak
 *.sav
 
+# Emacs
+*~
+
 # endfloat
 *.ttt
 *.fff
