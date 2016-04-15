@@ -850,7 +850,7 @@ left, then with cuts on both sides:
       \cb (\Gamma, \mor{A}(x,y) \types M)[(a_1,a_1)/x, (a_2,a_2)/y]
   }
 \end{mathpar}
-and with cuts on both sides:
+and with cuts on both sides (can these be written as a single rule?):
 \begin{mathpar}
   \inferrule{
     \Psi^{\flip{v_1}} \types \Gamma \ctx \\
@@ -1189,6 +1189,23 @@ It should be the case that $[(a,a)/w] [ (y,x) / u ] =?
 \inferrule*[right=End Left Axiom]
            {\Psi^p,x \pmcol A \types M \type}
            {\Psi^{p \combine \flip{p}}, x \pmcol A \cb \End_{x:A} M \types M}
+\end{mathpar}
+
+The left rule for end should be all substitutions/cuts with the left axiom, which gives (FIXME:
+check):
+\begin{mathpar}
+  \inferrule*[right=End Left Rule]{
+    d=d_1\combine d_2 \\
+    d_1 = v_1\combine v_1' \\
+    d_1 = v_2\combine v_2' \\\\
+    \Psi^{v_1\combine v_2} \types (\Gamma,\End_{x:A} M \types N) \ctx \\\\
+    \Psi^{v_1'} \types a:A \\
+    \Psi^{\flip{v_2'}} \types \rho:\Psi^{v_1'} \\\\
+    \Psi^d \cb \Gamma, \End_{x:A} M[(a,a[\rho])/x] \types N \\\\
+    \unif{\Psi^{d_1=v_1\combine v_1'}}{\Psi^{d_2=v_2\combine v_2'}}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \Psi_0 \cb (\Gamma, \End_{x:A} M \types N)[\rho_0]
+  }
 \end{mathpar}
 
 \subsection*{Function types}
