@@ -701,8 +701,8 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
           {x \pmcol A \cb \ec \types \mor{A}(x,x) }
 \qquad
 \inferrule{%% \Psi, x \mcol A, y \pcol A \types (\Gamma \vdash M) \ok \\
-           \Psi, x \pmcol A \cb (\Gamma \vdash M) [x/y\p]\\ }
-          {\Psi, x \pmcol A, y \pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
+           \Delta, x \pmcol A \cb (\Gamma \vdash M) [x/y\p]\\ }
+          {\Delta, x \pmcol A, y \pmcol A \cb \Gamma, \mor{A}(x,y) \types M }
 
 %% \inferrule {\Phi \combine x \pcol A \types M \type}
 %%            {\Phi\pm \combine x \pmcol A \combine y \pmcol A\cb M,\mor{A}(x,y) \types M[y/x]
@@ -720,16 +720,16 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
 }
 \qquad
 \inferrule{
-  \Psi \cb \Gamma,M_1,M_2 \types N
+  \Delta \cb \Gamma,M_1,M_2 \types N
 }{
-  \Psi \cb \Gamma, M_1\otimes M_2 \types N
+  \Delta \cb \Gamma, M_1\otimes M_2 \types N
 }
 \qquad
 \inferrule
     {\Phi_1 \types M_1 \type \and
       \Phi_2 \types M_2 \type
     }
-    {\Phi_1 \combine \Phi_2 \cb M_1 , M_2 \types M_1 \otimes M_2}
+    {\Phi_1\complete \combine \Phi_2\complete \cb M_1 , M_2 \types M_1 \otimes M_2}
 
 %% coend
 \inferrule{
@@ -756,9 +756,9 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
   }
 \qquad
 \inferrule{
-  \Psi \combine x \pmcol A \cb \Gamma \types M
+  \Delta \combine x \pmcol A \cb \Gamma \types M
 }{
-  \Psi \cb \Gamma \types \coend_{x:A} M
+  \Delta \cb \Gamma \types \coend_{x:A} M
 }
 \qquad
 \inferrule{\Phi \combine x \pmcol A \types M \type}
@@ -778,7 +778,7 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
   }
 \qquad
 \inferrule{
-  \flip{\Phi_1} \types M_1 \type \\ 
+  \Phi_1 \types M_1 \type \\ 
   \Phi_2 \types M_2 \type \\ 
   }{
     \Phi_1\complete,\Phi_2\complete \cb M_1,M_1\multimap M_2 \types M_2
@@ -834,7 +834,7 @@ Hom right rule:
   }
 \end{mathpar}
 
-Hom left rule, split into four cases (FIXME: write as single rule):
+Hom left rule, split into four cases (FIXME: write as single rule, without context morphism?):
 \begin{mathpar}
   \inferrule{
     \flip{\Psi_1} \types \Gamma \ctx \\
@@ -846,9 +846,9 @@ Hom left rule, split into four cases (FIXME: write as single rule):
     \Psi_2,\Psi_2',x\pmcol A \cb \Gamma'[\rho,x/y] \types M \\\\
     \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{(\Psi_1,\Psi_3,\Psi_3') \combineU \Psi_1'}
-      {\Psi_2' \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+      {\Psi_2' \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
     }{
-    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+    \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   }
 \end{mathpar}
 \begin{mathpar}
@@ -862,9 +862,9 @@ Hom left rule, split into four cases (FIXME: write as single rule):
     \Psi_2,\Psi_2',\Psi_3,\Psi_3' \cb \Gamma'[\rho,a_1/x,a_2/y] \types M \\\\
     \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{\Psi_1 \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3,\Psi_3') \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+      {(\Psi_2',\Psi_3,\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
     }{
-    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+    \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   }
 \end{mathpar}
 \begin{mathpar}
@@ -878,9 +878,9 @@ Hom left rule, split into four cases (FIXME: write as single rule):
     \Psi_2,\Psi_2',\Psi_3' \cb \Gamma'[\rho,a_2/x] \types M \\\\
     \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{(\Psi_1,\Psi_3) \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3') \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+      {(\Psi_2',\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
     }{
-    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+    \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   } \and
 \end{mathpar}
 \begin{mathpar}
@@ -894,9 +894,9 @@ Hom left rule, split into four cases (FIXME: write as single rule):
     \Psi_2,\Psi_2',\Psi_3 \cb \Gamma'[\rho,a_1/x] \types M \\\\
     \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{(\Psi_1,\Psi_3') \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3) \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+      {(\Psi_2',\Psi_3) \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
     }{
-    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+    \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   } \and
 \end{mathpar}
 
