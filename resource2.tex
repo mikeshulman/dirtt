@@ -677,7 +677,7 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
            }
            {\Phi\complete \cb (\Gamma \vdash M)[\flip{\theta} \combine \theta]}
 
-%% morphism types
+%% cut
 \inferrule{ (\Delta_1 \combine \Delta_2) \ctx \and
             \Delta_1 = \Psi_1 \combine \Psi_1' \and
             \Delta_2 = \Psi_2 \combine \Psi_2' \\\\
@@ -692,11 +692,13 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
            }
            {\Delta_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \\
+
+%% morphism types
 \inferrule{ }
           {x \mcol A \combine y\pcol A \types \mor A(x,y) \type}
 \qquad
 \inferrule{ }
-          {x :\pm A \cb \ec \types \mor{A}(x,x) }
+          {x \pmcol A \cb \ec \types \mor{A}(x,x) }
 \qquad
 \inferrule{%% \Psi, x \mcol A, y \pcol A \types (\Gamma \vdash M) \ok \\
            \Psi, x \pmcol A \cb (\Gamma \vdash M) [x/y\p]\\ }
@@ -821,6 +823,82 @@ We also have exactly the same equations for $J[\rho]$.
 
 \end{figure}
 
+\section{Sequent Calculus}
+
+Hom right rule:
+\begin{mathpar}
+  \inferrule{
+    \Phi \types a:A
+  }{
+    \Phi\complete \cb \ec \types \mor{A}(a,a)
+  }
+\end{mathpar}
+
+Hom left rule, split into four cases (FIXME: write as single rule):
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \Psi_1',x\pcol A,y\mcol A \types \Gamma' \ctx \\
+    \Psi_2' \types M \type \\\\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\\\
+    \Psi_1,\Psi_1',\Psi_3,\Psi_3' \cb \Gamma \types \Gamma'[a_1/x,a_2/y] \\
+    \Psi_2,\Psi_2',x\pmcol A \cb \Gamma'[\rho,x/y] \types M \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\
+    \unif{(\Psi_1,\Psi_3,\Psi_3') \combineU \Psi_1'}
+      {\Psi_2' \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+  }
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \Psi_1',x\pcol A,y\mcol A \types \Gamma' \ctx \\
+    \Psi_2' \types M \type \\\\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\\\
+    \Psi_1,\Psi_1',x\pmcol A \cb \Gamma \types \Gamma'[x/y] \\
+    \Psi_2,\Psi_2',\Psi_3,\Psi_3' \cb \Gamma'[\rho,a_1/x,a_2/y] \types M \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\
+    \unif{\Psi_1 \combineU \Psi_1'}
+      {(\Psi_2',\Psi_3,\Psi_3') \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+  }
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \Psi_1',x\pcol A \types \Gamma' \ctx \\
+    \Psi_2' \types M \type \\\\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\\\
+    \Psi_1,\Psi_1',\Psi_3 \cb \Gamma \types \Gamma'[a_1/x] \\
+    \Psi_2,\Psi_2',\Psi_3' \cb \Gamma'[\rho,a_2/x] \types M \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\
+    \unif{(\Psi_1,\Psi_3) \combineU \Psi_1'}
+      {(\Psi_2',\Psi_3') \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+  } \and
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \Psi_1',x\mcol A \types \Gamma' \ctx \\
+    \Psi_2' \types M \type \\\\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\\\
+    \Psi_1,\Psi_1',\Psi_3' \cb \Gamma \types \Gamma'[a_2/x] \\
+    \Psi_2,\Psi_2',\Psi_3 \cb \Gamma'[\rho,a_1/x] \types M \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\
+    \unif{(\Psi_1,\Psi_3') \combineU \Psi_1'}
+      {(\Psi_2',\Psi_3) \combineU \Psi_2}{\rho}{(\Psi_0,\rho_0)}
+    }{
+    \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+  } \and
+\end{mathpar}
 \end{document}
 
 
