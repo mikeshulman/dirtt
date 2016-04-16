@@ -899,6 +899,25 @@ Hom left rule, split into four cases (FIXME: write as single rule):
     \Psi_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   } \and
 \end{mathpar}
+
+Tensor left rule:
+\begin{mathpar}
+\inferrule{
+  \Delta \cb \Gamma,M_1,M_2 \types N
+}{
+  \Delta \cb \Gamma, M_1\otimes M_2 \types N
+}
+\end{mathpar}
+
+Tensor right rule:
+\begin{mathpar}
+\inferrule{
+  \Delta_1 \cb \Gamma_1 \types M_1 \\
+  \Delta_2 \cb \Gamma_2 \types M_2
+  }{
+  \Delta_1, \Delta_2 \cb \Gamma_1, \Gamma_2 \types M_1 \otimes M_2
+}
+\end{mathpar}
 \end{document}
 
 
