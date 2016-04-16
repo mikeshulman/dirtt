@@ -343,8 +343,8 @@ The rules for this judgement are
   \inferrule{
     \unif{(\Psi_1 \combineU \Psi_1')}{(\Psi_2 \combineU \Psi_2')}{\rho}{(\Delta_0 \vdash \rho_0)}
   }{
-    \unif{((\Psi_1 \combineU {x \vcol {\flip v} A}) \combine (\Psi_1' \combine {x \vcol v A}))}
-         {((\Psi_2 \combineU {y \vcol {v} A}) \combine (\Psi_2' \combine {y \vcol {\flip v} A}))}
+    \unif{((\Psi_1 \combine {x \vcol {\flip v} A}) \combineU (\Psi_1' \combine {x \vcol v A}))}
+         {((\Psi_2 \combine {y \vcol {v} A}) \combineU (\Psi_2' \combine {y \vcol {\flip v} A}))}
          {(\rho \combine (y/x^v))}
          {(\Delta_0 \combine x \pmcol A \vdash \rho_0 \combine (x/x^{\flip{v}}) \combine (x/y^{b}))}
   }
