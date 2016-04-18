@@ -5,6 +5,7 @@
 \usepackage{xcolor}
 \let\types\vdash % turnstile
 \def\cb{\mid} % context break
+\def\cbb{\mid\mid} % context break
 \def\op{^{\mathrm{op}}}
 \def\p{^+} % variances on variables
 \def\m{^-}
@@ -631,7 +632,7 @@ Together these define provability; we still need equations for
 substitutions and cuts on derivations of $\Delta \cb \Gamma \vdash M$ 
 and $\beta/\eta$ etc. to define isomorphisms etc.  
 
-\begin{figure}
+\begin{figure}[p]
 
 \begin{mathpar}
 
@@ -791,7 +792,7 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[p]
 
 \[
 \begin{array}{rcll}
@@ -823,7 +824,13 @@ We also have exactly the same equations for $J[\rho]$.
 
 \end{figure}
 
+\clearpage
+\newpage
+
 \section{Sequent Calculus}
+
+We write $\Delta \cbb \Gamma \types M$ to abbreviate $\Delta \vdash
+(\Gamma \types M) \ok$ and $\Delta \cb \Gamma \types M$.
 
 Hom right rule:
 \begin{mathpar}
@@ -912,8 +919,8 @@ Tensor left rule:
 Tensor right rule:
 \begin{mathpar}
 \inferrule{
-  \Delta_1 \cb \Gamma_1 \types M_1 \\
-  \Delta_2 \cb \Gamma_2 \types M_2
+  \Delta_1 \cbb \Gamma_1 \types M_1 \\
+  \Delta_2 \cbb \Gamma_2 \types M_2
   }{
   \Delta_1, \Delta_2 \cb \Gamma_1, \Gamma_2 \types M_1 \otimes M_2
 }
@@ -975,8 +982,8 @@ Arrow right rule:
 Arrow left rule:
 \begin{mathpar}
 \inferrule{
-  \Delta_1 \cb \Gamma_1 \types M_1 \\
-  \Delta_2 \cb \Gamma_2, M_2 \types N
+  \Delta_1 \cbb \Gamma_1 \types M_1 \\
+  \Delta_2 \cbb \Gamma_2, M_2 \types N
   }{
   \Delta_1,\Delta_2 \cb \Gamma_1,\Gamma_2,M_1\multimap M_2 \types N
 }
