@@ -347,7 +347,7 @@ The rules for this judgement are
     \unif{((\Psi_1 \combine {x \vcol {\flip v} A}) \combineU (\Psi_1' \combine {x \vcol v A}))}
          {((\Psi_2 \combine {y \vcol {v} A}) \combineU (\Psi_2' \combine {y \vcol {\flip v} A}))}
          {(\rho \combine (y/x^v))}
-         {(\Delta_0 \combine x \pmcol A \vdash \rho_0 \combine (x/x^{\flip{v}}) \combine (x/y^{b}))}
+         {(\Delta_0 \combine x \pmcol A \vdash \rho_0 \combine (x/x^{\flip{v}}) \combine (x/y^{v}))}
   }
 
   \inferrule{
@@ -607,12 +607,12 @@ A \in \Psi_2$.
 \inferrule{ }
           {x \pcol A \vdash x : A}
 
-\inferrule{\Psi' \types J \\
+\inferrule{\Psi' \types a:A \\
             \Psi \types \rho : \Psi'
            }
            {\Psi \vdash a[\rho] :A }
 
-\inferrule{\Psi' \types J \\
+\inferrule{\Psi' \types a:A \\
             \Psi \types \theta : \Psi'
            }
            {\Psi \vdash a[\theta] :A }
@@ -820,7 +820,7 @@ M_1[\flip{\theta_1}],M_2[\theta_2] & \text{ where } \theta \equiv (\theta_1 : \P
 We also have exactly the same equations for $J[\rho]$.
 
 \caption{Equations for Substitution}
-\label{fig:explicit-subst-rules}
+\label{fig:explicit-subst}
 
 \end{figure}
 
@@ -939,7 +939,7 @@ Coend right rule:
 \begin{mathpar}
 \inferrule{
   \Psi_1,\Psi_2 \types (\Gamma \types \coend^{x:A} M) \ok \\
-  \Psi_1 \types a:A \\
+  \Psi_1' \types a:A \\
   \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
   \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma \types M[a[\rho]/x\m,a/x\p] \\\\
   \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
@@ -964,7 +964,7 @@ End left rule:
   \Psi_1' \types a:A \\
   \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
   \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma, \End_{x:A} M[a/x\m,a[\rho]/x\p] \types N \\\\
-  \unif{\Psi_1,\Psi_1'}{\Psi_2,\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
+  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
   }{
   \Delta_0 \cb (\Gamma, \End_{x:A} M \types N)[\rho_0]
 }
