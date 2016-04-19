@@ -852,7 +852,7 @@ Hom left rule, split into four cases (FIXME: write as single rule, without conte
     \Psi_1,\Psi_1',\Psi_3,\Psi_3' \cb \Gamma \types \Gamma'[a_1/x\p,a_2/y\m] \\\\
     \Psi_2,\Psi_2',x\pmcol A \cb \Gamma'[\rho,x/y\m] \types M \\\\
     \unif{(\Psi_1,\Psi_3,\Psi_3') \combineU \Psi_1'}
-      {\Psi_2' \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {\Psi_2' \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   }
@@ -868,7 +868,7 @@ Hom left rule, split into four cases (FIXME: write as single rule, without conte
     \Psi_1,\Psi_1',x\pmcol A \cb \Gamma \types \Gamma'[x/y\m] \\\\
     \Psi_2,\Psi_2',\Psi_3,\Psi_3' \cb \Gamma'[\rho,a_1/x\p,a_2/y\m] \types M \\\\
     \unif{\Psi_1 \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3,\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {(\Psi_2',\Psi_3,\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   }
@@ -884,7 +884,7 @@ Hom left rule, split into four cases (FIXME: write as single rule, without conte
     \Psi_1,\Psi_1',\Psi_3 \cb \Gamma \types \Gamma'[a_1/x\p] \\\\
     \Psi_2,\Psi_2',\Psi_3' \cb \Gamma'[\rho,a_2/x\p] \types M \\\\
     \unif{(\Psi_1,\Psi_3) \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {(\Psi_2',\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   } \and
@@ -900,7 +900,7 @@ Hom left rule, split into four cases (FIXME: write as single rule, without conte
     \Psi_1,\Psi_1',\Psi_3' \cb \Gamma \types \Gamma'[a_2/x\m] \\\\
     \Psi_2,\Psi_2',\Psi_3 \cb \Gamma'[\rho,a_1/x\m] \types M \\\\
     \unif{(\Psi_1,\Psi_3') \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3) \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {(\Psi_2',\Psi_3) \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   } \and
@@ -937,7 +937,7 @@ Hom left rule, split into four cases (FIXME: write as single rule, without conte
   \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
   \Psi_1,\Psi_2 \types (\Gamma \types \coend^{x:A} M) \ok \\\\
   \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma \types M[a[\rho]/x\m,a/x\p] \\\\
-  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
+  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
   }{
   \Delta_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0]
 }
@@ -957,7 +957,7 @@ Hom left rule, split into four cases (FIXME: write as single rule, without conte
   \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
   \Psi_1,\Psi_2 \types (\Gamma,\End_{x:A} M \types N) \ok \\\\
   \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma, \End_{x:A} M[a/x\m,a[\rho]/x\p] \types N \\\\
-  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
+  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
   }{
   \Delta_0 \cb (\Gamma, \End_{x:A} M \types N)[\rho_0]
 }
@@ -982,7 +982,7 @@ Hom left rule, split into four cases (FIXME: write as single rule, without conte
 
 \subsection{Derivations}
 Some of the sequent calculus rules are significantly more complicated than their explicit substitution versions.
-To derive these from the simpler forms, we will need a new admissible rule for unification judgements.
+To derive these from the simpler forms, we will need new admissible rules for unification judgements.
 \begin{mathpar}
   \inferrule{
     \Delta\equiv\Delta_1,\Delta_2 \\
@@ -995,7 +995,64 @@ To derive these from the simpler forms, we will need a new admissible rule for u
     \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
   }{
     \unif{\Psi_3\combineU(\Psi_1',\Psi_2',\Psi_3')}{\Phi_1\combineU(\Phi_2,\flip{\Phi_2},\flip{\Phi_1})}
-      {(\rho[\flip{\rho_2}],\rho_2,\rho_1)}{(\Delta_0\types(1_{\Psi_3},\rho_1)[\rho_0])}
+    {(\rho[\flip{\rho_2}],\rho_2,\rho_1)}{(\Delta_0\types(1_{\Psi_3},\rho_1^{-1})[\rho_0])}
+  }
+\end{mathpar}
+
+And the closely related:
+\begin{mathpar}
+  \inferrule{
+    \Delta\equiv\Delta_1,\Delta_2 \\
+    \Delta_1\equiv\Psi_1,\Psi_1' \\
+    \Delta_2\equiv\Psi_2,\Psi_2' \\
+    \Psi_3,\Psi_3'\equiv\Psi_1,\Psi_2 \\\\
+    \flip{\Psi_2'} \types \rho:\Psi_1' \\
+    \Phi_1 \types \rho_1:\Psi_3' \\
+    \Phi_2 \types \rho_2:\Psi_1' \\\\
+    \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
+  }{
+    \unif{\Psi_3\combineU(\Psi_2',\Psi_1',\Psi_3')}{\Phi_1\combineU(\Phi_2,\flip{\Phi_2},\flip{\Phi_1})}
+    {((\flip{\rho})^{-1}[\flip{\rho_2}],\rho_2,\rho_1)}{(\Delta_0\types(1_{\Psi_3},\rho_1^{-1})[\rho_0])}
+  }
+\end{mathpar}
+
+Recall the coend right rule:
+\begin{mathpar}
+\inferrule*{
+  \Psi_1' \types a:A \\
+  \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
+  \Psi_1,\Psi_2 \types (\Gamma \types \coend^{x:A} M) \ok \\\\
+  \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma \types M[a[\rho]/x\m,a/x\p] \\\\
+  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
+  }{
+  \Delta_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0]
+}
+\end{mathpar}
+
+To derive this in the explicit substitution calculus, first let $\Psi_3,\Psi_3'\equiv\Psi_1,\Psi_2$,
+$\Psi_3\types\Gamma\ctx$, $\Psi_3',x\pmcol A\types M\type$, and let $\Phi_1\types\rho_1:\Psi_3'$ and
+$\Phi_2\types\rho_2:\Psi_2'$ be renamings to (arbitrary) $\Phi$ contexts. Using the second of the
+above unification rules, we can derive:
+\begin{mathpar}
+  \tiny
+  \inferrule{
+    \Delta \cb \Gamma \types M[a[\rho]/x\m,a/x\p]
+    \and
+    \inferrule*{
+      \Psi_1'\types a:A
+      \and
+      \inferrule*{
+        \inferrule{ }{
+          \Phi_1\complete,x\pmcol A,y\pmcol A \cb M[\rho_1,y/x\p] \types M[\rho_1,y/x\p]
+        }
+      }{
+        \Phi_1\complete,x\pmcol A \cb M[\rho_1] \types (\coend^{x:A}M)[\rho_1]
+      }
+      }{
+      \Phi_1\complete,\Phi_2\complete \cb M[\rho_1,a[\rho_2]/x\m,a[\rho_2]/x\p] \types (\coend^{x:A}M)[\rho_1]
+    }
+    }{
+    \Delta_0 \cb (\Gamma\types\coend^{w:A}M)[\rho_0]
   }
 \end{mathpar}
 \end{document}
