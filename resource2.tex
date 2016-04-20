@@ -680,16 +680,16 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
 
 %% cut
 \inferrule{ (\Delta_1 \combine \Delta_2) \ctx \and
-            \Delta_1 = \Psi_1 \combine \Psi_1' \and
-            \Delta_2 = \Psi_2 \combine \Psi_2' \\\\
+            \Delta_1 \equiv \Psi_1 \combine \Psi_1' \and
+            \Delta_2 \equiv \Psi_2 \combine \Psi_2' \\\\
             \Psi_1' \types M \type \and
             \flip{\Psi_2'} \types \rho : \Psi_1' \and
-            \Psi_1 \types \Gamma_1 \ctx \and 
+            \flip{\Psi_1} \types \Gamma_1 \ctx \and
             \Psi_2 \types (\Gamma_2 \types N) \ok \\\\
-            \Delta_1 \cb \Gamma_1 \vdash M \and 
-            \Delta_2 \cb \Gamma_2,M[\rho] \vdash N \and 
+            \Delta_1 \cb \Gamma_1 \vdash M \and
+            \Delta_2 \cb \Gamma_2,M[\rho] \vdash N \and
             \\\\
-            \unif{\Psi_1 \combine \Psi_1'}{\Psi_2 \combine \Psi_2'}{\rho}{(\Delta_0 \vdash \rho_0)} \\
+            \unif{\Psi_1 \combineU \Psi_1'}{\Psi_2 \combineU \Psi_2'}{\rho}{(\Delta_0 \vdash \rho_0)} \\
            }
            {\Delta_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \\
