@@ -680,16 +680,16 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
 
 %% cut
 \inferrule{ (\Delta_1 \combine \Delta_2) \ctx \and
-            \Delta_1 = \Psi_1 \combine \Psi_1' \and
-            \Delta_2 = \Psi_2 \combine \Psi_2' \\\\
+            \Delta_1 \equiv \Psi_1 \combine \Psi_1' \and
+            \Delta_2 \equiv \Psi_2 \combine \Psi_2' \\\\
             \Psi_1' \types M \type \and
             \flip{\Psi_2'} \types \rho : \Psi_1' \and
-            \Psi_1 \types \Gamma_1 \ctx \and 
+            \flip{\Psi_1} \types \Gamma_1 \ctx \and
             \Psi_2 \types (\Gamma_2 \types N) \ok \\\\
-            \Delta_1 \cb \Gamma_1 \vdash M \and 
-            \Delta_2 \cb \Gamma_2,M[\rho] \vdash N \and 
+            \Delta_1 \cb \Gamma_1 \vdash M \and
+            \Delta_2 \cb \Gamma_2,M[\rho] \vdash N \and
             \\\\
-            \unif{\Psi_1 \combine \Psi_1'}{\Psi_2 \combine \Psi_2'}{\rho}{(\Delta_0 \vdash \rho_0)} \\
+            \unif{\Psi_1 \combineU \Psi_1'}{\Psi_2 \combineU \Psi_2'}{\rho}{(\Delta_0 \vdash \rho_0)} \\
            }
            {\Delta_0 \cb (\Gamma_1,\Gamma_2 \vdash N)[\rho_0]}
 \\
@@ -832,93 +832,90 @@ We also have exactly the same equations for $J[\rho]$.
 We write $\Delta \cbb \Gamma \types M$ to abbreviate $\Delta \vdash
 (\Gamma \types M) \ok$ and $\Delta \cb \Gamma \types M$.
 
-Hom right rule:
 \begin{mathpar}
-  \inferrule{
-    \Phi \types a:A
+  \inferrule*[right=Hom Right Rule]{
+  \Phi \types a:A
   }{
-    \Phi\complete \cb \ec \types \mor{A}(a,a)
-  }
+  \Phi\complete \cb \ec \types \mor{A}(a,a)
+}
 \end{mathpar}
 
 Hom left rule, split into four cases (FIXME: write as single rule, without context morphism?):
 \begin{mathpar}
-  \inferrule{
+  \inferrule*[right=Hom Left Rule-A]{
     \flip{\Psi_1} \types \Gamma \ctx \\
     \Psi_1',x\pcol A,y\mcol A \types \Gamma' \ctx \\
-    \Psi_2' \types M \type \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\\\
+    \Psi_2' \types M \type \\
     \Psi_3 \types a_1:A \\
     \flip{\Psi_3'} \types a_2:A \\\\
-    \Psi_1,\Psi_1',\Psi_3,\Psi_3' \cb \Gamma \types \Gamma'[a_1/x\p,a_2/y\m] \\
+    \Psi_1,\Psi_1',\Psi_3,\Psi_3' \cb \Gamma \types \Gamma'[a_1/x\p,a_2/y\m] \\\\
     \Psi_2,\Psi_2',x\pmcol A \cb \Gamma'[\rho,x/y\m] \types M \\\\
-    \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{(\Psi_1,\Psi_3,\Psi_3') \combineU \Psi_1'}
-      {\Psi_2' \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {\Psi_2' \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   }
 \end{mathpar}
 \begin{mathpar}
-  \inferrule{
+  \inferrule*[right=Hom Left Rule-B]{
     \flip{\Psi_1} \types \Gamma \ctx \\
     \Psi_1',x\pcol A,y\mcol A \types \Gamma' \ctx \\
-    \Psi_2' \types M \type \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\\\
+    \Psi_2' \types M \type \\
     \Psi_3 \types a_1:A \\
     \flip{\Psi_3'} \types a_2:A \\\\
-    \Psi_1,\Psi_1',x\pmcol A \cb \Gamma \types \Gamma'[x/y\m] \\
+    \Psi_1,\Psi_1',x\pmcol A \cb \Gamma \types \Gamma'[x/y\m] \\\\
     \Psi_2,\Psi_2',\Psi_3,\Psi_3' \cb \Gamma'[\rho,a_1/x\p,a_2/y\m] \types M \\\\
-    \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{\Psi_1 \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3,\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {(\Psi_2',\Psi_3,\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   }
 \end{mathpar}
 \begin{mathpar}
-  \inferrule{
+  \inferrule*[right=Hom Left Rule-C]{
     \flip{\Psi_1} \types \Gamma \ctx \\
     \Psi_1',x\pcol A \types \Gamma' \ctx \\
-    \Psi_2' \types M \type \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\\\
+    \Psi_2' \types M \type \\
     \Psi_3 \types a_1:A \\
     \flip{\Psi_3'} \types a_2:A \\\\
-    \Psi_1,\Psi_1',\Psi_3 \cb \Gamma \types \Gamma'[a_1/x\p] \\
+    \Psi_1,\Psi_1',\Psi_3 \cb \Gamma \types \Gamma'[a_1/x\p] \\\\
     \Psi_2,\Psi_2',\Psi_3' \cb \Gamma'[\rho,a_2/x\p] \types M \\\\
-    \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{(\Psi_1,\Psi_3) \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {(\Psi_2',\Psi_3') \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   } \and
 \end{mathpar}
 \begin{mathpar}
-  \inferrule{
+  \inferrule*[right=Hom Left Rule-D]{
     \flip{\Psi_1} \types \Gamma \ctx \\
     \Psi_1',x\mcol A \types \Gamma' \ctx \\
-    \Psi_2' \types M \type \\\\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\\\
+    \Psi_2' \types M \type \\
     \Psi_3 \types a_1:A \\
     \flip{\Psi_3'} \types a_2:A \\\\
-    \Psi_1,\Psi_1',\Psi_3' \cb \Gamma \types \Gamma'[a_2/x\m] \\
+    \Psi_1,\Psi_1',\Psi_3' \cb \Gamma \types \Gamma'[a_2/x\m] \\\\
     \Psi_2,\Psi_2',\Psi_3 \cb \Gamma'[\rho,a_1/x\m] \types M \\\\
-    \flip{\Psi_2} \types \rho:\Psi_1' \\
     \unif{(\Psi_1,\Psi_3') \combineU \Psi_1'}
-      {(\Psi_2',\Psi_3) \combineU \Psi_2}{\rho}{(\Delta_0,\rho_0)}
+      {(\Psi_2',\Psi_3) \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
   } \and
 \end{mathpar}
 
-Tensor left rule:
 \begin{mathpar}
-\inferrule{
+\inferrule*[right=Tensor Left Rule]{
   \Delta \cb \Gamma,M_1,M_2 \types N
-}{
+  }{
   \Delta \cb \Gamma, M_1\otimes M_2 \types N
 }
 \end{mathpar}
 
-Tensor right rule:
 \begin{mathpar}
-\inferrule{
+\inferrule*[right=Tensor Right Rule]{
   \Delta_1 \cbb \Gamma_1 \types M_1 \\
   \Delta_2 \cbb \Gamma_2 \types M_2
   }{
@@ -926,67 +923,137 @@ Tensor right rule:
 }
 \end{mathpar}
 
-Coend left rule:
 \begin{mathpar}
-\inferrule{
+\inferrule*[right=Coend Left Rule]{
   \Delta \combine x \pmcol A \cb \Gamma, M \types N
   }{
   \Delta \cb \Gamma,\coend^{x:A} M \types N
 }
 \end{mathpar}
 
-Coend right rule:
 \begin{mathpar}
-\inferrule{
-  \Psi_1,\Psi_2 \types (\Gamma \types \coend^{x:A} M) \ok \\
+\inferrule*[right=Coend Right Rule]{
   \Psi_1' \types a:A \\
   \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
+  \Psi_1,\Psi_2 \types (\Gamma \types \coend^{x:A} M) \ok \\\\
   \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma \types M[a[\rho]/x\m,a/x\p] \\\\
-  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
+  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
   }{
   \Delta_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0]
 }
 \end{mathpar}
 
-End right rule:
 \begin{mathpar}
-\inferrule{
+\inferrule*[right=End Right Rule]{
   \Delta \combine x \pmcol A \cb \Gamma \types M
   }{
   \Delta \cb \Gamma \types \coend_{x:A} M
 }
 \end{mathpar}
 
-End left rule:
 \begin{mathpar}
-\inferrule{
-  \Psi_1,\Psi_2 \types (\Gamma,\End_{x:A} M \types N) \ok \\
+\inferrule*[right=End Left Rule]{
   \Psi_1' \types a:A \\
   \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
+  \Psi_1,\Psi_2 \types (\Gamma,\End_{x:A} M \types N) \ok \\\\
   \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma, \End_{x:A} M[a/x\m,a[\rho]/x\p] \types N \\\\
-  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
+  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
   }{
   \Delta_0 \cb (\Gamma, \End_{x:A} M \types N)[\rho_0]
 }
 \end{mathpar}
 
-Arrow right rule:
 \begin{mathpar}
-\inferrule{
+\inferrule*[right=Arrow Right Rule]{
   \Delta \cb \Gamma, M \types N
   }{
   \Delta \cb \Gamma \types M\multimap N
 }
 \end{mathpar}
 
-Arrow left rule:
 \begin{mathpar}
-\inferrule{
+\inferrule*[right=Arrow Left Rule]{
   \Delta_1 \cbb \Gamma_1 \types M_1 \\
   \Delta_2 \cbb \Gamma_2, M_2 \types N
   }{
   \Delta_1,\Delta_2 \cb \Gamma_1,\Gamma_2,M_1\multimap M_2 \types N
 }
+\end{mathpar}
+
+\subsection{Derivations}
+Some of the sequent calculus rules are significantly more complicated than their explicit substitution versions.
+To derive these from the simpler forms, we will need new admissible rules for unification judgements.
+\begin{mathpar}
+  \inferrule{
+    \Delta\equiv\Delta_1,\Delta_2 \\
+    \Delta_1\equiv\Psi_1,\Psi_1' \\
+    \Delta_2\equiv\Psi_2,\Psi_2' \\
+    \Psi_3,\Psi_3'\equiv\Psi_1,\Psi_2 \\\\
+    \flip{\Psi_2'} \types \rho:\Psi_1' \\
+    \Phi_1 \types \rho_1:\Psi_3' \\
+    \Phi_2 \types \rho_2:\Psi_2' \\\\
+    \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
+  }{
+    \unif{\Psi_3\combineU(\Psi_1',\Psi_2',\Psi_3')}{\Phi_1\combineU(\Phi_2,\flip{\Phi_2},\flip{\Phi_1})}
+    {(\rho[\flip{\rho_2}],\rho_2,\rho_1)}{(\Delta_0\types(1_{\Psi_3},\rho_1^{-1})[\rho_0])}
+  }
+\end{mathpar}
+
+And the closely related:
+\begin{mathpar}
+  \inferrule{
+    \Delta\equiv\Delta_1,\Delta_2 \\
+    \Delta_1\equiv\Psi_1,\Psi_1' \\
+    \Delta_2\equiv\Psi_2,\Psi_2' \\
+    \Psi_3,\Psi_3'\equiv\Psi_1,\Psi_2 \\\\
+    \flip{\Psi_2'} \types \rho:\Psi_1' \\
+    \Phi_1 \types \rho_1:\Psi_3' \\
+    \Phi_2 \types \rho_2:\Psi_1' \\\\
+    \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
+  }{
+    \unif{\Psi_3\combineU(\Psi_2',\Psi_1',\Psi_3')}{\Phi_1\combineU(\Phi_2,\flip{\Phi_2},\flip{\Phi_1})}
+    {((\flip{\rho})^{-1}[\flip{\rho_2}],\rho_2,\rho_1)}{(\Delta_0\types(1_{\Psi_3},\rho_1^{-1})[\rho_0])}
+  }
+\end{mathpar}
+
+Recall the coend right rule:
+\begin{mathpar}
+\inferrule*{
+  \Psi_1' \types a:A \\
+  \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
+  \Psi_1,\Psi_2 \types (\Gamma \types \coend^{x:A} M) \ok \\\\
+  \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma \types M[a[\rho]/x\m,a/x\p] \\\\
+  \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0)}
+  }{
+  \Delta_0 \cb (\Gamma \types \coend^{x:A} M)[\rho_0]
+}
+\end{mathpar}
+
+To derive this in the explicit substitution calculus, first let $\Psi_3,\Psi_3'\equiv\Psi_1,\Psi_2$,
+$\Psi_3\types\Gamma\ctx$, $\Psi_3',x\pmcol A\types M\type$, and let $\Phi_1\types\rho_1:\Psi_3'$ and
+$\Phi_2\types\rho_2:\Psi_2'$ be renamings to (arbitrary) $\Phi$ contexts. Using the second of the
+above unification rules, we can derive:
+\begin{mathpar}
+  \tiny
+  \inferrule{
+    \Delta \cb \Gamma \types M[a[\rho]/x\m,a/x\p]
+    \and
+    \inferrule*{
+      \Psi_1'\types a:A
+      \and
+      \inferrule*{
+        \inferrule{ }{
+          \Phi_1\complete,x\pmcol A,y\pmcol A \cb M[\rho_1,y/x\p] \types M[\rho_1,y/x\p]
+        }
+      }{
+        \Phi_1\complete,x\pmcol A \cb M[\rho_1] \types (\coend^{x:A}M)[\rho_1]
+      }
+      }{
+      \Phi_1\complete,\Phi_2\complete \cb M[\rho_1,a[\rho_2]/x\m,a[\rho_2]/x\p] \types (\coend^{x:A}M)[\rho_1]
+    }
+    }{
+    \Delta_0 \cb (\Gamma\types\coend^{w:A}M)[\rho_0]
+  }
 \end{mathpar}
 \end{document}
 
