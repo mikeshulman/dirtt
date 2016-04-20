@@ -1016,6 +1016,7 @@ And the closely related:
   }
 \end{mathpar}
 
+\textbf{Coend:}
 Recall the coend right rule:
 \begin{mathpar}
 \inferrule*{
@@ -1039,7 +1040,7 @@ above unification rules, we can derive:
     \Delta \cb \Gamma \types M[a[\rho]/x\m,a/x\p]
     \and
     \inferrule*{
-      \Psi_1'\types a:A
+      \Phi_2\types a[\rho_2]:A
       \and
       \inferrule*{
         \inferrule{ }{
@@ -1049,11 +1050,87 @@ above unification rules, we can derive:
         \Phi_1\complete,x\pmcol A \cb M[\rho_1] \types (\coend^{x:A}M)[\rho_1]
       }
       }{
-      \Phi_1\complete,\Phi_2\complete \cb M[\rho_1,a[\rho_2]/x\m,a[\rho_2]/x\p] \types (\coend^{x:A}M)[\rho_1]
+      \Phi_1\complete,\Phi_2\complete \cb M[\rho_1,a[\flip{\rho_2}]/x\m,a[\rho_2]/x\p] \types (\coend^{x:A}M)[\rho_1]
     }
     }{
     \Delta_0 \cb (\Gamma\types\coend^{w:A}M)[\rho_0]
   }
+\end{mathpar}
+Moreover, it is not hard to see that this substitution and cut is completely general, making the
+coend right rule the closure under substitution and cut of the corresponding explicit substitution
+rule.
+
+\textbf{Hom:}
+Recall the first of the hom left rules:
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \Psi_1',x\pcol A,y\mcol A \types \Gamma' \ctx \\
+    \flip{\Psi_2} \types \rho:\Psi_1' \\\\
+    \Psi_2' \types M \type \\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\\\
+    \Psi_1,\Psi_1',\Psi_3,\Psi_3' \cb \Gamma \types \Gamma'[a_1/x\p,a_2/y\m] \\\\
+    \Psi_2,\Psi_2',x\pmcol A \cb \Gamma'[\rho,x/y\m] \types M \\\\
+    \unif{(\Psi_1,\Psi_3,\Psi_3') \combineU \Psi_1'}
+      {\Psi_2' \combineU \Psi_2}{\rho}{(\Delta_0\types\rho_0)}
+    }{
+    \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+  }
+\end{mathpar}
+
+We will derive this from the explicit substitution rule:
+\begin{mathpar}
+\inferrule{
+  \Delta, x \pmcol A \cb (\Gamma \vdash M) [x/y\p] \\
+}{
+  \Delta, x \pmcol A, y \pmcol A \cb \Gamma, \mor{A}(x,y) \types M
+}
+\end{mathpar}
+In fact, we will only use the case where both $x$ and $y$ appear in $\Gamma$, which we rename to
+$\Gamma'$ to match the hom left rule:
+\begin{mathpar}
+\inferrule{
+  \Delta, x \pmcol A \cb \Gamma'[x/y\p] \vdash M \\
+}{
+  \Delta, x \pmcol A, y \pmcol A \cb \Gamma', \mor{A}(x,y) \types M
+}
+\end{mathpar}
+
+We will also need another admissible unification rule:
+\begin{mathpar}
+\inferrule{
+  \flip{\Psi_2} \types \rho:\Psi_1' \\
+  \Phi_1 \types \rho_1:\Psi_3 \\
+  \Phi_2 \types \rho_2:\Psi_3' \\\\
+  \unif{(\Psi_1,\Psi_3,\Psi_3')\combineU\Psi_1'}{\Psi_2'\combineU\Psi_2}{\rho}{(\Delta_0\types\rho_0)}
+}{
+\unif{\Psi_1\combineU(\Psi_1',\Psi_3,\Psi_3')}{(\Psi_2',\Phi_1,\Phi_2)\combineU(\Psi_2,\flip{\Phi_1},\flip{\Phi_2})}
+{(\rho,\rho_1,\rho_2)}{(\Delta_0\types(1_{\Psi_1},1_{\Psi_2'},\rho_1^{-1},\rho_2^{-1})[\rho_0])}
+}
+\end{mathpar}
+
+We can now derive:
+\begin{mathpar}
+\tiny
+\inferrule*{
+  \Delta \cb \Gamma \types \Gamma'[a_1/x\p,a_2/y\m] \\
+  \inferrule*{
+    \inferrule*{}{
+      \Phi_1 \types a_1[\rho_1]:A \\\\
+      \flip{\Phi_2} \types a_2[\flip{\rho_2}]:A
+    } \\
+    \inferrule*{ 
+      }{
+        \Delta_2,x\pmcol A,y\pmcol A \cb \Gamma'[\rho],\mor{A}(x,y) \types M
+    }
+  }{
+    \Delta_2,\Phi_1\complete,\Phi_2\complete \cb
+    \Gamma'[\rho,a_1[\rho_1]/x\p,a_2[\rho_2]/y\m],\mor{A}(a_1[\flip{\rho_1}],a_2[\flip{\rho_2}]) \types M
+  }
+}{
+  \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
+}
 \end{mathpar}
 \end{document}
 
