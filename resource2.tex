@@ -55,6 +55,9 @@
 \newcommand\samestring{\leftrightarrow}
 \newcommand{\unif}[4]{#1\doteq #2\,\mathsf{ via }\,#3\cb #4}
 \newcommand\complete{\pm}
+\newcommand{\Ja}[9]{\mathtt{transport}\; #1\coloneqq #2@#3 \;\mathtt{and}\; #4\coloneqq #5@#6
+  \;\mathtt{to}\; #7 \;\mathtt{via}\; #8 \;\mathtt{in}\; #9}
+\newcommand{\Jb}[7]{\mathtt{transport}\; #1\coloneqq #2@(#3,#4) \;\mathtt{to}\; #5 \;\mathtt{via}\; #6 \;\mathtt{in}\; #7}
 \mprset{flushleft}
 
 
@@ -1132,6 +1135,64 @@ We can now derive:
   \Delta_0 \cb (\Gamma,\mor{A}(a_1,a_2) \types M)[\rho_0]
 }
 \end{mathpar}
+
+\section{Term calculus}
+Starting to play with terms again, with some new ideas. Feel free to ignore for now\dots
+
+\subsection{Hom types}
+We seem to need several special cases for elim terms for hom types. To begin with, the \textsc{Hom
+Left Rule-A} splits into two cases, depending on whether the $x$ and $y$ in $\Gamma'$ appear in the
+same or in different types.
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_{11}} \types \Gamma_1 \ctx \\
+    \flip{\Psi_{12}} \types \Gamma_2 \ctx \\
+    \flip{\Psi_{23}} \types \Gamma_3 \ctx \\\\
+    \Psi_{11}', x\pcol A \types N_1 \type \\
+    \Psi_{12}', y\mcol A \types N_2 \type \\
+    \Psi_2' \types M \type \\\\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\
+    \flip{\Psi_{21}} \types \rho_1:\Psi_{11}' \\
+    \flip{\Psi_{22}} \types \rho_2:\Psi_{12}' \\\\
+    \Psi_{11},\Psi_{11}',\Psi_3 \cb \Gamma_1 \types n_1:N_1[a_1/x\p] \\
+    \Psi_{12},\Psi_{12}',\Psi_3' \cb \Gamma_2 \types n_2:N_2[a_2/y\m] \\\\
+    \Psi_{21},\Psi_{22},\Psi_{23},\Psi_2',x\pmcol A
+      \cb \Gamma_3, r:N_1[\rho_1], s:N_2[\rho_2,x/y\m] \types m:M \\\\
+    \unif{(\Psi_{11},\Psi_3,\Psi_{12},\Psi_3')\combineU(\Psi_{11}',\Psi_{12}')}
+      {(\Psi_{23},\Psi_2')\combineU(\Psi_{21},\Psi_{22})}{(\rho_1,\rho_2)}{(\Delta_0\types\rho_0)}
+    }{
+    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2)
+      \types (\Ja{r}{n_1}{a_1}{s}{n_2}{a_2}{x}{f}{m}):M)[\rho_0]
+  }
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma_1 \ctx \\
+    \flip{\Psi_{22}} \types \Gamma_2 \ctx \\
+    \Psi_1', x\pcol A, y\mcol A \types N \type \\
+    \Psi_2' \types M \type \\\\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\
+    \flip{\Psi_{21}} \types \rho:\Psi_1' \\
+    \Psi_1,\Psi_1',\Psi_3 \cb \Gamma_1 \types n:N[a_1/x\p,a_2/y\m] \\
+    \Psi_{21},\Psi_{22},\Psi_2',x\pmcol A
+      \cb \Gamma_2, r:N[\rho,x/y\m] \types m:M \\\\
+    \unif{(\Psi_1,\Psi_3)\combineU\Psi_1'}
+      {(\Psi_{22},\Psi_2')\combineU\Psi_{21}}{\rho}{(\Delta_0\types\rho_0)}
+    }{
+    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2)
+      \types (\Jb{r}{n}{a_1}{a_2}{x}{f}{m}):M)[\rho_0]
+  }
+\end{mathpar}
+
+The computation rules for these terms are
+\begin{gather*}
+  (\Ja{r}{n_1}{a}{s}{n_2}{a}{x}{\id(a)}{m}) \equiv m[a/x,n_1/r,n_2/s] \\
+  (\Ja{r}{r}{x}{s}{s}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m \\
+  (\Jb{r}{n}{a}{a}{x}{\id(a)}{m}) \equiv m[a/x,n/r] \\
+  (\Jb{r}{r}{x}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m
+\end{gather*}
 \end{document}
 
 
