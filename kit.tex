@@ -36,10 +36,15 @@ $#1\copy \z@
 \newcommand{\W}{\cW}
 \newcommand{\K}{\bbK}
 
+\newcommand{\Hkl}[2]{\mathbb{H}\text{-}\mathsf{Kl}(#1,#2)}
+\newcommand{\Hcokl}[2]{\mathbb{H}\text{-}\mathsf{coKl}(#1,#2)}
+\newcommand{\Hbikl}[2]{\mathbb{H}\text{-}\mathsf{biKl}(#1,#2)}
+
 \newcommand{\one}{\lone}
 \newcommand{\bone}{\mathbf{1}}
 
-\autodefs{\cMod\dCat\bCat\dSpan\dMod\bSet}
+\autodefs{\cMod\dCat\bCat\dSpan\dMod\bSet\bGraph\dMod}
+\let\Mod\dMod
 
 \def\cart{\chi}
 \def\opcart{\chi}
@@ -78,11 +83,11 @@ $#1\copy \z@
 \label{sec:intro}
 
 We propose a categorical structure designed for doing ``multivariable formal category theory'', including particularly contravariant functors and extraordinary natural transformations, and hence the abstract study of monoidal objects, enriched objects, multivariable adjunctions, closed objects, rigid objects, and so on.
-This is analogous to how proarrow equipments~\cite{wood:proarrow-i} and Yoneda structures~\cite{sw:yonstr} provide abstract contexts for doing one-variable formal category theory.
+This is analogous to how proarrow equipments~\cite{wood:proarrows-i} and Yoneda structures~\cite{street-walters:yoneda} provide abstract contexts for doing one-variable formal category theory.
 By analogy with the word ``equipment'', we call our structure a \textbf{kit}.
 
 There does already exist one structure in which one can do multivariable formal category theory.
-As observed by Day and Street~\cite{ds:monbi-hopf}, the opposite of a category is its dual in the monoidal bicategory of profunctors, making the latter ``compact closed'' (also called ``rigid'' or ``autonomous''); and inside a compact closed bicategory one can define structures of multivariable category theory.
+As observed by Day and Street~\cite{ds:monbi-hopfagbd}, the opposite of a category is its dual in the monoidal bicategory of profunctors, making the latter ``compact closed'' (also called ``rigid'' or ``autonomous''); and inside a compact closed bicategory one can define structures of multivariable category theory.
 Of course, the bicategory of profunctors does not quite know which profunctors are representable by functors (the left adjoint profunctors are ``representable up to Cauchy completion''), but this can be remedied by enhancing it to a ``compact closed proarrow equipment''.
 
 The differences between a kit and a compact closed equipment, and hence the reasons for defining the former, are:
@@ -91,7 +96,7 @@ The differences between a kit and a compact closed equipment, and hence the reas
   (As observed in~\cite{shulman:contravariance}, even for just the one-variable ``opposite category'' operation there are nontrivial coherence questions.)
   The definition of a kit is ``more obviously complete''.
   Below, we will actually also define compact closed equipments and prove that any such gives rise to a kit, justifying that definition.
-\item A kit is ``fully virtual'' in the sense of~\cite{cs:genmulti}; that is, all of its structure is multicategorical.
+\item A kit is ``fully virtual'' in the sense of~\cite{cs:multicats}; that is, all of its structure is multicategorical.
   This means that rather than including \emph{operations} such as profunctor composition, monoidal product, and dualization, a kit includes a basic notion of ``morphism out of such things'', in the same way that a multicategory has no actual monoidal product but includes a basic notion of ``multivariable morphism'' that ``would be a morphism out of a monoidal product if it existed''.
   This allows these operations, when they exist, to be characterized by universal properties, eliminating the question of what coherence axioms have to be imposed upon them as structure.
   It also allows us to describe examples where such operations do \emph{not} exist.
@@ -115,31 +120,45 @@ The differences between a kit and a compact closed equipment, and hence the reas
 \section{Generalized polycategories}
 \label{sec:genpoly}
 
-Let \bbK be an equipment (that is, a double category in which every vertical arrow has a companion and a conjoint, or equivalently in which the (source,target) map is a fibration~\cite{shulman:frbi}), and let $T$ and $S$ be monads on \bbK in the sense of~\cite{cs:genmulti}.
-A \textbf{(vertical) distributive law} between $T$ and $S$ is just an internal distributive law in the 2-category of equipments.
-However, we can also consider \emph{horizontal} distributive laws.
+We will use the framework developed in~\cite{cs:multicats} for the study of generalized multicategories, involving \emph{virtual double categories}.
+A virtual double category is a double-category-like structure in which horizontal arrows cannot be composed, but instead there are 2-cells whose vertical domains are strings of composable horizontal arrows, composed like in a multicategory.
+Also like in a multicategory, we can characterize those horizontal composites that do exist (including the nullary case of identities) by a universal property; if all such composites exist then the structure is equivalent to a (pseudo) double category (but the functors between them correspond to \emph{lax} double functors).
+When a virtual double category has horizontal identities and also \emph{restrictions} (meaning that the (source,target) functor from the category of horizontal arrows to the category of objects is a fibration), we call it a \textbf{virtual equipment}.
+If a virtual equipment has all composites (hence is a double category), we call it an \textbf{equipment}; as shown in~\cite{shulman:frbi} these are roughly equivalent to the \emph{proarrow equipments} of\cite{wood:proarrows-i}.
+We write $M:A\hto B$ for horizontal arrows and $f:A\to B$ for vertical ones.
 
-Recall from~\cite{gp:something} that a \emph{horizontal transformation} between (pseudo double) functors $F,G$ consists of a horizontal arrow $\alpha_X  F X \to G X$ for each object $X$ of the domain, forming a pseudonatural transformation between the horizontal parts of $F$ and $G$, together with for each vertical arrow $f:X\to Y$ in the domain, a cell
+Let \K be a virtual equipment, and let $T$ and $S$ be monads on \bbK in the sense of~\cite{cs:multicats} (that is, their multiplication and unit are vertical natural transformations).
+A \textbf{(vertical) distributive law} between $T$ and $S$ is just an internal distributive law in the 2-category of equipments.
+
+However, we can also consider \emph{horizontal} distributive laws.
+These are simplest to define when \K is an equipment.
+To that end, recall from~\cite{gp:something} that if $F$ and $G$ are lax double functors between pseudo double categories, a \emph{horizontal transformation} $\alpha:F\to G$ consists of a horizontal arrow $\alpha_X  F X \hto G X$ for each object $X$ of the domain, forming a pseudonatural transformation between the horizontal parts of $F$ and $G$, together with for each vertical arrow $f:X\to Y$ in the domain, a cell
 \[ \xymatrix{ F X \ar[r]|-{|}^-{\alpha_X} \ar[d]_{F f} \ar@{}[dr]|{\alpha_f} & G X \ar[d]^{G f} \\
 F Y \ar[r]|-{|}_-{\alpha_Y} & G Y} \]
 satisfying some evident axioms.
-These are the horizontal arrows in a double category whose vertical arrows are vertical transformations, and whose 2-cells are an evident kind of ``square modification''.
+These are the horizontal arrows in a double category of functors, whose vertical arrows are vertical transformations, and whose 2-cells are an evident kind of ``square modification''.
 
 \begin{defn}\label{def:hdl}
+  Let $T$ and $S$ be monads on an equipment \K.
   A \textbf{horizontal distributive law} between $(T,\mu,\eta)$ and $(S,\nu,\iota)$ consists of the following:
   \begin{enumerate}
     \item A horizontal transformation $\delta : T S \hto S T$.
     \item Square modifications
-      \[ \xymatrix{ T T S \ar[r]|{|}^{T \delta} \ar[d]_{\mu S} \ar@{}[drr]|{\hat\delta} &
-        T S T \ar[r]|{|}^{\delta T} & S T T \ar[d]^{S \mu} \\
-        T S \ar[rr]|{|}_{\delta}&& ST}\]
-      \[ \xymatrix{ T S S \ar[r]|{|}^{\delta S} \ar[d]_{T \nu} \ar@{}[drr]|{\check\delta} &
-        S T S \ar[r]|{|}^{S \delta} & S S T \ar[d]^{\mu T} \\
-        T S \ar[rr]|{|}_{\delta}&& ST}\]
-      \[ \xymatrix{ & S \ar[dl]_{\eta S} \ar[dr]^{S \eta} \ar@{}[d]|{\bar\delta} \\
-        T S \ar[rr]|{|}_{\delta} && S T}\]
-      \[ \xymatrix{ & T \ar[dl]_{T\iota} \ar[dr]^{\iota T} \ar@{}[d]|{\tilde\delta} \\
-        T S \ar[rr]|{|}_{\delta} && S T}\]
+      \begin{mathpar}
+        \xymatrix{ T T S \ar[r]|{|}^{T \delta} \ar[d]_{\mu S}
+          \ar@{}[drr]|{\hat\delta} &
+          T S T \ar[r]|{|}^{\delta T} & S T T \ar[d]^{S \mu} \\
+          T S \ar[rr]|{|}_{\delta}&& ST}\and
+        \xymatrix{ T S S \ar[r]|{|}^{\delta S} \ar[d]_{T \nu}
+          \ar@{}[drr]|{\check\delta} &
+          S T S \ar[r]|{|}^{S \delta} & S S T \ar[d]^{\mu T} \\
+          T S \ar[rr]|{|}_{\delta}&& ST}\and
+        \xymatrix{ & S \ar[dl]_{\eta S} \ar[dr]^{S \eta} \ar@{}[d]|{\bar\delta} \\
+          T S \ar[rr]|{|}_{\delta} && S T}\and
+        \xymatrix{ & T \ar[dl]_{T\iota} \ar[dr]^{\iota T} \ar@{}[d]|{\tilde\delta} \\
+          T S \ar[rr]|{|}_{\delta} && S T}
+      \end{mathpar}
+
     \item Some obvious axioms are satisfied.
       These axioms do involve the cell components of $\delta$.
   \end{enumerate}
@@ -150,79 +169,138 @@ If not everything is horizontally strong, then these (co)monads are only lax or 
 Similarly, a horizontal distributive law in this sense yields a suitable sort of ``lax'' distributive law between these lifted monads and comonads.
 However, we find it easier to keep the vertical arrows vertical.
 
-\begin{defn}
-If $\delta$ is a horizontal distributive law as above, then there is a \textbf{horizontal bi-Kleisli virtual equipment} defined as follows:
-\begin{enumerate}
+On the other hand, an ordinary vertical distributive law does give rise to horizontal ones in both directions, by lifting its components representably or co-representably, and this may sometimes be useful.
+
+Note also that the only part of \cref{def:hdl} that doesn't make sense if \K is only a \emph{virtual} equipment is the requirement that $\delta$ be a horizontal transformation, since horizontal (pseudo) naturality involves horizontal composites.
+It is possible to generalize the definition to virtual equipments by simply requiring the relevant composites to exist --- or by requiring only half of them to exist, yielding a more general notion of ``lax'' or ``colax'' horizontal transformation --- but we will have no need for this generality, so we leave it to the reader.
+
+We will now show the following:
+
+\begin{thm}
+  Let $\delta$ be a horizontal distributive law on a double category as above.
+  There is a \textbf{horizontal bi-Kleisli virtual double category} $\Hbikl{\K}{\delta}$ with the following properties:
+  \begin{enumerate}
   \item Its objects and vertical arrows are those of \bbK.
   \item A horizontal arrow from $X$ to $Y$ is a horizontal arrow $T X \hto S Y$ in \bbK.
-    The cells with unary source are obvious.
-  \item A cell with nullary source is a cell in \bbK like
-    \[ \xymatrix{ & Z \ar[dl]_{f} \ar[dr]^g \\
-      X \ar[d]_{\eta_X} & \Downarrow & Y \ar[d]^{\iota_Y} \\
+  \item A cell with unary source $M:X\hto Y$ in $\Hbikl\K\delta$ is a cell in \K like
+    \[ \xymatrix{ T X \ar[r]|{|}^{M} \ar[d]_{Tf} \ar@{}[dr]|{\Downarrow} & S Y \ar[d]^{Sg}\\
+      T X' \ar[r]|{|}_{N} & S Y' } \]
+  \item A cell with nullary source in $\Hbikl\K\delta$ is a cell in \bbK like
+    \[ \xymatrix{ & Z \ar[dl]_{\eta_Z} \ar[dr]^{\iota_Z} \\
+      T Z \ar[d]_{T f} & \Downarrow & S Z \ar[d]^{S g} \\
       T X \ar[rr]|{|} && S Y } \]
-  \item A cell with binary source is a cell in \bbK like
+    (Note $T f \circ \eta_Z = \eta_X \circ f$ by naturality, and similarly $S g \circ \iota_Z = \iota_Y \circ g$.)
+  \item A cell with binary source $X\xhto{M} Y \xhto{N} Z$ in $\Hbikl\K\delta$ is a cell in \bbK like\label{item:hbikl-binary}
     \[ \xymatrix{ TTX \ar[r]|{|}^{T M} \ar[d]_{\mu_X} \ar@{}[ddrrr]|{\Downarrow} &
       T S Y \ar[r]|{|}^{\delta} & S T Y \ar[r]|{|}^{S N} & S S Z \ar[d]^{\nu_Z}\\
       T X \ar[d]_{T f} &&& S Z \ar[d]^{S g}\\
       T X' \ar[rrr]|{|} &&& S Z'}\]
-  \item For cells with ternary or higher source, we need to choose, arbitrarily, a way to ``associate'' the $\delta$s.
-    Here is where we need the fact that $\delta$ is horizontally pseudonatural, to ensure that the result is independent, up to isomorphism, of the choice.
-    For definiteness, we choose to pull all the $S$'s to the left ``as soon as possible''.
-    Thus, a cell with ternary source is a cell in \bbK like
-    \[ \xymatrix{ TTTX \ar[r]|{|}^{TTM} \ar[d]_{\mu^2} \ar@{}[ddrrrrr]|{\Downarrow} &
-      TTSY \ar[r]|{|}^{\delta^2} & STTY \ar[r]|{|}^{STN} & STSZ \ar[r]|{|}^{S\delta} & SSTZ \ar[r]|{|}^{SSP} & SSSW \ar[d]^{\nu^2}\\
-      TX \ar[d]^{Tf} &&&&& SW \ar[d]^{S g} \\
-      TX' \ar[rrrrr]|{|} &&&&& S W'}\]
-  \item \label{item:hbkve-comp} Composition uses the four extra cell modifications that come along with $\delta$, and (in most cases) the horizontal pseudonaturality of $\delta$.
-    For instance, the two ways to compose two binary cells look like this:
-    \[ \xymatrix{ TTTX \ar[r]|{|}^{TTM} \ar[d]_{\mu T} \ar@{}[dr]|{\mu M} &
-      TTSY \ar[r]|{|}^{T\delta} \ar[d]_{\mu S} \ar@{}[drr]|{\hat\delta} & 
-      TSTX \ar[r]|{|}^{\delta T} &
-      STTY \ar[r]|{|}^{STN} \ar@{}[ddrrr]|{S\Downarrow} \ar[d]^{S\mu} &
-      STSZ \ar[r]|{|}^{S\delta} & 
-      SSTZ \ar[r]|{|}^{SSP} & 
-      SSSW \ar[d]^{S\nu}\\
-      TTX \ar@{=}[d] \ar[r]|{|}_{TM} & 
-      TSY \ar[rr]|{|}_{\delta} \ar@{=}[d] && 
-      STY \ar@{=}[d] &&& SSW \ar[d] \\
-      TTX \ar[d]^{\mu} \ar@{}[ddrrrrrr]|{\Downarrow} \ar[r]|{|}_{TM} &
-      TSY \ar[rr]|{|}_{\delta} && 
-      STY \ar[rrr]|{|}_{SQ} &&& SSW' \ar[d]^{\nu} \\
-      TX \ar[d] &&&&&& SW'\ar[d]\\
-      TX' \ar[rrrrrr]|{|} &&&&&& S W''}\]
-    and this, where at the top we use the horizontal pseudonaturality of $\delta$ to make the source match up with our arbitrary choice of pulling all the $S$'s to the front first (if we made the opposite choice, then the pseudonaturality of $\delta$ would be required in the preceding diagram):
-    \[ \xymatrix {
-      TTTX \ar[r]|{|}^{TTM} \ar@{=}[d] &
-      TTSY \ar[r]|{|}^{T\delta} \ar@{=}[d] &
-      TSTX \ar[r]|{|}^{\delta T} \ar@{=}[d] \ar@{}[drr]|{\delta} &
-      STTY \ar[r]|{|}^{STN} &
-      STSZ \ar[r]|{|}^{S\delta} \ar@{=}[d] & 
-      SSTZ \ar[r]|{|}^{SSP} \ar@{=}[d] & 
-      SSSW \ar@{=}[d]\\
-      TTTX \ar[d]_{T\mu} \ar[r]|{|}^{TTM} \ar@{}[ddrrr]|{T\Downarrow} &
-      TTSY \ar[r]|{|}^{T\delta} &
-      TSTY \ar[r]|{|}^{TSN} &
-      TSSZ \ar[d]^{T\nu} \ar[r]|{|}^{\delta S} \ar@{}[drr]|{\check\delta} &
-      STSZ \ar[r]|{|}^{S\delta} &
-      SSTZ \ar[d]_{\nu T} \ar[r]|{|}^{SSP} \ar@{}[dr]|{\nu P} & SSSZ \ar[d]^{\nu S} \\
-      TTX \ar[d] &&& TSZ \ar@{=}[d] \ar[rr]|{|}_{\delta}
-      && STZ \ar@{=}[d] \ar[r]|{|}_{SP} & SSW \ar@{=}[d] \\
-      TTX' \ar[d]^{\mu} \ar@{}[ddrrrrrr]|{\Downarrow} \ar[rrr]|{|}_{TQ} &&&
-      TSZ \ar[rr]|{|}_{\delta} && 
-      STZ \ar[r]|{|}_{SP} & SSW \ar[d]^{\nu} \\
-      TX' \ar[d] &&&&&& SW\ar[d]\\
-      TX'' \ar[rrrrrr]|{|} &&&&&& S W'}\]
-    The axioms for $\delta$ and its associated cells ensure that these operations are suitably associative and unital.
-\end{enumerate}
-\end{defn}
+  \end{enumerate}
+\end{thm}
 
-It would admittedly take some technical work to formally define the cells with $n$-ary source for all $n$, all of their composition operations, and prove associativity and unitality.
-However, since our real intent is only to give a definition, and (as we will see in a moment) the definition in question only requires cells of nullary, unary, and binary sources and their composites with at most ternary begin, we will omit that work for the present.
-Here is the first step towards that definition:
+This does not fully specify $\Hbikl{\K}{\delta}$ yet, of course; we need to say what its cells of higher arity are and then how to compose them.
+Now, whatever a cell of ternary source is, we ought to be able to get one by composing a binary cell with another binary cell at one of its inputs.
+There are two ways of composing binary cells in a virtual double category, and in each case there is a straightforward way to put together two cells of the form shown in~\ref{item:hbikl-binary} above.
+The first is
+\[ \xymatrix{ TTTX \ar[r]|{|}^{TTM} \ar[d]_{\mu T} \ar@{}[dr]|{\mu M} &
+  TTSY \ar[r]|{|}^{T\delta} \ar[d]_{\mu S} \ar@{}[drr]|{\hat\delta} & 
+  TSTX \ar[r]|{|}^{\delta T} &
+  STTY \ar[r]|{|}^{STN} \ar@{}[ddrrr]|{S\Downarrow} \ar[d]^{S\mu} &
+  STSZ \ar[r]|{|}^{S\delta} & 
+  SSTZ \ar[r]|{|}^{SSP} & 
+  SSSW \ar[d]^{S\nu}\\
+  TTX \ar@{=}[d] \ar[r]|{|}_{TM} & 
+  TSY \ar[rr]|{|}_{\delta} \ar@{=}[d] && 
+  STY \ar@{=}[d] &&& SSW \ar[d] \\
+  TTX \ar[d]^{\mu} \ar@{}[ddrrrrrr]|{\Downarrow} \ar[r]|{|}_{TM} &
+  TSY \ar[rr]|{|}_{\delta} && 
+  STY \ar[rrr]|{|}_{SQ} &&& SSW' \ar[d]^{\nu} \\
+  TX \ar[d] &&&&&& SW'\ar[d]\\
+  TX' \ar[rrrrrr]|{|} &&&&&& S W''}\]
+and the second is
+\[ \xymatrix {
+  % TTTX \ar[r]|{|}^{TTM} \ar@{=}[d] &
+  % TTSY \ar[r]|{|}^{T\delta} \ar@{=}[d] &
+  % TSTX \ar[r]|{|}^{\delta T} \ar@{=}[d] \ar@{}[drr]|{\delta} &
+  % STTY \ar[r]|{|}^{STN} &
+  % STSZ \ar[r]|{|}^{S\delta} \ar@{=}[d] & 
+  % SSTZ \ar[r]|{|}^{SSP} \ar@{=}[d] & 
+  % SSSW \ar@{=}[d]\\
+  TTTX \ar[d]_{T\mu} \ar[r]|{|}^{TTM} \ar@{}[ddrrr]|{T\Downarrow} &
+  TTSY \ar[r]|{|}^{T\delta} &
+  TSTY \ar[r]|{|}^{TSN} &
+  TSSZ \ar[d]^{T\nu} \ar[r]|{|}^{\delta S} \ar@{}[drr]|{\check\delta} &
+  STSZ \ar[r]|{|}^{S\delta} &
+  SSTZ \ar[d]_{\nu T} \ar[r]|{|}^{SSP} \ar@{}[dr]|{\nu P} & SSSZ \ar[d]^{\nu S} \\
+  TTX \ar[d] &&& TSZ \ar@{=}[d] \ar[rr]|{|}_{\delta}
+  && STZ \ar@{=}[d] \ar[r]|{|}_{SP} & SSW \ar@{=}[d] \\
+  TTX' \ar[d]^{\mu} \ar@{}[ddrrrrrr]|{\Downarrow} \ar[rrr]|{|}_{TQ} &&&
+  TSZ \ar[rr]|{|}_{\delta} && 
+  STZ \ar[r]|{|}_{SP} & SSW \ar[d]^{\nu} \\
+  TX' \ar[d] &&&&&& SW\ar[d]\\
+  TX'' \ar[rrrrrr]|{|} &&&&&& S W'}\]
+Both of these composites ought to yield a ternary cell in $\Hbikl\K\delta$ --- but their sources aren't the same!
+However, the difference is a $\delta T \odot STN$ versus a $TSN\odot\delta S$, and these are isomorphic by the horizontal pseudonaturality of $\delta$.
+Thus, we will have to make an arbitrary-seeming choice about how to \emph{define} what a ternary cell in $\Hbikl\K\delta$ should look like; but after making that choice, both of these composites can be massaged up to isomorphism to yield the correct data.
+(If $\delta$ were only horizontally lax or colax, then \emph{one} of these composites could be composed with the corresponding constraint to yield something with the same source as the other; thus in that case only one of the two choices would work as the definition.)
+
+% \item A cell with ternary source $X\xhto{M} Y \xhto{N} Z \xhto{P} W$ in $\Hbikl\K\delta$ is a cell in \bbK that looks like
+%   \[ \xymatrix@C=1.5pc{ TTTX \ar[r]|{|}^{TTM} \ar[d]_{\mu^2} \ar@{}[ddrrrrrr]|{\Downarrow} &
+%     TTSY \ar[r]|{|}^{T\delta} &
+%     TSTY \ar[r]|{|}^{\delta T} &
+%     STTY \ar[r]|{|}^{STN} & STSZ \ar[r]|{|}^{S\delta} & SSTZ \ar[r]|{|}^{SSP} & SSSW \ar[d]^{\nu^2}\\
+%     TX \ar[d]^{Tf} &&&&&& SW \ar[d]^{S g} \\
+%     TX' \ar[rrrrrr]|{|} &&&&&& S W'}\]
+% \item A cell with $n$-ary source $(M_1,\dots,M_n)$ in $\Hbikl\K\delta$ is a cell in \K whose source is
+% \item \label{item:hbkve-comp} Composition uses the four extra cell modifications that come along with $\delta$, and (in most cases) the horizontal pseudonaturality of $\delta$.
+%   For instance, the two ways to compose two binary cells look like this:
+
+The proof we will give is fairly explicit, along the lines of the construction of the one-sided horizontal Kleisli virtual double category in~\cite{cs:multicats}.
+As there, more abstract approaches are possible in special cases when enough things are horizontally strong.
+For instance, if $S$ is horizontally strong (i.e.\ its functor part preserves composites and its transformation parts induce pseudonatural transformations on the horizontal bicategory), $T$ is co-horizontally strong (the same, but lifting its transformation parts in the other direction to produce a comonad rather than a monad) and the cells involved in $\delta$ also induce pseudonatural transformations, then at least at the level of the horizontal bicategory the construction is a straightforward categorification of one from the ordinary formal theory of monads and is performed in\cite{garner:polycats}.
+Less restrictively, if $T$ is a strong functor, then one can show ``by hand'' that it lifts to a monad $T_S$ on the one-sided horizontal Kleisli construction $\Hkl\K S$, and then apply the dual of that construction to $T_S$ to produce $\Hbikl\K\delta = \Hcokl{\Hkl{\K}{S}}{T_S}$; and the dual construction is of course possible if $S$ is strong.
+Our monads $T$ and $S$ will in fact both be strong, but for purposes of future generality we give the explicit construction that works in all cases.
+
+\begin{proof}
+  We begin by defining an $n$-ary cell in $\Hbikl\K\delta$
+  \[ \xymatrix{ X_0 \ar[r]|{|}^{M_1} \ar[d]_f \ar@{}[drrr]|{\Downarrow} &
+    X_1 \ar[r]|{|}^{M_2} &
+    \cdots\ar[r]|{|}^{M_n} &
+    X_n \ar[d]^g \\
+    Y_0 \ar[rrr]|{|}_{N} &&& Y_n}\]
+ to be a cell in \K whose vertical source is the string
+  \begin{align*}
+    &(T^{n-1}M_1,T^{n-2}\delta,T^{n-3}\delta T,\dots,\\
+    &S T^{n-2} M_2,S T^{n-3}\delta, ST^{n-4}\delta T, \dots,\\
+    &S^2 T^{n-3} M_3, S^2 T^{n-4}\delta, S^2T^{n-5}\delta T, \dots,\\
+    &\dots,\\
+    &S^{n-2} T M_{n-1}, S^{n-2}\delta,\\
+    & S^{n-1} M_n),
+  \end{align*}
+  whose vertical target is $N:TY_0 \hto SY_n$, and whose horizontal source and target are the composites $T^n X_0 \xto{\mu^{n-1}} T X_0 \xto{T f} TY_0$ and $S^n X_n \xto{\nu^{n-1}} S X_n \xto{S g} SY_n$.
+  (When $n=0$ we interpret $T^0$ as the identity functor and $\mu^{-1}$ as $\eta$, and so on.)
+  In particular, in the case $n=3$ we are making the first of the two possible choices for the domain.
+  (TODO)
+\end{proof}
+
+We also observe:
+
+\begin{lem}\label{thm:hbikl-restr}
+  If \K has restrictions (or equivalently, is an equipment, since it is already assumed to be a double category), then $\Hbikl\K\delta$ also has restrictions.
+\end{lem}
+\begin{proof}
+  Given $M:X\hto Y$ in $\Hbikl\K\delta$, its restriction along $f:X'\to X$ and $g:Y'\to Y$ is the restriction of the underlying arrow $M:TX \hto SY$ in \K along $T f$ and $S g$.
+\end{proof}
+
+Now we can make the following definition.
 
 \begin{defn}
-  If $\delta$ is a horizontal distributive law $TS \hto ST$ as above, then a \textbf{$\delta$-monoid} is a monoid in the above horizontal bi-Kleisli virtual equipment.
+  If $\delta$ is a horizontal distributive law $TS \hto ST$ as above, then a \textbf{$\delta$-monoid} is a monoid in the above horizontal bi-Kleisli virtual double category.
 \end{defn}
+
+More generally, we have a virtual double category $\Mod(\Hbikl\K\delta)$ of $\delta$-monoids.
+By \cref{thm:hbikl-restr} combined with\cite[Propositions 5.5 and 7.4]{cs:multicats}, if \K  is an equipment then $\Mod(\Hbikl\K\delta)$ is a virtual equipment.
+In particular, it has a vertical 2-category, so $\delta$-monoids form a 2-category.
 
 More explicitly, a $\delta$-monoid consists of an object $A$ and a horizontal arrow $M:TA\hto SA$ together with a unit cell
 \[ \xymatrix{
@@ -232,7 +310,7 @@ and a multiplication cell
 \[ \xymatrix{ TTA \ar[r]|{|}^{T M} \ar[d]_{\mu_A} \ar@{}[drrr]|{\Downarrow} &
   T S A \ar[r]|{|}^{\delta} & S T A \ar[r]|{|}^{S M} & S S A \ar[d]^{\nu_A}\\
   T A \ar[rrr]|{|}_M &&& S A}\]
-such that the two ways to compose the multiplication with itself (as shown in~\ref{item:hbkve-comp} above) are equal, and moreover the two following two ways to compose the multiplication with the unit are equal to the identity on $M$:
+such that the two ways to compose the multiplication with itself (as shown above) are equal, and moreover the two following two ways to compose the multiplication with the unit are equal to the identity on $M$:
 \[ \xymatrix{ & TA \ar[dl]_{T\eta_A} \ar@{}[ddl]|(.3){T\Downarrow} \ar[d]|{T\iota_A} \ar[dr]^{\iota_{TA}} \ar[r]|{|}^{M} \ar@{}[ddr]|(.3){\Downarrow} &
   SA \ar[dr]^{\iota_{SA}} \\
   TTA \ar[r]|{|}_{T M} \ar[d]_{\mu_A} \ar@{}[drrr]|{\Downarrow} &
@@ -243,17 +321,19 @@ such that the two ways to compose the multiplication with itself (as shown in~\r
   TTA \ar[r]|{|}_{T M} \ar[d]_{\mu_A} \ar@{}[drrr]|{\Downarrow} &
   T S A \ar[r]|{|}^{\delta} & S T A \ar[r]|{|}^{S M} & S S A \ar[d]^{\nu_A}\\
   T A \ar[rrr]|{|}_M &&& S A}\]
-Our definition will be a special case of $\delta$-monoids, and we will have no use for the remainder of the structure of the horizontal bi-Kleisli virtual equipment.
+Our definition will be a special case of $\delta$-monoids.
+% and we will have no use for the remainder of the structure of the horizontal bi-Kleisli virtual equipment.
 
 \begin{eg}\label{eg:polycats}
   Let $T$ and $S$ both be the free symmetric monoidal category monad on the equipment \dCat of categories, functors, and profunctors.  
   In~\cite{garner:polycats} a horizontal distributive law is constructed between this $T$ and $S$, such that $\delta$-monoids with $A$ a discrete set are exactly ``ordinary'' polycategories.
   These are the categorical structure corresponding to a sequent calculus that allows multiple formulas on both sides, with the cut rule of classical linear logic:
   \[ \inferrule{\Gamma \vdash \Delta,A \\ \Psi,A \vdash \Theta}{\Gamma,\Psi \vdash \Delta,\Theta} \]
+  The relevant kinds of ``polyfunctor'' were not considered in~\cite{garner:polycats}, but here we obtain the full 2-category of polycategories.
 \end{eg}
 
 \begin{eg}
-  If $T$ is the identity monad, then for any $S$ there is a canonical distributive law $TS \hto ST$ consisting of horizontal units, and $\delta$-monoids for this $\delta$ are precisely $S$-monoids in the sense of~\cite{cs:genmulti}.
+  If $T$ is the identity monad, then for any $S$ there is a canonical distributive law $TS \hto ST$ consisting of horizontal units, and $\delta$-monoids for this $\delta$ are precisely $S$-monoids in the sense of~\cite{cs:multicats}.
 \end{eg}
 
 \begin{eg}
@@ -263,17 +343,17 @@ Our definition will be a special case of $\delta$-monoids, and we will have no u
 In equipments such as \dSpan whose objects are ``set-like'', $S$-monoids and $\delta$-monoids are an appropriate notion of ``generalized multicategory/polycategory'' on their own.
 However, in equipments such as \dCat whose objects are already ``category-like'', general $S$-monoids and $\delta$-monoids include two different notions of ``unary arrow'' --- the arrows in the category $A$, and the unary arrows in the profunctor $M$ --- and that is not generally what we want.
 There are two ways of remedying this situation: by requiring $A$ to be a discrete category (``object-discrete $S$-monoids''), or by requiring the unit cell to be cartesian (``normalized $S$-monoids'').
-We showed in~\cite{cs:genmulti} that for generalized multicategories, in many situations these methods produce equivalent results, and argued that in cases when they disagree it is the second solution that is often preferable.
+We showed in~\cite{cs:multicats} that for generalized multicategories, in many situations these methods produce equivalent results, and argued that in cases when they disagree it is the second solution that is often preferable.
 Moreover, $S$-monoids in an equipment such as \dSpan can always be identified with object-discrete or normalized $S$-monoids in an equipment such as $\dMod(\dSpan) = \dCat$.
-Expecting similar results for generalized polycategories, we extend the terminology of~\cite{cs:genmulti} as follows:
+Expecting similar results for generalized polycategories, we extend the terminology of~\cite{cs:multicats} as follows:
 
 \begin{defn}
   If $\delta$ is a horizontal distributive law $TS \hto ST$ as above, then a \textbf{virtual $\delta$-algebra} is a $\delta$-monoid such that the induced map $\hom_A \to M(\iota_A,\eta_A)$ is an isomorphism.
 \end{defn}
 
-In~\cite{cs:genmulti} we justified the similar terminology ``virtual $S$-algebra'' by showing that pseudo $S$-algebras embed into virtual $S$-algebras and can be characterized therein by a notion of representability.
+In~\cite{cs:multicats} we justified the similar terminology ``virtual $S$-algebra'' by showing that pseudo $S$-algebras embed into virtual $S$-algebras and can be characterized therein by a notion of representability.
 We expect a similar result to hold for generalized polycategories, pending a suitable definition of ``pseudo $\delta$-algebra'' for a horizontal distributive law $\delta$.
-(For instance, when $\delta$ is as in \cref{eg:polycats}, the pseudo $\delta$-algebras should be the linearly distributive categories.)
+(For instance, when $\delta$ is as in \cref{eg:polycats}, the pseudo $\delta$-algebras should be an ``unbiased'' form of linearly distributive categories.)
 
 
 \section{Extraordinary naturality}
@@ -373,7 +453,7 @@ Dually, the objects of $TS\E(E)$ are triples $(C,D,N)$ with $C,D\in \Chat$ and $
 Now suppose we want to compose a poly-arrow $\alpha : (B_1,M_1)\to (B_2,M_2)$ with a poly-arrow $\beta : (D_1,N_1) \to (D_2,N_2)$, so that say $M_i\in \E(B_i B_i\o F)$ and $N_i\in \E(D_i D_i\o G)$.
 Note that as elements of our profunctor \cM in $\dCat^{\Chat}$, $\alpha$ and $\beta$ are indexed by \emph{different} objects $F$ and $G$ of \Chat.
 But in order for this composite to make sense, we must have a permutation isomorphism $B_2 B_2\o F \cong D_1 D_1\o G$ that identifies $M_2$ with $N_1$.
-This isomorphism, together with the pairings of objects in $B_2\leftrightarrow B_2\o$ and $D_1 \leftrightarrow D_1\o$, defines a graph that according to the rule of~\cite{ek:gfc} must have no loops.
+This isomorphism, together with the pairings of objects in $B_2\leftrightarrow B_2\o$ and $D_1 \leftrightarrow D_1\o$, defines a graph that according to the rule of~\cite{ek:gen-funct-calc} must have no loops.
 
 If this is the case, then this graph consists only of ``segments'' with endpoints in $F$ and $G$ respectively.
 The segments connecting two objects in $F$ or two objects in $G$ indicate new extranaturalities appearing in the domain or codomain of the composite, respectively, while those connecting one object in $F$ with one in $G$ indicate ordinary naturalities.
@@ -497,6 +577,35 @@ Of course, \thchk is a quotient, so its elements are not uniquely written as tri
 \section{Multivariable morphisms}
 \label{sec:multivar}
 
+We will now define another monad $R$ on $\dCat^{\Chat\op}$ that incorporates multivariable morphisms.
+Roughly, $R$ is like the monad for symmetric strict monoidal categories: the objects of $R\cD$ should be finite lists of objects of \cD, and its morphisms should be pairs consisting of a list of morphisms of \cD and a permutation.
+Since \Chat is in particular a symmetric strict monoidal category, we could try to extend this monad to $\dCat^{\Chat\op}$ by interpreting the objects of the latter as (split) fibrations over $\Chat$ and sending $\E\to \Chat$ to the composite
+\[ R\E \to R\Chat \to \Chat \]
+Unfortunately, this composite is no longer a fibration.
+Thus, we need to ``tensor it up'' by an unbiased form of Day convolution.
 
+More precisely, given a functor $\E:\Chat\op\to \bCat$, we define $R\E$ by
+\[ R\E(B) = \sum_n \int^{A_1,\dots,A_n\in\Chat} \Chat(B,A_1 A_2\cdots A_n) \times \E(A_1)\times \E(A_2)\times \cdots\times \E(A_n) \]
+The summand $n=0$ is empty unless $B=\one$ in which case it is the terminal category.
+The summand $n=1$ is $\int^{A\in\Chat} \Chat(B,A) \times \E(A)$, which by the co-Yoneda lemma is isomorphic to $\E(B)$; thus inclusion of this summand gives the unit $\E\to R\E$ of the monad $R$.
+The multiplication $RR\E\to R\E$ is defined in a straightforward way by rearrangement, addition of the $n$'s, and product and composition in $\Chat$.
+
+Note, though, that in fact this formula can be simplified.
+Since a morphism $B\to A_1 A_2 \cdots A_n$ in \Chat necessarily factors as a permutation isomorphism $B\cong B_1 B_2 \cdots B_n$ followed by a product of morphisms $B_i \to A_i$, and this factorization is unique up to the action of permutations on the $B_i$, we can also write
+\begin{equation*}
+  R\E(B) = \sum_n \int^{B_1,\dots,B_n \in \Chats} 
+    \Chats(B,B_1 B_2\cdots B_n)\times \E(B_1)\times \E(B_2)\times\cdots \times \E(B_n)
+  % R\E(B) = \sum_n \left(\sum_{\sigma \in \Chats(B,B_1 B_2\cdots B_n)}
+  %   \E(B_1)\times \E(B_2)\times\cdots \times \E(B_n)\right) \Big/\sim
+\end{equation*}
+% where the equivalene relation $\sim$ is defined by
+% \[   (\sigma(\tau_1\tau_2\cdots \tau_n),M_1,M_2,\dots,M_n) \sim
+%   (\sigma,\tau_1^*M_1,\tau_2^*M_2,\dots,\tau_n^*M_n)
+% \]
+% for any $\tau_i \in \Chats(B_i,B_i')$.
+with the action of \Chat on $R\E$ defined by commuting past the isomorphisms.
+
+\bibliography{all}
+\bibliographystyle{alpha}
 
 \end{document}
