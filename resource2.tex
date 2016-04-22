@@ -59,6 +59,7 @@
   \;\mathtt{to}\; #7 \;\mathtt{via}\; #8 \;\mathtt{in}\; #9}
 \newcommand{\Jab}[7]{\mathtt{transport}\; #1\coloneqq #2@(#3,#4) \;\mathtt{to}\; #5 \;\mathtt{via}\; #6 \;\mathtt{in}\; #7}
 \newcommand{\Jb}[7]{\mathtt{transport}\; #1\coloneqq #2@#3 \;\mathtt{to}\; #4\coloneqq#5 \;\mathtt{via}\; #6 \;\mathtt{in}\; #7}
+\newcommand{\Jd}[5]{\mathtt{transport}\; #1\coloneqq(#2,#3) \;\mathtt{via}\; #4 \;\mathtt{in}\; #5}
 \mprset{flushleft}
 
 
@@ -1141,8 +1142,41 @@ We can now derive:
 Starting to play with terms again, with some new ideas. Feel free to ignore for now\dots
 
 \subsection{Hom types}
-We seem to need several special cases of elim terms for hom types. The \textsc{Hom Left Rule-B}
-case, without substitutions build in, looks like
+We seem to need several special cases of elim terms for hom types.
+
+\textsc{Hom Left Rule-D}: This is the simplest case.
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi} \types \Gamma \ctx \\
+    \Psi', x\mcol A, y\pcol A \types M \type \\
+    \Phi_1 \types a_1:A \\
+    \Phi_2 \types a_2:A \\\\
+    \Delta \equiv \Psi,\Psi' \\
+    \Delta, x\pmcol A \cb \Gamma \types m:M[x/y\p]
+    }{
+    \Delta,\Phi_1\complete,\Phi_2\complete \cb \Gamma, f:\mor{A}(a_1,a_2) \types \\\\
+    \quad (\Jd{x}{a_1}{a_2}{f}{m}):M[a_1/x\m,a_2/y\p]
+  }
+\end{mathpar}
+
+This can be used to define the functoriality of category terms:
+\begin{mathpar}
+  \inferrule{
+    \Phi,x\pcol A \cb F:B \\
+    \Phi_1 \types a_1:A \\
+    \Phi_2 \types a_2:A \\\\
+    \Phi\complete, x\pmcol \cb \ec \types \id(F):\mor{B}(\flip{F},F)
+    }{
+    \Phi\complete,\Phi_1\complete,\Phi_2\complete \cb f:\mor{A}(a_1,a_2) \types
+    \mathtt{app}(F,f):\mor{B}(F[a_1/x\p],F[a_2/x\m])
+  }
+\end{mathpar}
+by
+\[
+  \mathtt{app}(F,f) \equiv (\Jd{x}{a_1}{a_2}{f}{\id(F)})
+\]
+
+\textsc{Hom Left Rule-B}: Without substitutions build in, this looks like
 \begin{mathpar}
   \inferrule{
     \flip{\Psi_1} \types \Gamma \ctx \\
@@ -1163,7 +1197,7 @@ and with substitutions:
     \Psi_1', x\pcol A \types N \type \\
     \Psi_2', y\pcol A \types M \type \\\\
     \Psi_3 \types a_1:A \\
-    \flip{\Psi_3'} \types a_2:A \\
+    \Phi \types a_2:A \\
     \flip{\Psi_{21}} \types \rho:\Psi_1' \\\\
     \Psi_1,\Psi_1',\Psi_3 \cb \Gamma_1 \types n:N[a_1/x\p] \\\\
     \Psi_{21},\Psi_{22},\Psi_2',z\pmcol A
@@ -1171,7 +1205,7 @@ and with substitutions:
     \unif{(\Psi_1,\Psi_3)\combineU\Psi_1'}
       {(\Psi_{22},\Psi_2')\combineU\Psi_{21}}{\rho}{(\Delta_0\types\rho_0)}
     }{
-    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,y) \types \\\\
+    \Delta_0,\Phi\complete \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,y) \types \\\\
       \quad (\Jb{r}{n}{a_1}{z}{a_2}{f}{m}):M)[\rho_0,a_2/y\p,\flip{a_2}/y\m]
   }
 \end{mathpar}
@@ -1181,8 +1215,25 @@ This has computation rules
   (\Jb{r}{r}{x}{z}{y}{f}{m[z/x,,z/y,\id(z)/f]}) \equiv m
 \end{gather*}
 
+Using this, we can define a $J$ term as a special case, giving the covariant functoriality of types:
+\begin{mathpar}
+  \inferrule{
+    \Phi \types a_2:A \\
+    \Delta \cb \Gamma \types m:M[a_1/x\p]
+    }{
+    \Delta,\Phi\complete \cb \Gamma, f:\mor{A}(a_1,a_2) \types J\p(m,a_1,a_2,f):M[a_2/x\p]
+  }
+\end{mathpar}
+This is defined by
+\[
+  J\p(m,a_1,a_2,f) \equiv (\Jb{r}{m}{a_1}{x}{a_2}{f}{r})
+\]
+and satisfies
+\[
+  J\p(m,a,a,\id(a)) \equiv m
+\]
 
-The \textsc{Hom Left Rule-A} splits into two cases, depending on whether the $x$ and $y$ in
+\textsc{Hom Left Rule-A}: This splits into two cases, depending on whether the $x$ and $y$ in
 $\Gamma'$ appear in the same or in different types. Without substitutions built in, we have
 \begin{mathpar}
   \inferrule{
