@@ -375,7 +375,9 @@ we could also write this out formally as an operation on trees.
 
 \subsection{Substitutions}
 
-FIXME: could also force the $\cb$ split first?
+FIXME: could also force the $\cb$ split first?  This is the
+substitutions for resource2 with the new type system; I haven't thought
+about whether this is the nicest way to do things yet.  
 
 \begin{mathpar}
 \inferrule{ }
@@ -387,10 +389,10 @@ FIXME: could also force the $\cb$ split first?
 \inferrule{ \Psi \cb \Psi' \vdash a : A}
           { \Psi' \cb \Psi \vdash a/x\m : x : A \cb \cdot}
 \and 
-\inferrule{ \Psi_1' \cb \Psi_1 \vdash \theta_1 : \Psi_2' \cb \Psi_2  \\
-            \Psi_3' \cb \Psi_3 \vdash \theta_2 : \Psi_4' \cb \Psi_4 \\
+\inferrule{ \Psi_1' \cb \Psi_1 \vdash \theta_2 : \Psi_2' \cb \Psi_2  \\
+            \Psi_3' \cb \Psi_3 \vdash \theta_4 : \Psi_4' \cb \Psi_4 \\
            }
-          { \Psi_1',\Psi_3' \cb \Psi_1,\Psi_3 \vdash (\theta_1 \combine \theta_2) : \Psi_2',\Psi_4' \combine \Psi_2,\Psi_4}
+          { \Psi_1',\Psi_3' \cb \Psi_1,\Psi_3 \vdash (\theta_2 \combine \theta_4) : \Psi_2',\Psi_4' \cb \Psi_2,\Psi_4}
 \\\\
 \inferrule{ }
           {\Psi' \cb \Psi \vdash 1 : \Psi' \cb \Psi }
@@ -531,7 +533,7 @@ FIXME: could also force the $\cb$ split first?
 
 \begin{array}{l}
 x[\rho_1 \cb \rho_2] \equiv y \text{ if } \rho_1 \equiv \cdot \text{ and} \rho_2 \equiv y/x\\
-%% FIXME x[\theta] \equiv a \text{ if } \theta \equiv a/x\\
+x[\theta] \equiv a \text{ if } \theta \equiv a/x\p\\
 \end{array}
 \end{mathpar}
 
