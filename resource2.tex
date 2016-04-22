@@ -55,9 +55,10 @@
 \newcommand\samestring{\leftrightarrow}
 \newcommand{\unif}[4]{#1\doteq #2\,\mathsf{ via }\,#3\cb #4}
 \newcommand\complete{\pm}
-\newcommand{\Ja}[9]{\mathtt{transport}\; #1\coloneqq #2@#3 \;\mathtt{and}\; #4\coloneqq #5@#6
+\newcommand{\Jaa}[9]{\mathtt{transport}\; #1\coloneqq #2@#3 \;\mathtt{and}\; #4\coloneqq #5@#6
   \;\mathtt{to}\; #7 \;\mathtt{via}\; #8 \;\mathtt{in}\; #9}
-\newcommand{\Jb}[7]{\mathtt{transport}\; #1\coloneqq #2@(#3,#4) \;\mathtt{to}\; #5 \;\mathtt{via}\; #6 \;\mathtt{in}\; #7}
+\newcommand{\Jab}[7]{\mathtt{transport}\; #1\coloneqq #2@(#3,#4) \;\mathtt{to}\; #5 \;\mathtt{via}\; #6 \;\mathtt{in}\; #7}
+\newcommand{\Jb}[7]{\mathtt{transport}\; #1\coloneqq #2@#3 \;\mathtt{to}\; #4\coloneqq#5 \;\mathtt{via}\; #6 \;\mathtt{in}\; #7}
 \mprset{flushleft}
 
 
@@ -1140,9 +1141,76 @@ We can now derive:
 Starting to play with terms again, with some new ideas. Feel free to ignore for now\dots
 
 \subsection{Hom types}
-We seem to need several special cases for elim terms for hom types. To begin with, the \textsc{Hom
-Left Rule-A} splits into two cases, depending on whether the $x$ and $y$ in $\Gamma'$ appear in the
-same or in different types.
+We seem to need several special cases of elim terms for hom types. The \textsc{Hom Left Rule-B}
+case, without substitutions build in, looks like
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \flip{\Psi_2}, x\pcol A \types N \type \\
+    \Psi', y\pcol A \types M \type \\\\
+    \Delta\equiv\Psi_1,\Psi_2,\Psi' \\
+    \Delta, z\pmcol A \cb \Gamma, r:N[z/x\p] \types m:M[z/y\p]
+    }{
+    \Delta, x\pmcol A, y\pmcol A \cb \Gamma, r':N, f:\mor{A}(x,y) \types \\\\
+    \quad (\Jb{r}{r'}{x}{z}{y}{f}{m}):M
+  }
+\end{mathpar}
+and with substitutions:
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma_1 \ctx \\
+    \flip{\Psi_{22}} \types \Gamma_2 \ctx \\
+    \Psi_1', x\pcol A \types N \type \\
+    \Psi_2', y\pcol A \types M \type \\\\
+    \Psi_3 \types a_1:A \\
+    \flip{\Psi_3'} \types a_2:A \\
+    \flip{\Psi_{21}} \types \rho:\Psi_1' \\\\
+    \Psi_1,\Psi_1',\Psi_3 \cb \Gamma_1 \types n:N[a_1/x\p] \\\\
+    \Psi_{21},\Psi_{22},\Psi_2',z\pmcol A
+      \cb \Gamma_2, r:N[\rho,z/x\p] \types m:M[z/y\p] \\\\
+    \unif{(\Psi_1,\Psi_3)\combineU\Psi_1'}
+      {(\Psi_{22},\Psi_2')\combineU\Psi_{21}}{\rho}{(\Delta_0\types\rho_0)}
+    }{
+    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,y) \types \\\\
+      \quad (\Jb{r}{n}{a_1}{z}{a_2}{f}{m}):M)[\rho_0,a_2/y\p,\flip{a_2}/y\m]
+  }
+\end{mathpar}
+This has computation rules
+\begin{gather*}
+  (\Jb{r}{n}{a}{z}{a}{\id(a)}{m}) \equiv m[a/z,n/r] \\
+  (\Jb{r}{r}{x}{z}{y}{f}{m[z/x,,z/y,\id(z)/f]}) \equiv m
+\end{gather*}
+
+
+The \textsc{Hom Left Rule-A} splits into two cases, depending on whether the $x$ and $y$ in
+$\Gamma'$ appear in the same or in different types. Without substitutions built in, we have
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \flip{\Psi_2}, x\pcol A \types N_1 \type \\
+    \flip{\Psi_3}, y\mcol A \types N_2 \type \\
+    \Psi' \types M \type \\\\
+    \Delta \equiv \Psi_1,\Psi_2,\Psi_3,\Psi' \\
+    \Delta,z\pmcol \cb \Gamma, r:N_1[z/x\p], s:N_2[z/y\m] \types m:M
+    }{
+    \Delta,x\pmcol A,y\pmcol A \cb \Gamma, r':N_1, s':N_2, f:\mor{A}(x,y) \types \\\\
+      \quad(\Jaa{r}{r'}{x}{s}{s'}{y}{z}{f}{m}):M
+  }
+\end{mathpar}
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma \ctx \\
+    \flip{\Psi_2}, x\pcol A, y\mcol A \types N \type \\
+    \Psi' \types M \type \\\\
+    \Delta \equiv \Psi_1,\Psi_2,\Psi' \\
+    \Delta,z\pmcol A \cb \Gamma, r:N[z/x\p,z/y\m] \types m:M
+    }{
+    \Delta,x\pmcol A,y\pmcol A \cb \Gamma, r':N, f:\mor{A}(x,y) \types \\\\
+      \quad(\Jab{r}{r'}{x}{y}{z}{f}{m}):M
+  }
+\end{mathpar}
+
+With substitutions, these become
 \begin{mathpar}
   \inferrule{
     \flip{\Psi_{11}} \types \Gamma_1 \ctx \\
@@ -1163,7 +1231,7 @@ same or in different types.
       {(\Psi_{23},\Psi_2')\combineU(\Psi_{21},\Psi_{22})}{(\rho_1,\rho_2)}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2)
-      \types (\Ja{r}{n_1}{a_1}{s}{n_2}{a_2}{x}{f}{m}):M)[\rho_0]
+      \types (\Jaa{r}{n_1}{a_1}{s}{n_2}{a_2}{x}{f}{m}):M)[\rho_0]
   }
 \end{mathpar}
 \begin{mathpar}
@@ -1174,24 +1242,24 @@ same or in different types.
     \Psi_2' \types M \type \\\\
     \Psi_3 \types a_1:A \\
     \flip{\Psi_3'} \types a_2:A \\
-    \flip{\Psi_{21}} \types \rho:\Psi_1' \\
-    \Psi_1,\Psi_1',\Psi_3 \cb \Gamma_1 \types n:N[a_1/x\p,a_2/y\m] \\
+    \flip{\Psi_{21}} \types \rho:\Psi_1' \\\\
+    \Psi_1,\Psi_1',\Psi_3,\Psi_3' \cb \Gamma_1 \types n:N[a_1/x\p,a_2/y\m] \\\\
     \Psi_{21},\Psi_{22},\Psi_2',x\pmcol A
       \cb \Gamma_2, r:N[\rho,x/y\m] \types m:M \\\\
     \unif{(\Psi_1,\Psi_3)\combineU\Psi_1'}
       {(\Psi_{22},\Psi_2')\combineU\Psi_{21}}{\rho}{(\Delta_0\types\rho_0)}
     }{
     \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2)
-      \types (\Jb{r}{n}{a_1}{a_2}{x}{f}{m}):M)[\rho_0]
+      \types (\Jab{r}{n}{a_1}{a_2}{x}{f}{m}):M)[\rho_0]
   }
 \end{mathpar}
 
 The computation rules for these terms are
 \begin{gather*}
-  (\Ja{r}{n_1}{a}{s}{n_2}{a}{x}{\id(a)}{m}) \equiv m[a/x,n_1/r,n_2/s] \\
-  (\Ja{r}{r}{x}{s}{s}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m \\
-  (\Jb{r}{n}{a}{a}{x}{\id(a)}{m}) \equiv m[a/x,n/r] \\
-  (\Jb{r}{r}{x}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m
+  (\Jaa{r}{n_1}{a}{s}{n_2}{a}{x}{\id(a)}{m}) \equiv m[a/x,n_1/r,n_2/s] \\
+  (\Jaa{r}{r}{x}{s}{s}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m \\
+  (\Jab{r}{n}{a}{a}{x}{\id(a)}{m}) \equiv m[a/x,n/r] \\
+  (\Jab{r}{r}{x}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m
 \end{gather*}
 \end{document}
 
