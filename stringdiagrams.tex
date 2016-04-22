@@ -2,6 +2,7 @@
 \usepackage{amssymb,amsmath,latexsym,stmaryrd,mathtools}
 \usepackage{cleveref}
 \usepackage{mathpartir}
+\usepackage{xcolor}
 \usepackage[backgroundcolor=white,bordercolor=red]{todonotes}
 \newcommand{\todoi}[1]{\todo[inline]{#1}}
 \let\types\vdash % turnstile
@@ -41,6 +42,7 @@
 \newcommand{\introend}{\mathsf{inend}}
 %\newcommand{\letexp}[3]{\left(#1 := #2\right).#3}
 \newcommand{\letexp}[3]{\left(#1\mathrel{\reflectbox{$\Rrightarrow$}}#2\right).#3}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
 
 \title{A directed type theory for formal category theory}
 \author{Dan Licata \and Andreas Nuyts \and Patrick Schultz \and Michael Shulman}
@@ -122,7 +124,7 @@ The substitution rule for category variables will be:
 		\Psi \vdash a : A \\
 		\Phi, \strs s, x \strto y : A \cb \Gamma \vdash m : M \\
 	}{
-		\Phi, \strs s, \strs t : \Psi' \strto \Psi \cb \Gamma[a[\strs t]/x, a/y] \vdash m[a[\strs t]/x, a/y] : M[a[\strs t]/x, a/y]
+		\Phi, \strs s, \strs t : \Psi' \strto \Psi \cb (\Gamma \vdash m : M)[a[\strs t]/x, a/y]
 	}\and
 \end{mathpar}
 Observe that this respects all the necessary invariants: $\Gamma$ and $M$ together, and $m$ separately, use every variable from $\Phi$, as well as $x$ and $y$, precisely once. The category term $a$ uses every variable from $\Psi$ exactly once. Substituting $a[\strs t]$ for $x$ and $a$ for $y$ asserts that all variables from $\Phi$, $\Psi$ and $\Psi'$ are used exactly once in the conclusion's types and once in its term.
@@ -168,7 +170,7 @@ This suggests the simple computation rule: $(m_0)_{M \strto M[\strs t]} \jdeq m_
 		\Phi \vdash S \type \\
 		\Psi \vdash T \type
 	}{
-		\Phi \Psi \vdash S \otimes T \type
+		\Phi, \Psi \vdash S \otimes T \type
 	}
 \end{mathpar}
 \subsubsection{Right rule}
@@ -358,6 +360,7 @@ Right rule with built-in substitution:
 Here we are using $x$ covariantly and $y$ contravariantly, because this is an eliminator. Note that $f$ is not a well-formed term: it is a variable. When we plug a term into it, it will mention $x$ contra- and $y$ covariantly, while both will have disappeared from the context. Computation will resolve this.
 
 With built-in substitution, we can consider source-based, target-based and two-sided elimination. The two-sided one can be derived from either based one, and the target-based one should be derivable from the morphism type of the opposite category. So we just give the source-based one:
+\todoi{It doesn't respect term invariants!}
 \begin{mathpar}
 	\inferrule{
 		\Phi \vdash b : A \\
@@ -366,7 +369,18 @@ With built-in substitution, we can consider source-based, target-based and two-s
 		\Psi, \strs s, \strs t : \Phi' \strto \Phi \cb \Gamma[b/z], f : \mor A(a, b[\strs t]) \vdash \letexp{\id(a \strto b[\strs t])}{f}{m} : M[b/z]
 	}\and
 \end{mathpar}
+\begin{mathpar}
+	\inferrule{
+		\Phi_a \vdash a : A \\
+		\Phi_b \vdash b : A \\
+		(\Psi, \strs s), \strs t : \Phi'_a \strto \Phi_a \cb \Gamma[a/z] \vdash m : M[a/z]
+	}{
+		\Psi, \strs s, \strs t : \Phi'_a \strto \Phi_a, \strs u : \Phi'_b \strto \Phi_b \cb \Gamma[b/z], f : \mor A(a, b[\strs u]) \vdash \letexp{\id(a \strto b[\strs t])}{f}{m} : M[b/z]
+	}\and
+\end{mathpar}
 The two-sided one is probably more natural, so ideally we could derive the based ones from it.
+
+\todoi{Note:} \red{The left and right terms of the morphism type are the only terms where $x \strto y$ does not bind $x$ and $y$, but rather refers to $x$ and $y$ from the context. This means that substitution can lead you to terms of the form $\letexp{\id(a \strto b)}{f}{m}$ where $a$ and $b$ are not $\alpha$-equivalent.}
 
 \subsubsection{$\beta$-rule}
 As another demonstration of substitution, let us plug identity into the left rule:
