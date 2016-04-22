@@ -702,7 +702,7 @@ and $\beta/\eta$ etc. to define isomorphisms etc.
           {x \mcol A \combine y\pcol A \types \mor A(x,y) \type}
 \qquad
 \inferrule{ }
-          {x \pmcol A \cb \ec \types \mor{A}(x,x) }
+          {z \pmcol A \cb \ec \types \mor{A}(x,y)[z/x,z/y] }
 \qquad
 \inferrule{%% \Psi, x \mcol A, y \pcol A \types (\Gamma \vdash M) \ok \\
            \Delta, x \pmcol A \cb (\Gamma \vdash M) [x/y\p]\\ }
