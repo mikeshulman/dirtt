@@ -43,8 +43,11 @@ $#1\copy \z@
 \newcommand{\one}{\lone}
 \newcommand{\bone}{\mathbf{1}}
 
-\autodefs{\cMod\dCat\bCat\dSpan\dMod\bSet\bGraph\dMod}
+\autodefs{\cMod\dCat\bCat\dSpan\dMod\bSet\bGraph\dMod\cMod}
 \let\Mod\dMod
+\let\mod\cMod
+\def\modk{\mod_\K}
+\def\mor#1{\hom_{#1}}
 
 \def\cart{\chi}
 \def\opcart{\chi}
@@ -61,22 +64,25 @@ $#1\copy \z@
 \newcommand{\epbar}{^{\varepsilon^*}}
 \renewcommand{\ph}[1][]{^{\varphi_{#1}}}
 \newcommand{\phe}[2]{^{\varphi_{#1}\varepsilon_{#2}}}
-\let\vec\overrightarrow
-\let\Vec\Overrightarrow
+% \let\vec\overrightarrow
+% \let\Vec\Overrightarrow
 %\renewcommand{\Vec}[1]{\overset{\Rightarrow}{#1}}
 
-\let\types\vdash % turnstile
-\def\cb{\mid} % context break
+\def\types{\;\vdash\;} % turnstile
+\let\mto\vdash    % As a hom operator on modules
+\def\mhom#1#2{\left( #1 \vphantom{\big|}\mto #2 \right)}
+\def\cb{\;\mid\;} % context break
 \newcommand\combine{,}
 \newcommand\combineU{\sqcup}
 \def\flip#1{#1^*} % reverse the variances of all variables
 \newcommand{\unif}[4]{#1\doteq #2\,\mathsf{ via }\,#3\cb #4}
 
 \title{Multivariable formal category theory}
-\author{Michael Shulman and ??}
+\author{Patrick Schultz and Michael Shulman}
 \begin{document}
 \maketitle
 
+\setcounter{tocdepth}{1}
 \tableofcontents
 
 \section{Introduction}
@@ -115,7 +121,232 @@ The differences between a kit and a compact closed equipment, and hence the reas
   We will introduce this language informally here; for details see~\cite{lnss:dirtt}.
 \end{enumerate}
 
+\part{Multivariable formal category theory}
+\label{part:mfct}
 
+In this part we will describe the structure of a kit informally, and consider a number of examples of how to use that structure to formulate category-theoretic arguments abstractly.
+The formal definition of a kit is rather technically involved and occupies \cref{part:def}; but this part is intended to demonstrate that for nearly all practical applications it is not necessary to know the details of the formal definition, only to have faith that it exists and behaves as one would expect.
+
+\section{The structure of a kit}
+\label{sec:structure}
+
+A kit is composed of four sorts of things, which we discuss in turn.
+
+\subsection{Cats}
+
+There is a class of objects, which we call \textbf{cats}, since they play the role of categories.
+
+\subsection{Functors}
+
+We generally call the morphisms between cats \textbf{functors}.
+This is in line with the fact that the morphisms between many different kinds of generalized categories --- enriched categories, indexed categories, bicategories, $\infty$-categories, etc. --- are frequently called just ``functors'' without qualification.
+
+The functors in a kit are functors of many variables, some covariant and some contravariant.
+More precisely, the domain of a functor is a finite list of cats, some of which are annotated with the formal symbol $(-)\o$ to indicate contravariance.
+(This does not yet represent an operation of ``oppositization'' on cats; it is just a formal marker for contravariance.
+Similarly, we do not in general assume a ``tensor product'' of cats; as we will see later, these operations can be characterized by universal properties in terms of the multivariable functors.)
+The codomain of a functor, by contrast, is a single cat; thus we might have for instance $f:(A,B\o,C) \to D$.
+If the list contains only one cat, we generally omit the parentheses, writing $f:A\to B$.
+
+Functors can be composed in a ``multicategorical'' way that keeps track of variance.
+For instance, if in addition to $f:(A,B\o,C) \to D$ we have $g:X \to A$ and $h:(Y\o,Z)\to B$ and $k:()\to C$ (yes, lists can have length zero), then there is a composite $f\circ (g,h,k) : (X,Y,Z\o)\to D$.
+
+\subsection{Modules}
+
+Now we have a second class of objects, which we call \textbf{modules}; these represent presheaves, profunctors, and more general ``functors into the base of enrichment''.
+Each module is indexed by a finite list of cats with variance (the same sort of list that appears as the domain of a functor).
+We write $\modk(A,B\o,C)$ for the category (see below) of modules indexed by a list $(A,B\o,C)$.
+Modules can be restricted along functors; thus if $M\in \modk(A,B\o,C)$, and $g,h,k$ are as above, we have $(g,h,k)^*M \in \modk(X,Y,Z\o)$.
+This restriction is strictly functorial with respect to functor composition (one could consider generalizations of a kit where it is only weakly functorial, but in most examples it is strict, and in other cases it can be modified to become so).
+
+The symmetric groups also act on modules; thus if $M\in \modk(A,B\o,C)$ we have a $\sigma^*M\in \modk(B\o,C,A)$ and so on.
+Formally, the symmetric group action is combined with the restriction along functors, by representing the collection of modules as a functor defined on a category whose objects are lists of cats with variance and whose morphisms are lists of functors together with a permutation of their combined input.
+
+\subsection{Module morphisms}
+
+Finally we have module morphisms; this is where all the subtlety and difficulty lies.
+The simplest sort of morphism between modules is an ``ordinary'' one between modules indexed by the same list of cats.
+These form the morphisms of the categories such as $\modk(A,B\o,C)$, and restriction along functors is of course functorial on these categories.
+
+The next simplest sort of module morphism is a ``multivariable'' one that represents a potential ``tensor product of modules'' multicategorically, similarly to how the multivariable functors represent a potential tensor product of categories.
+Since our intended models include categories enriched over a non-cartesian base, the individual categories such as $\modk(A,B\o,C)$ are not necessarily monoidal (that is, we can't necessarily take a pointwise tensor product of presheaves), but we can expect ``external'' products such as $\modk(A) \times \modk(B) \to \modk(A,B)$.
+Thus, representing these multicategorically we have multivariable module morphisms such as $(M_1,M_2,\dots,M_n) \to N$, where $M_i\in \modk(\Psi_i)$ and $N\in\modk(\Psi_1 \Psi_2\cdots \Psi_n)$.
+
+However, in order to really do multivariable category theory, we also need ``extraordinary'' natural transformations as in~\cite{ek:gen-funct-calc}.
+For instance, given $M\in\modk(A,A\o,B)$ and $N\in \modk(C,C\o,B)$ we want to speak about a transformation $\alpha:M\to N$ that is ordinary natural in $B$ and extraordinary natural in $A$ and $C$ on either side; in plain set-based category theory this means we have components $\alpha_{a,b,c}:M(a,a,b) \to N(c,c,b)$ such that the following naturality squares commute for all $f:a_1\to a_2$, $g:b_1\to b_2$, $h:c_1\to c_2$, and $a,b,c$:
+\begin{mathpar}
+  \xymatrix{ M(a,a,b_1) \ar[d]_{M(1,1,g)} \ar[r]^{\alpha} &
+    N(c,c,b_1) \ar[d]^{N(1,1,g)}\\
+    M(a,a,b_2) \ar[r]_{\alpha} & N(c,c,b_2)}\and
+  \xymatrix{ M(a_1,a_2,b) \ar[d]_{M(1,f,1)} \ar[r]^{M(f,1,1)} &
+    M(a_2,a_2,b) \ar[d]^{\alpha}\\
+    M(a_1,a_1,b) \ar[r]_{\alpha} & N(c,c,b)}\and
+  \xymatrix{ M(a,a,b) \ar[d]_{\alpha} \ar[r]^{\alpha} &
+    N(c_2,c_2,b) \ar[d]^{N(1,h,1)}\\
+    N(c_1,c_1,b) \ar[r]_{N(h,1,1)} & N(c_2,c_1,b)}
+\end{mathpar}
+Thus, a kit includes a set of ``extraordinary'' module morphisms from $M$ to $N$ whenever $M\in \modk(\Psi_1, \Psi_1\o,\Psi_2)$ and $N\in\modk(\Psi_3, \Psi_3\o,\Psi_2)$.
+Here the $\Psi_i$ are lists of cats \emph{with variance}, and $\Psi\o$ denotes reversal of all the variances in $\Psi$.
+The extraordinary morphisms, like the ordinary ones that form the arrows of the categories $\modk(\Psi)$, can be restricted along functors, in a functorial way.
+And we can have multivariable extraordinary morphisms as well (see below).
+
+The complication comes when defining how extraordinary morphisms can be \emph{composed}.
+The rules for how to compose extraordinary natural transformations were given in~\cite{ek:gen-funct-calc}, but it seems to be quite involved to use these rules to define an abstract structure in a categorically respectable way.
+In \cref{sec:composing} we will describe the rules informally; but first we digress to introduce a better notation for extraordinary morphisms.
+
+
+\section{Abstract variable notation}
+\label{sec:tt}
+
+It turns out to be quite convenient to use a different notation for modules and their morphisms.
+Rather than writing
+\[ M \in \modk(A,B\o,C) \]
+we allow ourselves to think of $M$ as a functor that takes ``values'' on ``variables'' belonging to $A,B,C$, and write
+\[ \ctx{a:A,b:B\o,c:C} \types M(a,b,c) \in\modk. \]
+Note that the cats in a kit are still just abstract objects; we are not asserting that they have ``elements'' in any sense.
+These ``variables'' are purely schematic.
+This is very much like the ``abstract index notation'' of tensor calculus, that allows us to write $T^{a b}_{c}$ for an element of a tensor space $V \otimes V\otimes V^*$ without needing to actually pick a basis of $V$ to make $a,b,c$ into actual numerical indices of components.
+
+One reason this ``abstract variable notation'' is useful is when restricting modules along functors.
+In the previous example with $M$ as above and
+\begin{mathpar}
+  g:X \to A \and h:(Y\o,Z)\to B \and k:()\to C
+\end{mathpar}
+instead of $(g,h,k)^*M \in \modk(X,Y,Z\o)$ we can write
+\[ \ctx{x:X,y:Y,z:Z\o}\types M(g(x),h(y,z),k)\in\modk \]
+This indicates much more clearly how the functors $g,h,k$ match up with the dependence of $M$ on $A,B\o,C$ and how the resulting dependence on $X,Y,Z\o$ feeds into $g,h,k$.
+The strict functoriality of restriction with respect to functor composition means that this notation behaves as we expect on such composites; for instance, if we have
+\begin{mathpar}
+  \ctx{c:C}\types M(c)\in\modk \and g:B\to C \and f:A\to B
+\end{mathpar}
+then the three restrictions $g^*M$, $f^*g^*M$, and $(g\circ f)^*M$ are represented in this notation as
+\begin{mathpar}
+  \ctx{b:B}\types M(g(b)) \in\modk\\
+  \ctx{a:A}\types M(g(f(a))) \in\modk\and
+  \ctx{a:A}\types M((g\circ f)(a)) \in\modk
+\end{mathpar}
+where the second and third are, as we expect, equal.
+
+The second place that abstract variable notation is useful is when describing module morphisms, and especially extraordinary ones.
+We said above that extraordinary module morphisms go from $M$ to $N$ whenever $M\in \modk(\Psi_1,\Psi_1\o,\Psi_2)$ and $N\in\modk (\Psi_3,\Psi_3\o,\Psi_2)$.
+Of course, in practice it could be that the cats for which we want to assert ordinary or extraordinary naturality are not lined up in this exact order; for instance we could have $M\in \modk(A,B,A\o)$ and $N\in \modk(B,C,C\o)$.
+Formally, in this case we have to use the symmetric group actions to put the cats in the right order; but in practice it is easier to just indicate how the cats should be matched up.
+We can do this with abstract variables as follows:
+\[ \ctx{a:A,b:B,c:C} \cb M(a,b,a) \types N(b,c,c) \]
+Note that every variable appears exactly twice to the right of the vertical bar, once covariantly and once contravariantly (where occurrences to the left of the turnstile $\vdash$ are counted with opposite variance).
+
+This notation is especially valuable when the same cat appears multiple times.
+For instance, if $M\in\modk(A,A\o,A)$ and $N\in\modk(A)$, then there are two kinds of extraordinary morphisms from $M$ to $N$, which are represented in this notation as
+\begin{mathpar}
+  \ctx{x:A,y:A} \cb M(x,x,y)\types N(y)\\
+  \ctx{x:A,y:A} \cb M(x,y,y)\types N(x)
+\end{mathpar}
+This notation, or something like it, is also essential when talking about multivariable extraordinary morphisms.
+For instance, we could have
+\[ \ctx{a:A,b:B,c:C,d:D} \cb M_1(a,b), M_2(b,c) \types N(a,d,c,d) \]
+but here there is no way to act on $M_1$ and $M_2$ by symmetric groups separately to put the $B,B\o$ in front.
+Formally, this means that when describing multivariable extraordinary morphisms we have to incorporate a permutation in the definition; but with abstract variable notation we don't need to think about that.
+
+Finally, if the cats that the variables correspond to are obvious from context, we can omit their declarations, obtaining a more concise notation $M(a,b,a) \mto N(b,c,c)$ for a set of extraordinary module morphisms.
+Thus, if we want to give a name to a particular such morphism we can write
+\[ \phi \in \mhom{M(a,b,a)}{N(b,c,c)} \]
+
+So far we have described our ``abstract variable notation'' somewhat informally.
+When doing formal category theory, this informal understanding is generally sufficient.
+However, it is useful to know that the notation can be made much more precise, by defining a type theory to serve as the ``internal language'' of a kit; see~\cite{lnss:dirtt}.
+
+\section{Composing extraordinary morphisms}
+\label{sec:composing}
+
+The simplest sort of composition for extraordinary morphisms is composition with ordinary ones on either side.
+For instance, a morphism $\phi\in \mhom{M(a,b,a)}{N(b,c,c)}$ can be composed with an ordinary map $\psi:N\to N'$ in $\modk(B,C,C\o)$ to obtain a morphism $\psi\phi\in \mhom{M(a,b,a)}{N'(b,c,c)}$
+In examples it is easy to see how to do this: just compose the components
+\[ M(a,b,a) \xto{\phi_{a,b,c}} N(b,c,c) \xto{\psi_{b,c,c}} N'(b,c,c) \]
+and check that the naturality relations (both ordinary and extraordinary) are preserved.
+(Note that the components $\psi_{b,c_1,c_2}$ with $c_1\neq c_2$ do not appear in the definition, but they do appear in the proof of extraordinary naturality.)
+Formally, we can say that each set of extraordinary morphisms admits an action on both sides by the categories $\modk(\Psi)$ (that is, it is a profunctor).
+
+More interesting sorts of composition involve two extraordinary transformations, as explained in~\cite{ek:gen-funct-calc}.
+The most basic composite of this sort involves two morphisms
+\begin{mathpar}
+  \phi\in \mhom{M(x)}{N(x,y,y)} \and \psi\in\mhom{N(z,z,w)}{P(w)}.
+\end{mathpar}
+with $x,y,z,w$ all associated to the same cat $A$.
+In examples, we can compose these by composing their components
+\[ M(x) \xto{\phi_{x,x}} N(x,x,x) \xto{\psi_{x,x}} P(x) \]
+and check that the result is an ordinary natural transformation $M\to P$.
+
+Note that the identification of all three variables in $N$ is mandated in order to be able to write both $\phi$ and $\psi$, since $\phi$ requires the second and third variables to be the same while $\psi$ requires the first and second to be the same.
+This then determines how the naturality of the composite matches up the variables of $M$ and $P$ (in this case, of course, they have only one variable each, but in general they might have many and this matching might be ambiguous).
+This process of identifying variables can be represented by drawing a graph:
+\begin{center}
+  \begin{tikzpicture}[xscale=2,yscale=.8]
+    \node (A1) at (0,0) {$A$};
+    \node (A2a) at (1,1) {$A$};
+    \node (A2b) at (1,0) {$A$};
+    \node (A2c) at (1,-1) {$A$};
+    \node (A3) at (2,0) {$A$};
+    \draw (A1) to[out=0,in=180] node[auto,swap] {$x$} (A2c);
+    \draw (A2a) to[out=0,in=180] node[auto] {$w$} (A3);
+    \draw (A2a) to[out=180,in=180] node[auto,swap] {$y$} (A2b);
+    \draw (A2b) to[out=0,in=0] node[auto] {$z$} (A2c);
+  \end{tikzpicture}
+\end{center}
+or by solving a system of equations that ``unifies'' each arguments of the codomain $N(x,y,y)$ of $\phi$ with the corresponding argument of the domain $N(z,z,w)$ of $\psi$:
+\begin{mathpar}
+  x=z \and y=z \and y=w
+\end{mathpar}
+
+There are cases where this doesn't work; that is, pairs of extraordinary morphisms from $M$ to $N$ and from $N$ to $P$ that are ``non-composable'' despite having the same module $N$ in the middle.
+For example, we might instead have
+\begin{mathpar}
+  \phi\in \mhom{M(x)}{N(x,y,y)} \and \xi\in\mhom{N(w,z,z)}{P(w)}.
+\end{mathpar}
+The problem is that when ``composing components'' there is no way to decide what $y$ and $z$ should be: we can write down the composite
+\[ M(x) \xto{\phi_{x,y,y}} N(x,y,y) \xto{\xi_{x,y,y}} P(x) \]
+for any value of $y$, and there is no canonical choice (note that $x$ and $w$ might belong to an entirely different cat, so choosing $y=x$ is not an option).
+Graphically, this problem is visible as the presence of a ``loop'':
+\begin{center}
+  \begin{tikzpicture}[xscale=2,yscale=.8]
+    \node (A1) at (0,0) {$A$};
+    \node (A2a) at (1,1) {$B$};
+    \node (A2b) at (1,0) {$B$};
+    \node (A2c) at (1,-1) {$A$};
+    \node (A3) at (2,0) {$A$};
+    \draw (A1) to[out=0,in=180] node[auto,swap] {$x$} (A2c);
+    \draw (A2c) to[out=0,in=180] node[auto,swap] {$w$} (A3);
+    \draw (A2a) to[out=180,in=180] node[auto,swap] {$y$} (A2b);
+    \draw (A2a) to[out=0,in=0] node[auto] {$z$} (A2b);
+  \end{tikzpicture}
+\end{center}
+A more careful explanation of this condition, and a proof that it is the most general answer (for the classical case of enriched categories), can be found in~\cite{ek:gen-funct-calc}.
+
+The technical work in the precise definition of a kit is to make precise \emph{all} the allowable composites of extraordinary morphisms, how they interact with restriction along functors, and in what sense these composites must be ``associative''.
+However, in practical applications this generality is rarely needed, as most extraordinary morphisms only involve a few variables and intuition from ordinary category theory is generally sufficient to give the right answer.
+We intend to demonstrate this with some examples of doing ``formal category theory'' in a kit; but first we need to discuss some universal properties of cats and modules.
+
+\section{Universal constructions}
+\label{sec:univ}
+
+\subsection{Opposites and tensor products}
+\label{sec:op-tens}
+
+\subsection{Hom-modules and representable modules}
+\label{sec:hom}
+
+\subsection{Ends and coends}
+\label{sec:ends-coends}
+
+\subsection{Function modules}
+\label{sec:func-mod}
+
+\subsection{Functor and presheaf cats}
+\label{sec:func-pshf}
+
+
+
+\part{The definition of a kit}
+\label{part:def}
 
 \section{Generalized polycategories}
 \label{sec:genpoly}
@@ -518,7 +749,9 @@ Thus, we ``tensor $\thhat$ up'' in the following way:
 \[ \thchk(A,B,C,D,E) = \int^{\Bhat,\Dhat\in\Chats} \Chat(\Bhat,B) \times \Chat(\Dhat,D)\times \thhat(A,\Bhat,C,\Dhat,E) \]
 We will see in a moment that this is sufficient.
 Now we define our putative horizontal distributive law to be
-\[ \delta_{\E,E}((A,B,M),(C,D,N)) = \sum_{(u,v,\sigma)\in \thchk(A,B,C,D,E)} \E(u^*M,\sigma^*v^*N) \]
+\begin{equation}\label{eq:delta}
+  \delta_{\E,E}((A,B,M),(C,D,N)) = \sum_{(u,v,\sigma)\in \thchk(A,B,C,D,E)} \E(u^*M,\sigma^*v^*N)
+\end{equation}
 where according to the definition of $\thchk$ we have $u\in \Chat(\Bhat,B)$, $v\in \Chat(\Dhat,D)$, and $\sigma\in\thhat(A,\Bhat,C,\Dhat,E)$.
 Of course, \thchk is a quotient, so its elements are not uniquely written as triples $(u,v,\sigma)$; but it is easy to see that a different representative yields a canonically isomorphic set of morphisms $\E(u^*M,\sigma^*v^*N)$, so $\delta$ is well-defined up to isomorphism.
 
@@ -564,7 +797,9 @@ Of course, \thchk is a quotient, so its elements are not uniquely written as tri
   Thus, $\delta_\E$ is a horizontal arrow $TS\E \hto ST\E$ in $\dCat^{\Chat\op}$.
 
   Third, we must check that $\delta$ defines a horizontal (pseudonatural) transformation.
-  Let $H:\E\hto \F$ be a horizontal arrow in $\dCat^{\Chat\op}$; we will show that $\delta_E \otimes STH$ and $TSH\otimes \delta_F$ are both isomorphic to the same thing.
+  Let $H:\E\hto \F$ be a horizontal arrow in $\dCat^{\Chat\op}$; we will show that $\delta_\E \otimes STH$ and $TSH\otimes \delta_\F$ are both isomorphic to the same thing, namely the obvious extension of~\eqref{eq:delta}:
+  \[ \delta_{H,E}((A,B,M),(C,D,N)) = \sum_{(u,v,\sigma)\in \thchk(A,B,C,D,E)} H(u^*M,\sigma^*v^*N) \]
+
   (TODO)
 
   Fourth, we must construct the four modifications from \cref{def:hdl}.
