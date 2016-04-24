@@ -71,6 +71,7 @@ $#1\copy \z@
 \def\types{\;\vdash\;} % turnstile
 \let\mto\vdash    % As a hom operator on modules
 \def\mhom#1#2{\left( #1 \vphantom{\big|}\mto #2 \right)}
+\def\mhomc#1#2#3{\left( #1 \mid #2 \vphantom{\big|}\mto #3 \right)}
 \def\cb{\;\mid\;} % context break
 \newcommand\combine{,}
 \newcommand\combineU{\sqcup}
@@ -150,6 +151,7 @@ If the list contains only one cat, we generally omit the parentheses, writing $f
 
 Functors can be composed in a ``multicategorical'' way that keeps track of variance.
 For instance, if in addition to $f:(A,B\o,C) \to D$ we have $g:X \to A$ and $h:(Y\o,Z)\to B$ and $k:()\to C$ (yes, lists can have length zero), then there is a composite $f\circ (g,h,k) : (X,Y,Z\o)\to D$.
+Finally, like in a symmetric multicategory, we have symmetric group actions on the domains of functors, so that from $f:(A,B\o,C) \to D$ we can obtain a functor $(B\o,C,A)\to D$ and so on.
 
 \subsection{Modules}
 
@@ -160,6 +162,7 @@ Modules can be restricted along functors; thus if $M\in \modk(A,B\o,C)$, and $g,
 This restriction is strictly functorial with respect to functor composition (one could consider generalizations of a kit where it is only weakly functorial, but in most examples it is strict, and in other cases it can be modified to become so).
 
 The symmetric groups also act on modules; thus if $M\in \modk(A,B\o,C)$ we have a $\sigma^*M\in \modk(B\o,C,A)$ and so on.
+As with restriction, we assume for simplicity that this action is strict.
 Formally, the symmetric group action is combined with the restriction along functors, by representing the collection of modules as a functor defined on a category whose objects are lists of cats with variance and whose morphisms are lists of functors together with a permutation of their combined input.
 
 \subsection{Module morphisms}
@@ -171,6 +174,7 @@ These form the morphisms of the categories such as $\modk(A,B\o,C)$, and restric
 The next simplest sort of module morphism is a ``multivariable'' one that represents a potential ``tensor product of modules'' multicategorically, similarly to how the multivariable functors represent a potential tensor product of categories.
 Since our intended models include categories enriched over a non-cartesian base, the individual categories such as $\modk(A,B\o,C)$ are not necessarily monoidal (that is, we can't necessarily take a pointwise tensor product of presheaves), but we can expect ``external'' products such as $\modk(A) \times \modk(B) \to \modk(A,B)$.
 Thus, representing these multicategorically we have multivariable module morphisms such as $(M_1,M_2,\dots,M_n) \to N$, where $M_i\in \modk(\Psi_i)$ and $N\in\modk(\Psi_1 \Psi_2\cdots \Psi_n)$.
+As with functors, the symmetric groups act on the domains of such morphisms.
 
 However, in order to really do multivariable category theory, we also need ``extraordinary'' natural transformations as in~\cite{ek:gen-funct-calc}.
 For instance, given $M\in\modk(A,A\o,B)$ and $N\in \modk(C,C\o,B)$ we want to speak about a transformation $\alpha:M\to N$ that is ordinary natural in $B$ and extraordinary natural in $A$ and $C$ on either side; in plain set-based category theory this means we have components $\alpha_{a,b,c}:M(a,a,b) \to N(c,c,b)$ such that the following naturality squares commute for all $f:a_1\to a_2$, $g:b_1\to b_2$, $h:c_1\to c_2$, and $a,b,c$:
@@ -322,14 +326,67 @@ Graphically, this problem is visible as the presence of a ``loop'':
 A more careful explanation of this condition, and a proof that it is the most general answer (for the classical case of enriched categories), can be found in~\cite{ek:gen-funct-calc}.
 
 The technical work in the precise definition of a kit is to make precise \emph{all} the allowable composites of extraordinary morphisms, how they interact with restriction along functors, and in what sense these composites must be ``associative''.
-However, in practical applications this generality is rarely needed, as most extraordinary morphisms only involve a few variables and intuition from ordinary category theory is generally sufficient to give the right answer.
+However, in practical applications this generality is rarely needed, as most extraordinary morphisms only involve a few variables, and intuition from ordinary category theory is generally sufficient to give the right answer.
 We intend to demonstrate this with some examples of doing ``formal category theory'' in a kit; but first we need to discuss some universal properties of cats and modules.
 
 \section{Universal constructions}
 \label{sec:univ}
 
-\subsection{Opposites and tensor products}
-\label{sec:op-tens}
+\subsection{Tensor products and opposites}
+\label{sec:tens-opp}
+
+One of the simplest universal constructions in a kit is the tensor product of modules, whose universal property is very much like that of tensor products in an ordinary multicategory.
+The extra wrinkle is that the universal property applies to all sorts of extraordinary morphisms.
+
+\begin{defn}
+  A \textbf{tensor product} of $M_1\in\modk(\Psi_1)$ and $M_2\in\modk(\Psi_2)$ is a module $M_1\otimes M_2 \in \modk(\Psi_1\Psi_2)$ along with an (ordinary) morphism $\chi:(M_1,M_2)\to M_1\otimes M_2$ such that precomposition with $\chi$ induces bijections
+  \[ \mhom{\Gamma,M_1\otimes M_2}{N} \toiso \mhom{\Gamma,M_1,M_2}{N} \]
+  for any list $\Gamma$ of modules and any ``variable pairing'' such that this makes sense.
+\end{defn}
+
+This universal property includes extraordinary morphisms of all sorts, where paired variables may occur anywhere.
+Examples include:
+\begin{align*}
+  \mhom{M_1(a) \otimes M_2(b)}{N(a,b)} &\toiso \mhom{M_1(a), M_2(b)}{N(a,b)}\\
+  \mhom{M_1(a) \otimes M_2(a)}{N} &\toiso \mhom{M_1(a), M_2(a)}{N}\\
+  \mhom{P(a),M_1(a,b) \otimes M_2(c)}{N(b,c,d,d)} &\toiso \mhom{P(a),M_1(a,b), M_2(c)}{N(b,c,d,d)}
+\end{align*}
+and so on.
+Note that due to the symmetric group actions, it suffices to assert this universal property when $M_1\otimes M_2$ is at the end of the domain list; a corresponding property then follows when it appears anywhere.
+
+Similarly, we can define $n$-ary tensor products for all $n$, and the usual arguments show that these are associative and symmetric insofar as they exist; i.e. if $M\otimes N$ and $(M\otimes N)\otimes P$ exist, then the latter is a ternary tensor product; hence if $N\otimes P$ exists then $M\otimes (N\otimes P)$ exists and is isomorphic to $(M\otimes N)\otimes P$.
+A nullary tensor product is a module $I\in \modk(())$ and a morphism $() \to I$ precomposition with which induces bijections $\mhom{\Gamma,I}{N} \toiso \mhom\Gamma N$.
+
+We can similarly talk about tensor products of cats; now the extra wrinkle is that the universal property has to apply to modules as well as to functors.
+
+\begin{defn}
+  A \textbf{tensor product} of cats $A,B$ is a cat $A\otimes B$ with a functor $\chi:(A,B) \to A\otimes B$ such that
+  \begin{enumerate}
+  \item Precomposition with $\chi$ induces bijections of functor sets
+    \[ \K((\Psi,A\otimes B),C) \toiso \K((\Psi,A,B),C)\]
+    for any list $\Psi$ of cats with variance;
+  \item Restriction along $\chi$ induces an isomorphism of categories
+    \[ \modk(\Psi,A\otimes B) \toiso \modk(\Psi,A,B) \]
+    for any $\Psi$; and finally
+  \item Restriction along $\chi$ induces bijections of sets of extraordinary morphisms
+    \[ \mhomc{\Psi,A\otimes B}{\Gamma}{N}\toiso \mhomc{\Psi,A,B}{\chi^*\Gamma}{\chi^*N}\]
+    whenever this makes sense.\label{item:tenscat-3}
+  \end{enumerate}
+\end{defn}
+In \ref{item:tenscat-3} we have omitted the variables that would normally be assigned to the cats.
+If we wrote instead $(z:A\otimes B)$ and $(x:A),(y:B)$ then instead of $\chi^*N$ we ought to write $N[\chi(x,y)/z]$, meaning to substitute $\chi(x,y)$ for $z$ wherever it appears in $N$ (and in $\Gamma$); but we will try to avoid this more type-theoretic sort of notation as much as possible.
+
+The internalization of contravariance looks essentially the same.
+
+\begin{defn}
+  An \textbf{opposite} of a cat $A$ is a cat $A\op$ with a functor $\chi:(A\o) \to A\op$ precomposition with which induces isomorphisms
+  \begin{align*}
+    \K((\Psi,A\op),C) &\toiso \K((\Psi,A\o),C)\\
+    \modk(\Psi,A\op) &\toiso \modk(\Psi,A\o) \\
+    \mhomc{\Psi,A\op}{\Gamma}{N} &\toiso \mhomc{\Psi,A\o}{\chi^*\Gamma}{\chi^*N}
+  \end{align*}
+\end{defn}
+
 
 \subsection{Hom-modules and representable modules}
 \label{sec:hom}
