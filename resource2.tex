@@ -1141,7 +1141,114 @@ I think the terms for hom types are in a good form now. In a couple places I'm c
 a substitution to a sequent with term. I will fix that soon by defining an extended unification
 judgement which explicitly produces substitutions to apply to terms as well as types.
 
+With terms in the calculus, we will need a new kind of context isomorphism/renaming, which we denote
+$\sigma$. Renamings $\sigma$ are only defined between $\Delta$ contexts, and effectively treat them
+as ordinary contexts, ignoring the +/- resources.
+\begin{mathpar}
+\inferrule{ }
+          {\cdot \vdash \cdot : \cdot}
+\and
+\inferrule{ x \pmcol A \in \Delta }
+          { \Delta \vdash x/y : (y \pmcol A)}
+\and
+\inferrule{ \Delta_1 \vdash \sigma_1 : \Delta_1'  \\
+            \Delta_2 \vdash \sigma_2 : \Delta_2' \\
+           }
+          { \Delta_1 \combine \Delta_2 \vdash (\sigma_1 \combine \sigma_2) : \Delta_1' \combine \Delta_2'}
+\and
+\inferrule{ }{ \Delta_1,\Delta_2 \types \pi_{\Delta_1}:\Delta_1 }
+\end{mathpar}
+(FIXME: finish/fix rules)
+
+We also need to define an extended version of the unification judgement, which provides $\sigma$
+renamings to apply to the terms involved in a cut. The judgement has the form
+\[
+\unif{(\Psi_1 \combineU \Psi_1')} {(\Psi_2 \combineU \Psi_2')} {\rho} {(\Delta_0 \vdash
+\rho_0\cb\sigma_1\cb\sigma_2)}
+\]
+where the renamings $\Delta_0 \types \sigma_1:\Psi_1,\Psi_1'$ and $\Delta_0 \types
+\sigma_2:\Psi_2,\Psi_2'$ are the new additions.
+
+The rules for this extended unification judgement are
+\begin{small}
+\begin{mathpar}
+  \inferrule{ }
+            {
+              \unif{(\Delta_1 \combineU \cdot)}{(\Delta_2 \combineU \cdot)}{\cdot}{({\Delta_1
+              \combine \Delta_2} \vdash 1\cb\pi_{\Delta_1}\cb\pi_{\Delta_2})}
+            }
+
+  \inferrule{
+    \unif{(\Psi_1 \combineU \Psi_1')}{(\Psi_2 \combineU \Psi_2')}{\rho}{(\Delta_0 \vdash \rho_0 \cb
+    \sigma_1 \cb \sigma_2)}
+  }{
+    \unif{((\Psi_1 \combine {x \vcol {\flip v} A}) \combineU (\Psi_1' \combine {x \vcol v A}))}
+         {((\Psi_2 \combine {y \vcol {v} A}) \combineU (\Psi_2' \combine {y \vcol {\flip v} A}))}
+         {(\rho \combine (y/x^v))}{}
+         \\\qquad
+         (\Delta_0 \combine x \pmcol A \vdash \rho_0 \combine (x/x^{\flip{v}}) \combine (x/y^{v})
+         \cb \sigma_1,x/x \cb \sigma_2,y/x)
+  }
+
+  \inferrule{
+    [  (\Delta_2 \combine x \pmcol A \combine y \pmcol A) \equiv \Psi_2 \combine (\Psi_2' \combine x \pcol A \combine y \mcol A) ]\\\\
+    ((\Delta_2 \combine x \pmcol A) \vdash (1_{\Delta_2} \combine
+    x/x\m \combine x/y\p) : (\Psi_2 \combine \Psi_2')) \equiv (\Psi_3 \vdash \rho_3 : \Psi_2) \combine (\Psi_3' \vdash \rho_3' : \Psi_2')\\\\
+    \unif{\Psi_1 \combineU \Psi_1'}{\Psi_3 \combineU \Psi_3'}{\rho[\flip{\rho_3'}]}
+      {(\Delta_0 \vdash \rho_0 \cb \sigma_1 \cb \sigma_2,\zeta/x)}
+  }{
+    \unif{\Psi_1 \combineU (\Psi_1' \combine z \pmcol A)} %% {\Psi^{d_1\combine z\pm = v_1 \combine (v_1' \combine z\pm)}}
+         {\Psi_2 \combineU (\Psi_2' \combine x \pcol A \combine y \mcol A)}
+         {(\rho \combine x/z\m \combine y/z\p)}{} \\
+         \qquad(\Delta_0 \vdash (1_{\Psi_1} \combine \rho_3)[\rho_0] \cb \sigma_1,\zeta/z \cb \sigma_2,\zeta/x,\zeta/y)
+  }
+
+  \inferrule{
+    [  (\Delta_1 \combine x \pmcol A \combine y \pmcol A) \equiv \Psi_1 \combine (\Psi_1' \combine x \pcol A \combine y \mcol A) ]\\\\
+    (1_{\Delta_1} \combine (x/x\m \combine x/y\p)) \equiv (\Psi_3 \vdash \rho_3 : \Psi_1 , \Psi_3' \vdash \rho_3' : \Psi_1' ) \\\\
+        \unif{\Psi_3 \combineU \Psi_3'}{\Psi_2 \combineU \Psi_2'}{\rho_3'^{-1}[\rho]}
+          {(\Delta_0 \vdash \rho_0 \cb \sigma_1,\zeta/x \cb \sigma_2)}
+  }{
+    \unif{\Psi_1 \combineU (\Psi_1' \combine x \pcol A \combine y \mcol A)}
+         {\Psi_2 \combineU (\Psi_2' \combine z \pmcol A)}
+         {(\rho \combine z/x\p \combine z/y\m)}{} \\
+         \qquad(\Delta_0 \vdash (1_{\Psi_2} \combine \rho_3)[\rho_0] \cb \sigma_1,\zeta/x,\zeta/y \cb \zeta/z)
+  }
+\end{mathpar}
+\end{small}
+
+When applying a renaming to a sequent $(\Delta\cb\Gamma\types m:M)[\rho]$, the renaming applies only
+to $\Gamma$ and $M$. Only $\sigma$ renamings will be applied to terms, and this will be written
+$(\Delta\cb\Gamma\types m[\sigma]:M)[\rho]$. Similarly for substitutions.
+
+Now we state the cut rule for the calculus with terms:
+\begin{mathpar}
+\inferrule{ (\Delta_1 \combine \Delta_2) \ctx \and
+            \Delta_1 \equiv \Psi_1 \combine \Psi_1' \and
+            \Delta_2 \equiv \Psi_2 \combine \Psi_2' \\\\
+            \Psi_1' \types M \type \and
+            \flip{\Psi_2'} \types \rho : \Psi_1' \and
+            \flip{\Psi_1} \types \Gamma_1 \ctx \and
+            \Psi_2 \types (\Gamma_2 \types N) \ok \\\\
+            \Delta_1 \cb \Gamma_1 \vdash m:M \and
+            \Delta_2 \cb \Gamma_2,r:M[\rho] \vdash n:N \and
+            \\\\
+            \unif{\Psi_1 \combineU \Psi_1'}{\Psi_2 \combineU \Psi_2'}{\rho}{(\Delta_0 \vdash \rho_0
+            \cb \sigma_1 \cb \sigma_2)} \\
+           }
+           {\Delta_0 \cb (\Gamma_1,\Gamma_2 \vdash n[\sigma_2,m[\sigma_1]/r]:N)[\rho_0]}
+\end{mathpar}
+
 \subsection{Hom types}
+First we have identities:
+\begin{mathpar}
+  \inferrule{
+    \Phi \types a:A
+    }{
+    \Phi\complete \cb \ec \types \id(a):\mor{A}(a,a)
+  }
+\end{mathpar}
+
 Recall the left hom rule from the explicit substitution calculus:
 \begin{mathpar}
   \inferrule{
@@ -1225,9 +1332,9 @@ And with substitutions:
     \flip{\Psi_2'} \types \rho:\Psi_3 \\\\
     \Psi_1,\Psi_1',\Psi_3 \cb \Gamma_1 \types m:M[a_1/z\p] \\
     \Psi_2,\Psi_2',\Psi_3' \cb \Gamma_2 \types f:\mor{A}(a_1[\rho],a_2) \\\\
-    \unif{(\Psi_1,\Psi_1')\combineU\Psi_3}{(\Psi_2,\Psi_3')\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0)}
+    \unif{(\Psi_1,\Psi_1')\combineU\Psi_3}{(\Psi_2,\Psi_3')\combineU\Psi_2'}{\rho}{(\Delta_0,\rho_0 \cb \sigma_1 \cb \sigma_2)}
     }{
-    \Delta_0 \cb (\Gamma_1,\Gamma_2 \types J\p(m,a_1,a_2,f):M[a_2/z\p])[\rho_0]
+    \Delta_0 \cb (\Gamma_1,\Gamma_2 \types J\p(m[\sigma_1],a_1[\sigma_1],a_2[\sigma_2],f[\sigma_2]):M[a_2/z\p])[\rho_0]
   }
 \end{mathpar}
 \begin{mathpar}
@@ -1240,9 +1347,10 @@ And with substitutions:
     \Psi_2' \types \rho:\flip{\Psi_3'} \\\\
     \Psi_1,\Psi_1',\Psi_3' \cb \Gamma_1 \types m:M[a_2/z\m] \\
     \Psi_2,\Psi_2',\Psi_3 \cb \Gamma_2 \types f:\mor{A}(a_1,a_2[\rho]) \\\\
-    \unif{(\Psi_1,\Psi_1')\combineU\Psi_3'}{(\Psi_2,\Psi_3)\combineU\Psi_2'}{\flip{\rho}}{(\Delta_0,\rho_0)}
+    \unif{(\Psi_1,\Psi_1')\combineU\Psi_3'}{(\Psi_2,\Psi_3)\combineU\Psi_2'}{\flip{\rho}}{(\Delta_0,\rho_0
+    \cb \sigma_1 \cb \sigma_2)}
     }{
-    \Delta_0 \cb (\Gamma_1,\Gamma_2 \types J\p(m,a_1,a_2,f):M[a_1/z\m])[\rho_0]
+    \Delta_0 \cb (\Gamma_1,\Gamma_2 \types J\m(m[\sigma_1],a_1[\sigma_2],a_2[\sigma_1],f[\sigma_2]):M[a_1/z\m])[\rho_0]
   }
 \end{mathpar}
 These have computation rules
@@ -1300,10 +1408,11 @@ With substitutions, these become
     \Psi_{21},\Psi_{22},\Psi_{23},\Psi_2',x\pmcol A
       \cb \Gamma_3, r:N_1[\rho_1], s:N_2[\rho_2,x/y\m] \types m:M \\\\
     \unif{(\Psi_{11},\Psi_3,\Psi_{12},\Psi_3')\combineU(\Psi_{11}',\Psi_{12}')}
-      {(\Psi_{23},\Psi_2')\combineU(\Psi_{21},\Psi_{22})}{(\rho_1,\rho_2)}{(\Delta_0\types\rho_0)}
+      {(\Psi_{23},\Psi_2')\combineU(\Psi_{21},\Psi_{22})}{(\rho_1,\rho_2)}{(\Delta_0\types\rho_0 \cb
+      \sigma_1 \cb \sigma_2)}
     }{
-    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2) \\\\
-      \quad\types (\transa{r}{n_1}{a_1}{s}{n_2}{a_2}{x}{f}{m}):M)[\rho_0]
+    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2) \types \\
+      \quad(\transa{r}{n_1[\sigma_1]}{a_1[\sigma_1]}{s}{n_2[\sigma_1]}{a_2[\sigma_1]}{x}{f}{m[\sigma_2]}):M)[\rho_0]
   }
 \end{mathpar}
 \begin{mathpar}
@@ -1319,10 +1428,10 @@ With substitutions, these become
     \Psi_{21},\Psi_{22},\Psi_2',x\pmcol A
       \cb \Gamma_2, r:N[\rho,x/y\m] \types m:M \\\\
     \unif{(\Psi_1,\Psi_3)\combineU\Psi_1'}
-      {(\Psi_{22},\Psi_2')\combineU\Psi_{21}}{\rho}{(\Delta_0\types\rho_0)}
+      {(\Psi_{22},\Psi_2')\combineU\Psi_{21}}{\rho}{(\Delta_0\types\rho_0 \cb \sigma_1 \cb \sigma_2)}
     }{
-    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2)
-      \types (\transb{r}{n}{a_1}{a_2}{x}{f}{m}):M)[\rho_0]
+    \Delta_0 \cb (\Gamma_1,\Gamma_2,\Gamma_3,f:\mor{A}(a_1,a_2) \types \\
+    \quad(\transb{r}{n[\sigma_1]}{a_1[\sigma_1]}{a_2[\sigma_1]}{x}{f}{m[\sigma_2]}):M)[\rho_0]
   }
 \end{mathpar}
 
@@ -1332,6 +1441,87 @@ The computation rules for these terms are
   (\transa{r}{r}{x}{s}{s}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m \\
   (\transb{r}{n}{a}{a}{x}{\id(a)}{m}) \equiv m[a/x,n/r] \\
   (\transb{r}{r}{x}{y}{z}{f}{m[z/x,z/y,\id(z)/f]}) \equiv m
+\end{gather*}
+
+\subsection{Coend}
+\begin{mathpar}
+\inferrule{
+  \Delta \combine x \pmcol A \cb \Gamma, r:M \types n:N
+}{
+  \Delta \cb \Gamma,s:\coend^{x:A} M \types \clet x,r:=s in n:N
+}
+\qquad
+\inferrule{\Phi\combine x \pmcol A \vdash M \type}
+          {
+            \Phi\complete \combine x \pmcol A \cb r:M \types \cpair{x}{r}:\coend^{x:A} M
+          }
+\end{mathpar}
+and with substitutions:
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma_1 \ctx \\
+    \flip{\Psi_{21}} \types \Gamma_2 \ctx \\
+    \Psi_1',x\pmcol A \types M \type \\
+    \Psi_2' \types N \type \\\\
+    \flip{\Psi_{22}} \types \rho:\Psi_1' \\
+    \Psi_1,\Psi_1' \cb \Gamma_1 \types m:\coend^{x:A} M \\\\
+    \Psi_{21},\Psi_{22},\Psi_2',z\pmcol A \cb \Gamma_2, r:M[\rho,z/x\p,z/x\m] \types n:N \\\\
+    \unif{\Psi_1\combineU\Psi_1'}{(\Psi_{21},\Psi_2')\combineU\Psi_{22}}{\rho}{(\Delta_0\types\rho_0\cb\sigma_1\cb\sigma_2)}
+    }{
+    \Delta_0 \cb (\Gamma_1,\Gamma_2 \types \clet z,r:=m[\sigma_1] in n[\sigma_2]:N)[\rho_0]
+  }
+  \and
+  \inferrule{
+    \Psi_1' \types a:A \\
+    \flip{\Psi_2'} \types \rho:\Psi_1' \\\\
+    \Psi_1,\Psi_2 \types (\Gamma \types \coend^{x:A} M) \ok \\\\
+    \Psi_1,\Psi_1',\Psi_2,\Psi_2' \cb \Gamma \types m:M[a[\rho]/x\m,a/x\p] \\
+    \unif{\Psi_1\combineU\Psi_1'}{\Psi_2\combineU\Psi_2'}{\rho}{(\Delta_0\types\rho_0\cb\sigma_1\cb\sigma_2)}
+    }{
+    \Delta_0 \cb (\Gamma \types \cpair{a[\sigma_1]}{m[\sigma_1,\sigma_2]}:\coend^{x:A} M)[\rho_0]
+  }
+\end{mathpar}
+
+The computation rules are
+\begin{gather*}
+  (\clet z,r:=\cpair{a}{m} in n) \equiv n[a/z,m/r] \\
+  (\clet x,r:=s in n[\cpair{x}{r}/z]) \equiv n[s/z]
+\end{gather*}
+
+\subsection{Arrow types}
+Without substitutions:
+\begin{mathpar}
+  \inferrule{
+    \Delta \cb \Gamma, r:M \types n:N
+  }{
+    \Delta \cb \Gamma \types \lambda r.n:M\multimap N
+  } \and
+  \inferrule{
+    \Phi_1 \types M_1 \type \\
+    \Phi_2 \types M_2 \type \\
+  }{
+    \Phi_1\complete,\Phi_2\complete \cb r:M_1,s:M_1\multimap M_2 \types sr:M_2
+  }
+\end{mathpar}
+The second, with substitutions, becomes
+\begin{mathpar}
+  \inferrule{
+    \flip{\Psi_1} \types \Gamma_1 \ctx \\
+    \flip{\Psi_2} \types \Gamma_2 \ctx \\
+    \Psi_1' \types M \type \\
+    \Psi_{22}' \types N \type \\\\
+    \flip{\Psi_{21}'} \types \rho:\Psi_1' \\
+    \Psi_1,\Psi_1' \cb \Gamma_1 \types m:M \\
+    \Psi_2,\Psi_{21}',\Psi_{22}' \cb \Gamma_2 \types t:M[\rho]\multimap N \\\\
+    \unif{\Psi_1\combineU\Psi_1'}{(\Psi_2,\Psi_{22}')\combineU\Psi_{21}'}{\rho}{(\Delta_0\types\rho_0\cb\sigma_1\cb\sigma_2)}
+    }{
+    \Delta_0 \cb (\Gamma_1,\Gamma_2 \types t[\sigma_2]m[\sigma_1]:N)[\rho_0]
+  }
+\end{mathpar}
+The computation rules are
+\begin{gather*}
+  (\lambda r.n)s \equiv n[s/r] \\
+  \lambda r.(sr) \equiv s
 \end{gather*}
 \end{document}
 
