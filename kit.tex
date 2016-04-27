@@ -473,6 +473,7 @@ First one more bit of notation:
 \item We will write $\xi$ for a $\theta$ that contains no functors or pairings, only a list of distinct abstract variables.
   In other words, $M(\xi)$ simply stands for a way to import $M$ into abstract variable notation, which is unique up to the choice of variable names.
   Thus if $M\in \modk(A,B\o,C)$ then $M(\xi)$ might mean $M(a,b,c)$ but not $M(g(x),h(y,z),k)$.
+  Moreover, if different $\xi$s appear in an expression we assume them to be disjoint.
 \end{itemize}
 
 For instance, the universal morphism of a tensor product could be written in abstract variable notation as $\chi \in \mhom{M_1(\xi_1), M_2(\xi_2)}{(M_1\otimes M_2)(\xi_1,\xi_2)}$.
@@ -539,8 +540,7 @@ The first of these are function modules, the ``right adjoints'' to tensor produc
   whenever this makes sense.
 \end{defn}
 
-As before, $\xi$'s represent a list of distinct variables, and we assume also that $\xi_1$ and $\xi_2$ are disjoint.
-Thus, $\ev$ (``evaluation'') is a single morphism such as $(M_1\multimap M_2)(a,b), M_1(a) \mto M_2(b)$.
+As before, $\xi$'s represent disjoint lists of distinct variables; thus $\ev$ (``evaluation'') is a single morphism such as $(M_1\multimap M_2)(a,b), M_1(a) \mto M_2(b)$.
 But also as before, the $\theta$'s represent arbitrary expressions, possibly with variable pairings; thus the universal property includes as particular cases:
 \begin{align*}
   \mhom{N(a,b)}{(M_1\multimap M_2)(a,b))} &\toiso \mhom{N(a,b),M_1(a)}{M_2(b)}\\
@@ -585,6 +585,8 @@ postcomposition with which induces an isomorphism
 \subsection{Hom-modules and representable modules}
 \label{sec:hom}
 
+The most important universal objects in a kit are the ``hom-modules'' $\mor A \in \modk(A\o,A)$.
+Their universal property is essentially the Yoneda lemma
 
 
 \subsection{Functor and presheaf cats}
