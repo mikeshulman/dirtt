@@ -81,6 +81,7 @@ $#1\copy \z@
 \newcommand{\tend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\subst}[3]{{#1}[#2 \mapsfrom #3]}
 \newcommand{\ev}{\mathsf{ev}}
+\renewcommand{\id}{\mathsf{id}}
 
 \title{Multivariable formal category theory}
 \author{Patrick Schultz and Michael Shulman}
@@ -588,11 +589,29 @@ postcomposition with which induces an isomorphism
 \label{sec:hom}
 
 The most important universal objects in a kit are the ``hom-modules'' $\mor A \in \modk(A\o,A)$.
-Their universal property is essentially the Yoneda lemma
+Their universal property is essentially a ``two-sided double Yoneda lemma''.
+
+\begin{defn}
+  A \textbf{hom-module} of a cat $A$ is a module $\mor A \in \modk(A\o,A)$ together with a morphism $\id_A \in \mhom{}{\mor A(a,a)}$, precomposition with which induces bijections
+  \[ \mhom{\Gamma,\mor A(x,y)}{\Omega} \toiso
+  \mhom{\subst\Gamma y x}{\subst\Omega y x}
+  \]
+\end{defn}
+
+Two instances of this universal property look like the Yoneda lemma and the co-Yoneda lemma:
+\begin{align*}
+  \mhom{\mor A(x,y)}{M(x,y)} &\toiso \mhom{}{M(x,x)}\\
+  \mhom{M(x),\mor A(x,y)}{N(y)} &\toiso \mhom{M(x)}{N(x)}
+\end{align*}
+TODO: Derive the one-sided versions.
 
 
 \subsection{Functor and presheaf cats}
 \label{sec:func-pshf}
+
+
+\section{Examples of formal category theory}
+\label{sec:examples}
 
 
 
