@@ -613,8 +613,23 @@ TODO: Derive the one-sided versions.
 \section{Examples of formal category theory}
 \label{sec:examples}
 
+\subsection{Limits and colimits}
 
+Consider functors $d:\Psi_1\to C$ and $l:\Psi_2\to C$, and a module $J\in\modk(\Psi_1,\Psi_2\o)$.
+Say that $l$ is the \emph{$J$-weighted limit of $d$} if there is a universal module morphism
+\[ \pi \in \mhom{J}{\mor{C}(l,d))} \]
+or equivalently (using the universal property of hom-modules) a module morphism
+\[ \pi' \in \mhom{J,\mor{C}(c,l)}{\mor{C}(c,d)} \]
+such that postcomposition with $\pi'$ induces bijections
+\[ \mhom{\Gamma}{\mor{C}(c,l)} \toiso \mhom{\Gamma,J}{\mor{C}(c,d)}. \]
 
+If the kit $\K$ has tensor products of cats, ends, and function modules, an equivalent characterization of limits is possible.
+Let $D$ be the tensor product of the categories in $\Psi_1$, so that $d$ corresponds to a unary functor $d':D\to C$, and $J$ corresponds to a $J'\in\modk(D,\Psi_2\o)$.
+Then $l$ is the $J$-weighted limit of $d$ if there is an isomorphism
+\[ \mor{C}(c,l) \cong J' \multimap_D \mor{C}(c,d') \]
+in the category $\modk(C,\Psi_2)$.
+
+As a special case, we can define (pointwise) Kan extensions. If $f:D\to C$ and $g:D\to E$ are functors, then the right Kan extension of $f$ along $g$ (if it exists) is the limit of $f$ weighted by $\mor{E}(e,g(d))$.
 
 \part{The definition of a kit}
 \label{part:def}
