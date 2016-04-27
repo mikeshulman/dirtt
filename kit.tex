@@ -80,6 +80,7 @@ $#1\copy \z@
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\tend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\subst}[3]{{#1}[#2 \mapsfrom #3]}
+\newcommand{\ev}{\mathsf{ev}}
 
 \title{Multivariable formal category theory}
 \author{Patrick Schultz and Michael Shulman}
@@ -424,7 +425,7 @@ By comparing universal properties, we can see that $(A\op)\op\cong A$ and $(A\ot
 \label{sec:tens}
 
 Like the tensor product of cats, the tensor product of modules has a universal property very much like that of tensor products in an ordinary multicategory.
-It is simpler in that we don't need to worry about the dependence of modules on cats (the second two properties in \cref{defn:tens-cat,defn:opp-cat}.
+It is simpler in that we don't need to worry about the dependence of modules on cats (the second two properties in \cref{defn:tens-cat,defn:opp-cat}).
 However, it is more complicated in that the universal property applies to all sorts of extraordinary morphisms, and that it must be stable under restriction along functors.
 
 To state this precisely, we need a bit more notation.
@@ -516,8 +517,8 @@ Finally, ends are dual to coends.
 These are our first module with a ``mapping in'' universal property.
 
 \begin{defn}
-  An \textbf{end} of a module $M\in \modk(A,A\o,\Psi)$ is a module $\tend^A M\in\modk(\Psi)$ together with a morphism $\chi\in\mhom{\big(\tend^A M\big)(\xi)}{M(a,a,\xi)}$, postcomposition with which induces bijections
-  \[ \mhom{\Gamma(\gamma)}{(\tend^A M)(\theta)} \toiso \mhom{\Gamma(\gamma)}{M(a,a,\theta)} \]
+  An \textbf{end} of a module $M\in \modk(A,A\o,\Psi)$ is a module $\tend_A M\in\modk(\Psi)$ together with a morphism $\chi\in\mhom{\big(\tend_A M\big)(\xi)}{M(a,a,\xi)}$, postcomposition with which induces bijections
+  \[ \mhom{\Gamma(\gamma)}{(\tend_A M)(\theta)} \toiso \mhom{\Gamma(\gamma)}{M(a,a,\theta)} \]
   whenever this makes sense.
 \end{defn}
 
@@ -525,6 +526,60 @@ These are our first module with a ``mapping in'' universal property.
 \subsection{Function modules}
 \label{sec:func-mod}
 
+For ends and coends, the universal morphism is extraordinary in the input (the module being ended or coended); now we move on to universal morphisms that are extraordinary in the output (the object with a universal property).
+The first of these are function modules, the ``right adjoints'' to tensor products --- although as we will see, to actually construct adjunctions requires incorporating ends and coends as well.
+
+\begin{defn}
+  A \textbf{function module} of modules $M_1\in \modk(\Phi_1)$ and $M_2\in \modk(\Phi_2)$ is a module $M_1\multimap M_2 \in \modk(\Phi_1\o,\Phi_2)$ with a morphism
+  \[\ev \in \mhom{(M_1\multimap M_2)(\xi_1,\xi_2), M_1(\xi_1)}{M_2(\xi_2)},\]
+  postcomposition with which induces bijections
+  \[ \mhom{\Gamma(\gamma)}{(M_1\multimap M_2)(\theta_1,\theta_2)} \toiso
+  \mhom{\Gamma(\gamma),M_1(\theta_1)}{M_2(\theta_2)}
+  \]
+  whenever this makes sense.
+\end{defn}
+
+As before, $\xi$'s represent a list of distinct variables, and we assume also that $\xi_1$ and $\xi_2$ are disjoint.
+Thus, $\ev$ (``evaluation'') is a single morphism such as $(M_1\multimap M_2)(a,b), M_1(a) \mto M_2(b)$.
+But also as before, the $\theta$'s represent arbitrary expressions, possibly with variable pairings; thus the universal property includes as particular cases:
+\begin{align*}
+  \mhom{N(a,b)}{(M_1\multimap M_2)(a,b))} &\toiso \mhom{N(a,b),M_1(a)}{M_2(b)}\\
+  \mhom{N}{(M_1\multimap M_2)(a,a))} &\toiso \mhom{N,M_1(a)}{M_2(a)}\\
+  \mhom{N(a,b)}{(M_1\multimap M_2)(a,c,b,c))} &\toiso \mhom{N(a,b),M_1(a,c)}{M_2(b,c)}\\
+  \mhom{N(f(x,z),g(y))}{(M_1\multimap M_2)(h(x,y),z))} &\toiso \mhom{N(f(x,z),g(y)),M_1(h(x,y))}{M_2(z)}
+\end{align*}
+and so on.
+
+Combining the universal properties of function modules with tensor products, we have an isomorphism
+\[ \mhom{(M_1\otimes M_2)(\theta_1,\theta_2)}{M_3(\theta_3)} \cong \mhom{M_1(\theta_1)}{(M_2\multimap M_3)(\theta_2,\theta_3)}
+\]
+that looks like an adjunction, except that one side or the other (or both) must always be extraordinary.
+However, if we add in an end or a coend, we can make an isomorphism between two ordinary sets of morphisms, and therefore an actual adjunction.
+Examples include
+\begin{align*}
+  \mhom{\coend^{a:A} (M_1\otimes M_2)(a,a)}{M_3} &\cong \mhom{M_1(a)}{(M_2\multimap M_3)(a)}\\
+  \mhom{(M_1\otimes M_2)(a)}{M_3(a)} &\cong \mhom{M_1}{\tend_{a:A} (M_2\multimap M_3)(a,a)}\\
+\end{align*}
+which can be interpreted (for fixed $M_2\in \modk(A)$) as adjunctions
+\begin{align*}
+  \modk(A) &\leftrightarrows \modk(())\\
+  \modk(()) &\leftrightarrows \modk(A)
+\end{align*}
+respectively.
+Adding in a couple of other variables, we find that for $M\in \modk(B\o,A)$ and $N\in\modk(C\o,B)$ and $P\in modk(C\o,A)$ we have
+\begin{align*}
+  \mhom{\coend^{b:B} (N\otimes M)(c,b,b,a)}{P(c,a)} &\cong \mhom{M(b,a)}{\tend_{c:C} (N\multimap P)(c,b,c,a)}
+\end{align*}
+Since $\coend^B (N\otimes M)$ is the composition in the expected ``bicategory of profunctors'', this shows that if we have function modules and ends then that will be a \emph{closed bicategory}, in the usual sense that its composition functors have right adjoints on both sides.
+
+As in the case of the binding tensor product, it is sometimes useful to directly name the \emph{binding function module}
+\[ M\multimap_A N = \tend_A (M\multimap N)\]
+whose universal property can be expressed directly as a morphism
+\[\ev\in \mhom{(M\multimap_A N)(\theta_1,\theta_2),M(\theta_1,a)}{N(\theta_2,a)}\]
+postcomposition with which induces an isomorphism
+\[ \mhom{\Gamma(\gamma)}{(M\multimap_A N)(\theta_1,\theta_2)} \toiso
+\mhom{\Gamma(\gamma),M(\theta_1,a)}{N(\theta_2,a)}.
+\]
 
 
 \subsection{Hom-modules and representable modules}
