@@ -371,7 +371,7 @@ And finally, it also needs to apply to module morphisms of all sorts, even extra
 In order to state all of these universal properties precisely, we need some more notation.
 \begin{itemize}
 \item We will write $A\e$ to indicate either $A$ or $A\o$, and in this case we write $A\epbar$ for the other one ($A\o$ or $A$, respectively).
-\item We will use the letter $\Gamma$ for a finite list of modules with abstract variables, such as $M(a,b),N(b,c,d),P(e)$.
+\item We will use the letter $\Gamma$ for a finite list of modules with abstract variables, such as $M(a,b),N(b,c,d),P(e)$ or $M_1(f(x),g(y,z)),M_2(h(y,x))$.
   Similarly, we will use the letter $\Omega$ for a single module with abstract variables; thus a general extraordinary module morphism can be written $\phi\in\mhom{\Gamma}{\Omega}$.
 \item We will write $\subst\Gamma x \theta$ for the result of substituting the expression $\theta$ for all occurrences of the abstract variable $x$ in $\Gamma$, and similarly, for $\Omega$.
   Thus, for instance, if $\Omega = M(a,b)$, then $\subst\Omega a{f(x,y)} = M(f(x,y),b)$.
@@ -437,7 +437,7 @@ To state this precisely, we need a bit more notation.
 
 \begin{defn}
   A \textbf{tensor product} of modules $M_1\in\modk(\Psi_1)$ and $M_2\in\modk(\Psi_2)$ is a module $M_1\otimes M_2 \in \modk(\Psi_1,\Psi_2)$ along with an (ordinary) morphism $\chi:(M_1,M_2)\to M_1\otimes M_2$ such that precomposition with $\chi$ (or some restriction of it) induces bijections
-  \[ \mhom{\Gamma(\gamma),(M_1\otimes M_2)(\theta_1,\theta_2)}{\Omega(\omega)} \toiso \mhom{\Gamma(\gamma),M_1(\theta_1),M_2(\theta_2)}{\Omega(\omega)} \]
+  \[ \mhom{\Gamma,(M_1\otimes M_2)(\theta_1,\theta_2)}{\Omega} \toiso \mhom{\Gamma,M_1(\theta_1),M_2(\theta_2)}{\Omega} \]
 \end{defn}
 
 The presence of the $\theta$s means that this universal property includes extraordinary morphisms of all sorts, where paired variables may occur anywhere.
@@ -481,7 +481,7 @@ We avoided this before by writing it without abstract variables, but that is no 
 
 \begin{defn}
   A \textbf{coend} of a module $M\in \modk(A,A\o,\Psi)$ is a module $\coend^A M\in\modk(\Psi)$ together with a morphism $\chi\in\mhom{M(a,a,\xi)}{\big(\coend^A M\big)(\xi)}$, precomposition with which induces bijections
-  \[ \mhom{\Gamma(\gamma),(\coend^A M)(\theta)}{\Omega(\omega)} \toiso \mhom{\Gamma(\gamma),M(a,a,\theta)}{\Omega(\omega)} \]
+  \[ \mhom{\Gamma,(\coend^A M)(\theta)}{\Omega} \toiso \mhom{\Gamma,M(a,a,\theta)}{\Omega} \]
   whenever this makes sense.
 \end{defn}
 
@@ -511,7 +511,7 @@ and we can verify the pentagon axiom.
 This wants to be the composition operation in a bicategory of cats and modules, where the hom-category from $A$ to $B$ is $\modk(B\o,A)$; but we do not yet have the identity 1-cells for such a bicategory.
 
 Note that it is possible to express directly the universal property of the binding tensor product: it comes with a morphism $M(\xi_1,a), N(a,\xi_2) \mto (M\otimes_A N)(\xi_1,\xi_2)$, inducing bijections
-\[ \mhom{\Gamma(\gamma),(M\otimes_A N) (\theta_1,\theta_2)}{\Omega(\omega)} \toiso \mhom{\Gamma(\gamma),M(\theta_1,a),N(a,\theta_2)}{\Omega(\omega)} \]
+\[ \mhom{\Gamma,(M\otimes_A N) (\theta_1,\theta_2)}{\Omega} \toiso \mhom{\Gamma,M(\theta_1,a),N(a,\theta_2)}{\Omega} \]
 This is useful because in some kits the binding tensor product may exist even if the external tensor product and coend do not separately exist.
 
 Finally, ends are dual to coends.
@@ -519,7 +519,7 @@ These are our first module with a ``mapping in'' universal property.
 
 \begin{defn}
   An \textbf{end} of a module $M\in \modk(A,A\o,\Psi)$ is a module $\tend_A M\in\modk(\Psi)$ together with a morphism $\chi\in\mhom{\big(\tend_A M\big)(\xi)}{M(a,a,\xi)}$, postcomposition with which induces bijections
-  \[ \mhom{\Gamma(\gamma)}{(\tend_A M)(\theta)} \toiso \mhom{\Gamma(\gamma)}{M(a,a,\theta)} \]
+  \[ \mhom{\Gamma}{(\tend_A M)(\theta)} \toiso \mhom{\Gamma}{M(a,a,\theta)} \]
   whenever this makes sense.
 \end{defn}
 
@@ -534,9 +534,10 @@ The first of these are function modules, the ``right adjoints'' to tensor produc
   A \textbf{function module} of modules $M_1\in \modk(\Phi_1)$ and $M_2\in \modk(\Phi_2)$ is a module $M_1\multimap M_2 \in \modk(\Phi_1\o,\Phi_2)$ with a morphism
   \[\ev \in \mhom{(M_1\multimap M_2)(\xi_1,\xi_2), M_1(\xi_1)}{M_2(\xi_2)},\]
   postcomposition with which induces bijections
-  \[ \mhom{\Gamma(\gamma)}{(M_1\multimap M_2)(\theta_1,\theta_2)} \toiso
-  \mhom{\Gamma(\gamma),M_1(\theta_1)}{M_2(\theta_2)}
-  \]
+  \begin{equation}
+    \mhom{\Gamma}{(M_1\multimap M_2)(\theta_1,\theta_2)} \toiso
+    \mhom{\Gamma,M_1(\theta_1)}{M_2(\theta_2)}\label{eq:func-ump}
+  \end{equation}
   whenever this makes sense.
 \end{defn}
 
@@ -549,6 +550,7 @@ But also as before, the $\theta$'s represent arbitrary expressions, possibly wit
   \mhom{N(f(x,z),g(y))}{(M_1\multimap M_2)(h(x,y),z))} &\toiso \mhom{N(f(x,z),g(y)),M_1(h(x,y))}{M_2(z)}
 \end{align*}
 and so on.
+Note that the composition map~\eqref{eq:func-ump} is indeed what we get by postcomposing with $\ev$: as described in \cref{sec:composing}, when composing $\mhom{(M_1\multimap M_2)(\xi_1,\xi_2), M_1(\xi_1)}{M_2(\xi_2)}$ with $\mhom{\Gamma}{(M_1\multimap M_2)(\theta_1,\theta_2)}$ (and technically the identity on $M_1(\xi_1)$ as well), $\xi_1$ and $\xi_2$ get identified with $\theta_1$ and $\theta_2$, so that in the result instead of $M_1(\xi_1)$ and $M_2(\xi_2)$ in the domain and codomain we have $M_1(\theta_1)$ and $M_2(\theta_2)$.
 
 Combining the universal properties of function modules with tensor products, we have an isomorphism
 \[ \mhom{(M_1\otimes M_2)(\theta_1,\theta_2)}{M_3(\theta_3)} \cong \mhom{M_1(\theta_1)}{(M_2\multimap M_3)(\theta_2,\theta_3)}
@@ -577,8 +579,8 @@ As in the case of the binding tensor product, it is sometimes useful to directly
 whose universal property can be expressed directly as a morphism
 \[\ev\in \mhom{(M\multimap_A N)(\theta_1,\theta_2),M(\theta_1,a)}{N(\theta_2,a)}\]
 postcomposition with which induces an isomorphism
-\[ \mhom{\Gamma(\gamma)}{(M\multimap_A N)(\theta_1,\theta_2)} \toiso
-\mhom{\Gamma(\gamma),M(\theta_1,a)}{N(\theta_2,a)}.
+\[ \mhom{\Gamma}{(M\multimap_A N)(\theta_1,\theta_2)} \toiso
+\mhom{\Gamma,M(\theta_1,a)}{N(\theta_2,a)}.
 \]
 
 
