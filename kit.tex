@@ -167,6 +167,7 @@ Now we have a second class of objects, which we call \textbf{modules}; these rep
 Each module is indexed by a finite list of cats with variance (the same sort of list that appears as the domain of a functor).
 We write $\modk(A,B\o,C)$ for the category (see below) of modules indexed by a list $(A,B\o,C)$.
 Modules can be restricted along functors; thus if $M\in \modk(A,B\o,C)$, and $g,h,k$ are as above, we have $(g,h,k)^*M \in \modk(X,Y,Z\o)$.
+We will also write $(g,h,k)^*M$ as $M(g,h,k)$.
 This restriction is strictly functorial with respect to functor composition (one could consider generalizations of a kit where it is only weakly functorial, but in most examples it is strict, and in other cases it can be modified to become so).
 
 The symmetric groups also act on modules; thus if $M\in \modk(A,B\o,C)$ we have a module $\sigma^*M\in \modk(B\o,C,A)$ and so on.
@@ -233,7 +234,7 @@ In the previous example with $M$ as above and
 \begin{mathpar}
   g:X \to A \and h:(Y\o,Z)\to B \and k:()\to C
 \end{mathpar}
-instead of $(g,h,k)^*M \in \modk(X,Y,Z\o)$ we can write
+instead of $(g,h,k)^*M$ or $M(g,h,k)$ we can write
 \[ \ctx{x:X,y:Y,z:Z\o}\types M(g(x),h(y,z),k)\in\modk \]
 This indicates much more clearly how the functors $g,h,k$ match up with the dependence of $M$ on $A,B\o,C$ and how the resulting dependence on $X,Y,Z\o$ feeds into $g,h,k$.
 The strict functoriality of restriction with respect to functor composition means that this notation behaves as we expect on such composites; for instance, if we have
@@ -247,6 +248,10 @@ then the three restrictions $g^*M$, $f^*g^*M$, and $(g\circ f)^*M$ are represent
   \ctx{a:A}\types M((g\circ f)(a)) \in\modk
 \end{mathpar}
 where the second and third are, as we expect, equal.
+
+\begin{rmk}\label{rmk:turnstile}
+  To avoid confusion between functors and abstract variables, we emphasize that the symbol $\types$ always indicates the use of abstract variables, and in its absence we always revert back to the notation $M(g,h,k)$.
+\end{rmk}
 
 The second place that abstract variable notation is useful is when describing module morphisms, and especially extraordinary ones.
 We said above that extraordinary module morphisms go from $M$ to $N$ whenever $M\in \modk(\Psi_1, \Psi_1\o, \Psi_2)$ and $N\in\modk (\Psi_3, \Psi_3\o, \Psi_2)$.
@@ -271,11 +276,12 @@ Formally, this means that when describing multivariable extraordinary morphisms 
 Finally, if the cats that the variables correspond to are obvious from context, we can omit their declarations, obtaining a more concise notation $M(a,b,a) \mto N(b,c,c)$ for a set of extraordinary module morphisms.
 Thus, if we want to give a name to a particular such morphism we can write
 \[ \phi \in \mhom{M(a,b,a)}{N(b,c,c)} \]
+As noted in \cref{rmk:turnstile}, the symbol $\types$ is still present here to indicate the use of abstract variables, even though the correspondence of variables to cats is not explicitly ``declared''.
 
 It is worth emphasizing one difference between the use of abstract variables for restriction and for extraordinary morphisms.
-In the case of restriction, we write $M(f(a),g(b))$ to denote the \emph{actual module} $(f,g)^*M$ obtained by restricting $M$ along $f$ and $g$.
-However, in the case of extraordinary morphisms, it is probably better not to think of the notation $M(a,a)$ as actually denoting any module distinct from $M$;\footnote{In the formal definition to be presented in \cref{part:def}, it is possible to think of $M(a,a)$ as an object of ``$S\E$'', but this is arguably just a technical device.} in particular it is not obtained by restriction of $M$ along any sort of ``diagonal'' (which need not exist in an arbitrary kit).
-We will also combine these notations, writing for instance $M(f(a),g(a),h(b))\mto N(k(b))$; in this case it is better to think of the restrictions as happening first (obtaining modules such as $M(f(a_1),g(a_2),h(b))$), followed by the pairing of variables to determine a type of extraordinary morphism.
+In the case of restriction, we write $\ctx{a:A,b:B}\types M(f(a),g(b))$ to denote the \emph{actual module} $(f,g)^*M$ obtained by restricting $M$ along $f$ and $g$.
+However, in the case of extraordinary morphisms, it is probably better not to think of the notation $\ctx{a:A} \types M(a,a)$ as actually denoting any module distinct from $M$;\footnote{In the formal definition to be presented in \cref{part:def}, it is possible to think of $\ctx{a:A} \types M(a,a)$ as an object of ``$S\E$'', but this is arguably just a technical device.} in particular it is not obtained by restriction of $M$ along any sort of ``diagonal'' (which need not exist in an arbitrary kit).
+We will also combine these notations, writing for instance $M(f(a),g(a),h(b))\mto N(k(b))$; in this case it is better to think of the restrictions as happening first (obtaining modules such as $\ctx{a_1:A,a_2:A,b:B}\types M(f(a_1),g(a_2),h(b))$), followed by the pairing of variables to determine a type of extraordinary morphism.
 
 So far we have described our ``abstract variable notation'' somewhat informally.
 When doing formal category theory, this informal understanding is generally sufficient.
@@ -613,26 +619,34 @@ TODO: Derive the one-sided versions.
 \section{Examples of formal category theory}
 \label{sec:examples}
 
+We will always assume that all kits have hom-modules; this seems to be a prerequisite for doing much of any formal category theory.
+However, we will explicitly assume other universal objects when we need them.
+
 \subsection{Limits and colimits}
 
-Consider functors $d:D\to C$ and $l:()\to C$, and a module $J\in\modk(D)$.
-Say that $l$ is the \emph{$J$-weighted limit of $d$} if there is a universal module morphism
-\[ \pi \in \mhom{J}{\mor{C}(l,d))} \]
-or equivalently (using the universal property of hom-modules) a module morphism
-\[ \pi' \in \mhom{J,\mor{C}(c,l)}{\mor{C}(c,d)} \]
-such that postcomposition with $\pi'$ induces bijections
-\[ \mhom{\Gamma}{\mor{C}(c,l)} \toiso \mhom{\Gamma,J}{\mor{C}(c,d)}. \]
+Consider functors $d:D\to C$ and $l:()\to C$ (i.e.\ $l$ is an ``object'' of $C$), and a module $J\in\modk(D)$.
+A \textbf{$J$-weighted cone} over $d$ with vertex $l$ is a (ordinary) module morphism
+\[ \pi \in \mhom{J(x)}{\mor{C}(l,d(x))}. \]
+Using the universal property of hom-modules, this corresponds to a morphism
+\[ \pi' \in \mhom{\mor{C}(y,l),J(x)}{\mor{C}(y,d(x))}. \]
+We say that $\pi$ exhibits $l$ as a \textbf{$J$-weighted limit} of $d$ if $\pi'$ gives $\mor C(1,l)$ the universal property of the binding function module $J \multimap_D \mor{C}(1,d)$; in other words, if postcomposition with $\pi'$ induces bijections
+\[ \mhom{\Gamma}{\mor{C}(y,l)} \toiso \mhom{\Gamma,J(x)}{\mor{C}(y,d(x))}. \]
+Of course, if $J \multimap_D \mor{C}(1,d)$ is known to exist (such as if $\K$ has ends and function modules), then to make $l$ a $J$-weighted limit of $d$ is equivalent to giving an isomorphism $\mor{C}(1,l) \cong J \multimap_D \mor{C}(1,d)$ in $\modk(C\o)$.
 
-If the kit $\K$ has ends and function modules, an equivalent characterization of limits is possible:
-$l$ is the $J$-weighted limit of $d$ if there is an isomorphism
-\[ \mor{C}(c,l) \cong J' \multimap_D \mor{C}(c,d') \]
-in the category $\modk(C\o)$.
+(Hmm, in the definition of function modules (and all the other universal properties) I incorporated a substitution to make it restriction-stable.  Is that necessary to do here too?  In an equipment that corresponds to asserting the universal property with respect to cells having nontrivial vertical-arrow boundaries.  But maybe we can avoid that once we have homs and the Yoneda lemma by moving them into the domain?)
 
 While the above definition most closely matches the usual definition of weighted limits, it is not necessary to restrict $d$ and $l$ to have unary and nullary domains, respectively.
-In particular, if $l$ has unary domain $E$, then $l:E\to C$ is a functor given by ``pointwise'' limits.
+The case when $l$ also has unary domain $E$ is also very important.
+In this case $\pi$ is ordinary in $E$ and $\pi'$ is extraordinary:
+\begin{align*}
+\pi &\in \mhom{J(e,x)}{\mor{C}(l(e),d(x))} \\
+\pi' &\in \mhom{\mor{C}(y,l(e)),J(e,x)}{\mor{C}(y,d(x))}
+\end{align*}
+and the limit is again characterized by $\mor{C}(1,l) \cong J \multimap_D \mor{C}(1,d)$, only now this is an isomorphism in $\modk(C\o,E)$.
+Since universal properties are stable under restriction, it follows that for any $f:E'\to E$ we have also $\mor{C}(1,l f) \cong J(f,1) \multimap_D \mor{C}(1,d)$, so that $l:E\to C$ is a functor given by taking ``pointwise limits''.
 
 As a special case, we can define (pointwise) Kan extensions.
-If $f:D\to C$ and $g:D\to E$ are functors, then the right Kan extension of $f$ along $g$ (if it exists) is the limit of $f$ weighted by $\mor{E}(e,g(d))$.
+If $f:D\to C$ and $g:D\to E$ are functors, then the right Kan extension of $f$ along $g$ (if it exists) is the limit of $f$ weighted by $\mor{E}(1,g)$.
 
 \part{The definition of a kit}
 \label{part:def}
