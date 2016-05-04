@@ -83,6 +83,9 @@ $#1\copy \z@
 \newcommand{\ev}{\mathsf{ev}}
 \renewcommand{\id}{\mathsf{id}}
 
+\newcommand{\repr}[1]{{#1}_\bullet}
+\newcommand{\corepr}[1]{{#1}^\bullet}
+
 \title{Multivariable formal category theory}
 \author{Patrick Schultz and Michael Shulman}
 \begin{document}
@@ -872,6 +875,37 @@ Our definition will be a special case of $\delta$-monoids.
 
 \begin{eg}
   Similarly, if $S$ is the identity, we have a canonical distributive law for any $T$, giving rise to the evident notion of ``co-$T$-monoid''.
+\end{eg}
+
+\begin{eg}
+  If $T$ is a monad whose multiplication $\mu:T^2\to T$ is both horizontally and co-horizontally strong, so that it induces horizontal transformations $\repr\mu : T^2\hto T$ and $\corepr\mu : T\hto T^2$, then the composite $T^2\hto T\hto T^2$ is a horizontal distributive law of $T$ over itself.
+  The first modification is
+  \[ \xymatrix{
+    TTT \ar[r]|{|}^{T\repr \mu} \ar[d]_{\mu T} & 
+    TT \ar[r]|{|}^{T\corepr \mu} \ar[d]_{\mu} &
+    TTT \ar[r]|{|}^{\repr{(\mu T)}}  & 
+    TT \ar[r]|{|}^{\corepr{(\mu T)}} \ar[d]^{\mu} &
+    TTT \ar[d]^{T\mu} \\
+    TT \ar[r]|{|}^{\repr \mu} \ar@{=}[d] &
+    T \ar[rr]|{|}^{U_T} & \ar@{}[d]|{\cong} &
+    T \ar[r]|{|}^{\corepr\mu} &
+    TT \ar@{=}[d]\\
+    TT \ar[rr]|{|}^{\repr \mu} &&
+    T \ar[rr]|{|}^{\corepr \mu} &&
+    TT
+  } \]
+  where the three cells at the top are induced by the associativity axiom of $\mu$.
+  The second is similar.
+  The third
+  \[ \xymatrix{ & T \ar[dl]_{\eta T} \ar[dr]^{T\eta} \\
+    TT \ar[r]|{|}_{\repr \mu} &
+    T \ar[r]|{|}_{\corepr \mu} &
+    TT } \]
+  is induced by the unit axioms $\mu \circ \eta T = 1 = \mu\circ T \eta$, and the fourth is similar.
+  The axioms follow immediately.
+
+  A $\delta$-monoid for this distributive law may be called a \emph{bi-$T$-monoid}.
+  For instance, if $T$ is the monad for symmetric monoidal categories, then a bi-$T$-monoid (on a discrete set) is a polycategorical way to describe a ``PROP''.
 \end{eg}
 
 In equipments such as \dSpan whose objects are ``set-like'', $S$-monoids and $\delta$-monoids are an appropriate notion of ``generalized multicategory/polycategory'' on their own.
