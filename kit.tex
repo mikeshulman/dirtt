@@ -982,6 +982,13 @@ The morphisms in the categories $\E(B)$ will be the ``ordinary'' natural transfo
 To describe the extraordinary ones, we will enhance \E to a generalized polycategory.
 Consider the equipment $\dCat^{\Chat\op}$, whose objects are (strict) functors $\E:\Chat\op\to\bCat$, whose vertical arrows are (strict) natural transformations, and so on.
 Note that the objects of $\dCat^{\Chat\op}$ can be regarded as split fibrations over $\Chat$ or as split opfibrations over $\Chat\op$, and similarly for the rest of its structure.
+
+\begin{rmk}
+  A functor $\Chat\op\to\bSet$ can equivalently be regarded as a horizontal arrow $1\hto \C$ in the virtual equipment of $V$-monoids.
+  (We owe this observation to Peter LeFanu Lumsdaine.)
+  Therefore, the equipment $\dCat^{\Chat\op}$ can also be regarded as the equipment of \emph{internal} categories in the category whose objects are such horizontal arrows.
+\end{rmk}
+
 We define a monad $S$ on $\dCat^{\Chat\op}$ by the following pullback:
 \[ \xymatrix{ S \E \ar[r] \ar[d] \pullback & \E \ar[d] \\
   \Chat\times\Chat \ar[r]^-m \ar[d]^{\pi_2} & \Chat \\
