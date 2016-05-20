@@ -863,10 +863,10 @@ Our definition will be a special case of $\delta$-monoids.
 
 \begin{eg}\label{eg:polycats}
   Let $T$ and $S$ both be the free symmetric monoidal category monad on the equipment \dCat of categories, functors, and profunctors.  
-  In~\cite{garner:polycats} a horizontal distributive law is constructed between this $T$ and $S$, such that $\delta$-monoids with $A$ a discrete set are exactly ``ordinary'' polycategories.
-  These are the categorical structure corresponding to a sequent calculus that allows multiple formulas on both sides, with the cut rule of classical linear logic:
+  In~\cite{garner:polycats} a horizontal distributive law is constructed between this $T$ and $S$, such that $\delta$-monoids with $A$ a discrete set are exactly ``ordinary'' symmetric polycategories (see~\cite{szabo:polycats,cs:wk-distrib-cats}).
+  These are the categorical structure corresponding to a sequent calculus that allows multiple formulas on both sides, with the exchange rule but no contraction or weakening, and the cut rule of classical linear logic:
   \[ \inferrule{\Gamma \vdash \Delta,A \\ \Psi,A \vdash \Theta}{\Gamma,\Psi \vdash \Delta,\Theta} \]
-  The relevant kinds of ``polyfunctor'' were not considered in~\cite{garner:polycats}, but here we obtain the full 2-category of polycategories.
+  The appropriate kinds of ``polyfunctor'' were not considered in~\cite{garner:polycats}, but here we obtain the full 2-category of polycategories.
 \end{eg}
 
 \begin{eg}
@@ -905,7 +905,12 @@ Our definition will be a special case of $\delta$-monoids.
   The axioms follow immediately.
 
   A $\delta$-monoid for this distributive law may be called a \emph{bi-$T$-monoid}.
-  For instance, if $T$ is the monad for symmetric monoidal categories, then a bi-$T$-monoid (on a discrete set) is a polycategorical way to describe a ``PROP''.
+  For instance, if $T$ is the monad for symmetric monoidal categories, then a bi-$T$-monoid (on a discrete set) is a polycategorical way to describe a ``PROP'': it is like an ordinary symmetric polycategory but allows us to compose along multiple objects at once.
+\end{eg}
+
+\begin{eg}
+  If $S$ is the monad for cartesian monoidal categories and $T$ is the monad for cocartesian monoidal categories, then there should be a horizontal distributive law $\delta:TS\hto ST$ for which the $\delta$-monoids model Gentzen's original nonlinear two-sided sequents, with contraction and weakening on both sides as well as exchange.
+  Szabo's original paper~\cite{szabo:polycats} referred to these as \emph{Gentzen polycategories}.
 \end{eg}
 
 In equipments such as \dSpan whose objects are ``set-like'', $S$-monoids and $\delta$-monoids are an appropriate notion of ``generalized multicategory/polycategory'' on their own.
