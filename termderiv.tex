@@ -246,29 +246,29 @@ Here $M$ is actually a ``term'' describing the derivation tree that could be omi
 \begin{figure}
   \centering
   \begin{mathpar}
-    \inferrule{H\in \cT(A_1\e1,\dots,A_n\e n)}{A_1\e1,\dots,A_n\e n\types H\type}
+    \inferrule{H\in \cT(A_1\e1,\dots,A_n\e n)}{A_1\e1,\dots,A_n\e n\types \type}\;H
     \and
-    \inferrule{ }{A\m, A\p \types \mor A \type}
+    \inferrule{ }{A\m, A\p \types \type}\; \mor{}
     \and
     \inferrule{
       \Psi_1 \types M_1\type \\ \Psi_2 \types M_2\type
     }{
-      \Psi_1, \Psi_2 \types M_1\otimes M_2\type
-    }\and
+      \Psi_1, \Psi_2 \types \type
+    }\;\otimes\and
     \inferrule{
       \flip{\Psi_1} \types M_1\type \\ \Psi_2 \types M_2\type
     }{
-      \Psi_1,\Psi_2 \types M_1 \multimap M_2 \type
-    }\and
+      \Psi_1,\Psi_2 \types \type
+    }\;\multimap\and
     \inferrule{\Psi \combine A\p,A\m \types M \type \\
     }{
-      \Psi \types \End_{A} M \type
-    }\and
+      \Psi \types  \type
+    }\;\End_{\Box} \and
     \inferrule{
       \Psi \combine A\p,A\m \types M \type \\
     }{
-      \Psi \types \coend^{A} M \type
-    }
+      \Psi \types \type
+    }\;\coend^{\Box}
   \end{mathpar}
   \caption{The type judgment, without substitutions, permutations, or variables}
   \label{fig:type-nosub}
@@ -278,29 +278,29 @@ Here $M$ is actually a ``term'' describing the derivation tree that could be omi
   \centering
   \begin{mathpar}
     \inferrule{H\in \cT(A_1\e1,\dots,A_n\e n) \\ \Psi_i\types A_i \\
-      \shuf(\Psi_1\e1,\dots\Psi_n\e n;\Phi)}{\Phi\types H\type}
+      \shuf(\Psi_1\e1,\dots\Psi_n\e n;\Phi)}{\Phi\types \type}\;H
     \and
-    \inferrule{\Psi_1\types A \\ \Psi_2 \types A \\ \shuf(\Psi_1\m,\Psi_2;\Phi)}{\Phi \types \mor A \type}
+    \inferrule{\Psi_1\types A \\ \Psi_2 \types A \\ \shuf(\Psi_1\m,\Psi_2;\Phi)}{\Phi \types \type}\;\mor{}
     \and
     \inferrule{
       \Psi_1 \types M_1\type \\ \Psi_2 \types M_2\type \\ \shuf(\Psi_1,\Psi_2;\Phi)
     }{
-      \Phi \types M_1\otimes M_2\type
-    }\and
+      \Phi \types \type
+    }\;\otimes\and
     \inferrule{
       \Psi_1 \types M_1\type \\ \Psi_2 \types M_2\type \\ \shuf(\Psi_1\m,\Psi_2;\Phi)
     }{
-      \Phi \types M_1 \multimap M_2 \type
-    }\\
+      \Phi \types \type
+    }\;\multimap\\
     \inferrule{\Psi,A\p,A\m \types M \type \\
     }{
-      \Psi \types \End_{A} M \type
-    }\and
+      \Psi \types \type
+    }\;\End_{\Box}\and
     \inferrule{
       \Psi,A\p,A\m \types M \type \\
     }{
-      \Psi \types \coend^{A} M \type
-    }
+      \Psi \types\type
+    }\;\coend^{\Box}
   \end{mathpar}
   \caption{The type judgment, with substitutions and permutations, but no variables}
   \label{fig:type-novar}
