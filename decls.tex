@@ -114,6 +114,9 @@
 % Blackboard Bold: \bbA is \mathbb{A}
 \def\definebb#1{\ea\gdef\csname bb#1\endcsname{\ensuremath{\mathbb{#1}}\xspace}}
 \foreachLetter{1}{27}{\definebb}
+% Blackboard Bold: \dA is \mathbb{A}
+\def\definebb#1{\ea\gdef\csname d#1\endcsname{\ensuremath{\mathbb{#1}}\xspace}}
+\foreachLetter{1}{27}{\definebb}
 % Fraktur: \ka is \mathfrak{a} (except when it's \kappa, see below), \kA is \mathfrak{A}
 \def\definefrak#1{\ea\gdef\csname k#1\endcsname{\ensuremath{\mathfrak{#1}}\xspace}}
 \foreachletter{1}{27}{\definefrak}
