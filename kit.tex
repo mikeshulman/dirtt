@@ -28,9 +28,15 @@ $#1\copy \z@
   \slashedarrowfill@\relbar\relbar{\raisebox{1pt}{$\scriptscriptstyle\bullet$}}\rightarrow}
 \newcommand\xbulletrightarrow[2][]{%
   \ext@arrow 0055{\rightbulletarrowfill@}{#1}{#2}}
-\mdef\bto{\xbulletrightarrow{}}
-\mdef\btoo{\xbulletrightarrow{\quad}}
+\mdef\bto{\xbulletrightarrow{\quad}}
 \let\xbto\xbulletrightarrow
+
+\def\rightcircarrowfill@{%
+  \slashedarrowfill@\relbar\relbar{\raisebox{1pt}{$\scriptscriptstyle\circ$}}\rightarrow}
+\newcommand\xcircrightarrow[2][]{%
+  \ext@arrow 0055{\rightcircarrowfill@}{#1}{#2}}
+\mdef\oto{\xcircrightarrow{\quad}}
+\let\xoto\xcircrightarrow
 \makeatother
 
 \newcommand{\C}{\cC}
@@ -70,11 +76,12 @@ $#1\copy \z@
 \newcommand{\one}{\lone}
 \newcommand{\bone}{\mathbf{1}}
 
-\autodefs{\cMod\dCat\bCat\dSpan\dMod\bSet\bGraph\dMod\cMod}
+\autodefs{\cMod\dCat\bCat\dSpan\dMod\bSet\bGraph\dMod\cMod\fSpan\cDbl\cLx}
 \let\Mod\dMod
 \let\mod\cMod
 \def\modk{\mod_\K}
 \def\mor#1{\hom_{#1}}
+\def\lxdbl{\cLx\cDbl}
 
 \def\cart{\chi}
 \def\opcart{\chi}
@@ -863,6 +870,135 @@ In a later paper we will do the same for generalized polycategories relative to 
 
 TODO: Define the 2-category of $\dl$-monoids.
 
+We now proceed to define a loose distributive law for which $\dl$-monoids are kits (or, more precisely, ``pre-kits'').
+Of course, first we need a couple of monads.
+In a kit there are actually \emph{four} different kinds of structure that have to be incorporated into these monads: the extraordinary pairing of variables in the domain, the extraordinary pairing in the codomian, the possibility of multiple modules in the domain, and the substitution of functor terms for abstract variables in the codomain.
+To simplify the construction and clarify the essential point (composing extraordinary natural transformations), we will first define a loose distributive law for ``unary kits without substitution'' that includes only the first two; then we will ``mix in'' the other two using a kind of mixed distributive law.
+
+\section{Linear double monads}
+\label{sec:linear-double-monads}
+
+Many of the monads we will be interested in are particularly simple: they are the monads on a slice $\bCat/A$ induced by an internal category in \bCat (that is, a strict double category) with $A$ as object-of-objects.
+In particular, their underlying functors are given by span composition; functors between slice categories of this sort are sometimes called \textbf{linear} (by analogy with the more general \emph{polynomial} functors that also involve an exponential).
+
+However, we need not only monads on the ordinary category \bCat, but on the double category \dCat; and also loose distributive laws between these.
+For this it is convenient to have a structure that describes ``spans in \dCat''.
+The answer is the ``intercategory'' $\fSpan(\dCat)$ defined in~\cite[6.5]{gp:intercategories-ii}.
+
+An \textbf{intercategory} is a type of weak \emph{triple} category.
+It has three kinds of arrow, called \emph{transversal}, \emph{horizontal}, and \emph{vertical}; three kinds of cell, called \emph{horizontal} (horizontal/transversal), \emph{vertical} (vertical/transversal), and \emph{basic} (horizontal/vertical); and also \emph{cubes}.
+Like in a pseudo double category, composition in the transversal direction is strict, while composition in the horizontal and vertical directions is associative and unital up to transversal isomorphism.
+Moreover, composition of basic cells satisfies the interchange law (in both binary and nullary versions) only up to a \emph{not-necessarily-invertible} transversal cube.
+
+It is shown in~\cite[\S6]{gp:intercategories-ii} that there is an intercategory $\fSpan(\dCat)$ whose:
+\begin{itemize}
+\item Objects are categories,
+\item Transversal arrows are functors
+\item Vertical arrows are profunctors,
+\item Horizontal arrows are spans of functors,
+\item Vertical cells are profunctor morphisms (cells in \dCat),
+\item Horizontal cells are span morphisms (cells in the double category $\dSpan(\bCat)$),
+\item Basic cells are spans of profunctor morphisms, and
+\item Cubes are morphisms between spans of profunctor morphisms.
+\end{itemize}
+In particular, the double category of objects, transversal arrows, vertical arrows, and vertical cells is \dCat, while the double category of objects, transversal arrows, horizontal arrows, and horizontal cells is $\dSpan(\bCat)$.
+The nullary interchangers are isomorphisms, but the binary-binary one is not in general.
+
+Now, a linear functor $\bC/A\to \bC/B$ induced by a span $A \ot C \to B$ in $\bC$ can be described in terms of the double category $\dSpan(\bC)$, by identifying $\bC/A$ with the hom-category of loose morphisms $1\bto A$ and composing them with the given span $A \ot C \to B$.
+To do something similar in $\fSpan(\dCat)$ we would like to identify a slice double category $\dCat/A$ with a ``hom-double-category'' whose
+\begin{itemize}
+\item objects are horizontal arrows $1\oto A$,
+\item tight arrows are horizontal cells between these whose horizontal source and target are identity transversal arrows,
+\item loose arrows are basic cells between these whose horizontal source and target are identity vertical arrows, and
+\item cells are cubes whose horizontal source and target are identity vertical cells.
+\end{itemize}
+Such a ``hom-double-category'' construction, as natural as it seems, does not work in an arbitrary intercategory, because composition of vertical arrows is not strictly unital, so that these loose arrows cannot be composed.
+However, it is always possible to re-define vertical composition to make it strictly unital; and this seems especially harmless in \dCat, where composition of profunctors is (being a coend) only defined up to isomorphism by a universal property anyway.\footnote{In fact, there is even an easy-to-define equivalent of \dCat that is a totally \emph{strict} double category, in which the loose arrows are cocontinuous functors between presheaf categories.}
+(Another approach is to assume that basic cells are ``transportable'' along transversal isomorphisms, such as the unit constraints for vertical composition.)
+
+We will assume this has been done, so that the above hom-double-category exists.
+Moreover, for simplicity we will always assume our intercategories are \textbf{normal}, meaning that all the nullary interchangers are isomorphisms, as is the case in $\fSpan(\dCat)$.
+Now we can describe the action of linear functors with the following abstract picture.
+
+\begin{lem}\label{thm:intercat-bicat}
+  Let \iA be a normal intercategory with strictly unital vertical composition, and fix an object $X\in\iA$.
+  Let $\cH(\iA)$ denote the bicategory whose objects are those of \iA, whose morphisms are the horizontal arrows of \iA, and whose 2-cells are the ``globular'' horizontal cells (those whose horizontal source and target are identity transversal arrows).
+  Then there is a pseudofunctor $\hom_\iA(X,-) : \cH(\iA) \to \lxdbl$, where $\lxdbl$ is the 2-category of double categories and lax double functors.
+\end{lem}
+\begin{proof}
+  Each object $A$ is sent to the above hom-double-category $\hom_\iA(X,A)$.
+  A horizontal arrow $f:A\oto B$ acts on all the data in $\hom_\iA(X,A)$ by composing horizontally with $f$ or an appropriate identity of it.
+  This is strictly functorial on tight arrows, since horizontal cells satisfy strict interchange, and laxly functorial on loose arrows, since basic cells interchange only laxly.
+  (The reader is invited to check that the orientations are set up to make it lax in this direction rather than colax.)
+  A globular horizontal cell similarly induces a tight transformation in the same way that postcomposition with a 2-cell in a bicategory is a natural transformation, and functoriality follows by associativity of horizontal composition in \iA.
+\end{proof}
+
+In particular, any ``horizontal monad'' on $A\in \iA$ induces a monad on any $\hom_X(X,A)$, and in particular on $\hom_\iA(1,A)$.
+It follows that any linear monad on $\bCat/A$ induces a double monad on $\dCat/A$.
+(In a later paper we will show that the same is true more generally for polynomial monads.)
+
+Now to construct distributive laws, we need to consider an analogous action by ``horizontally globular'' basic cells.
+This is somewhat trickier because not every such cell induces a loose transformation; the culprit is again the laxness of interchange.
+At an fully abstract level, about all we can do is demand explicitly that the relevant interchangers be invertible.
+
+\begin{defn}
+  A globular basic cell in a normal intercategory:
+  \[ \xymatrix{A \ar@{=}[d] \ar[r]|{\circ}^f \ar@{}[dr]|{\delta} & B \ar@{=}[d] \\ A \ar[r]|{\circ}_g & B } \]
+  is \textbf{pseudo for postcomposition} if the interchangers for composites of the following form are invertible whenever $\gamma$ is globular in the same way:
+  \[
+  \begin{array}{c|c}
+    \alpha&\delta\\\hline\beta& \gamma %\mathrm{Id}_g
+  \end{array}\qquad
+  \begin{array}{c|c}
+    \alpha& \gamma %&\mathrm{Id}_f
+    \\\hline\beta&\delta
+  \end{array}
+  \]
+\end{defn}
+
+Note that if the vertical identity on $f:A\oto B$ is pseudo for postcomposition, then the double functors induced by $f$ as above are in fact strong.
+
+\begin{lem}
+  If $\delta$ as above is pseudo for postcomposition, then it induces a loose transformation $\hom_\iA(X,f) \to \hom_\iA(X,g)$ for any object $X$.
+\end{lem}
+\begin{proof}
+  TODO.
+\end{proof}
+
+To enhance this to a version of \cref{thm:intercat-bicat}, it is natural to use the notion of \emph{locally cubical bicategory} from~\cite{gg:lowdim-tricats}.
+These are categories weakly enriched over the cartesian monoidal category of double categories, \emph{pseudo} double functors, and tight transformations.
+Thus, they have objects, morphisms, tight and loose 2-cells, and square 3-cells.
+
+\begin{lem}
+  Let \iA be a normal intercategory with strictly unital vertical composition.
+  Then there is a locally cubical bicategory $\cL(\iA)$ whose objects are those of \iA and whose hom-double-categories are the ``tightly full'' sub-double-categories of $\hom_\iA(A,B)$ containing only those basic cells of \iA that are pseudo for postcomposition (and hence only those horizontal arrows of \iA whose vertical identities are such).
+  Moreover, for any object $X$ there is a locally cubical pseudofunctor $\hom_\iA(X,-):\cL(\iA) \to \cDbl$, where $\cDbl$ denotes the tautological locally cubical bicategory of double categories, strong double functors, tight transformations, and loose transformations.
+\end{lem}
+\begin{proof}
+  TODO.
+\end{proof}
+
+All this would be in vain if no cells were pseudo for postcomposition, but fortunately we have some.
+For instance:
+
+\begin{lem}
+  A basic cell in $\fSpan(\dCat)$, consisting of a span of cells in $\dCat$:
+  \[ \xymatrix{ A \ar@{<-}[r] \ar@{=}[d] \ar@{}[dr]|{\Leftarrow} & 
+    B \ar[r] \ar[d]|{\bullet} \ar@{}[dr]|{\Rightarrow}& 
+    C \ar[d]|{\bullet} \\
+    A \ar@{<-}[r] & D \ar[r] & E } \]
+  is pseudo for postcomposition if $A$ is a groupoid and the functors $B\to A$ and $D\to A$ are fibrations.
+\end{lem}
+\begin{proof}
+  Inspecting the construction of horizontal composites in $\fSpan(\dCat)$ from~\cite[\S6]{gp:intercategories-ii}, we see that this follows from ~\cite[Proposition 49]{garner:double-clubs}.
+\end{proof}
+
+We end this section by noting that loose distributive laws are a ``locally cubical'' concept, i.e.\ they can be defined in any locally cubical bicategory and are preserved by locally cubical pseudofunctors.
+To see this, simply take the definition and replace functors by 1-cells, tight and loose transformations by tight and loose 2-cells, square modifications by square 3-cells, and so on.
+The pseudonaturality of $\dl$ comes from the invertible interchange, which in the locally cubical world corresponds to the composition functor being strong rather than lax.
+
+It follows that we can also define loose distributive laws in any intercategory, by working with globular cells and adding the condition that they are pseudo for postcomposition.
+
 
 \section{Extraordinary naturality}
 \label{sec:extranat}
@@ -897,7 +1033,14 @@ Here $f:a\to e$, $g:b\to e$, $h:b\to d$, $k:c\to d$, and $\ell:a\to f$ are morph
 Note that there can only be a morphism between two lists if they have the same length \emph{and} the same number of opposites.
 Formally, if $A=(a_1\e[1],\dots,a_n\e[n])$ and $B=(b_1\ph[1],\dots,b_n\ph[n])$, then a morphism $A\to B$ is a pair $(\sigma,f)$ where $\sigma\in \Sigma_n$ is a permutation such that $\varphi_{\sigma(k)} = \varepsilon_{k}$, and $f=(f_1,\dots,f_n)$ is a list of morphisms with $f_n : a_n \to b_{\sigma(n)}$.
 
-We extend $V$ to a monad on the equipment \dCat in the usual way (in fact, the unique way), by treating the elements of profunctors as if they were ``morphisms''.
+For the rest of this section, let \C
+
+
+
+\section{Substitutions}
+\label{sec:substitutions}
+
+We extend $V$ to a monad on the double category \dCat in the usual way (in fact, the unique way), by treating the elements of profunctors as if they were ``morphisms''.
 That is, the above diagram could also represent an element of a profunctor $V H : V \D \hto V \C$, if $a,b,c\in\C$ and $d,e,f\in \D$ while $f\in H(a,e)$, $g\in H(b,e)$, and so on.
 The technology of generalized multicategories then yields a notion of \emph{virtual $V$-algebra}, which contains ``multimorphisms'' whose domain is a list with variance like $(a,b\o,b,c\o,a)$.
 Note that these are like symmetric multicategories in that symmetric groups act on the domain lists.
