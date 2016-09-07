@@ -86,7 +86,7 @@ $#1\copy \z@
 \newcommand{\one}{\done}
 \newcommand{\bone}{\mathbf{1}}
 
-\autodefs{\cMod\dCat\bCat\dSpan\cSpan\dMod\bSet\bGraph\dMod\cMod\fSpan\cDbl\cLx}
+\autodefs{\cMod\dCat\bCat\dSpan\cSpan\dMod\bSet\bGraph\dMod\cMod\fSpan\cDbl\cLx\fDbl}
 \let\Mod\dMod
 \let\mod\cMod
 \def\modk{\mod_\K}
@@ -890,19 +890,19 @@ To simplify the construction and clarify the essential point (composing extraord
 
 Many of the monads we will be interested in are particularly simple: they are the monads on a slice $\bCat/A$ induced by an internal category in \bCat (that is, a strict double category) with $A$ as object-of-objects.
 In particular, their underlying functors are given by span composition.
-Functors between slice categories of this sort are sometimes called \textbf{linear} (by analogy with the more general \emph{polynomial} functors that also involve an exponential); they and the ``linear'' transformations between them are induced by morphisms in the bicategory of spans in \bCat.
+Functors between slice categories of this sort are sometimes called \textbf{linear} (by analogy with the more general \emph{polynomial} functors that also involve an exponential); they and the ``linear'' transformations between them are induced by morphisms and 2-cells in the bicategory of spans in \bCat.
 
 However, we need not only monads on the ordinary category \bCat, but on the double category \dCat; and also loose distributive laws between these.
 For this it is convenient to have a structure that describes ``spans in \dCat'' analogous to the bicategory of spans in the 1-category \bCat.
 There are several ways one could organize such a structure, but for us the important one will be the following.
 
-Let \lxdbl denote the 2-category of pseudo double categories and lax double functors.
-Though in general it is poorly endowed with limits and colimits, it has finite products, so we can regard it as cartesian monoidal.
+Let \cDbl denote the 2-category of pseudo double categories and strong double functors.
+This has finite products, so we can regard it as cartesian monoidal.
 
-\begin{defn}
-  A \textbf{locally lax-cubical bicategory} is a \lxdbl-enriched bicategory.
-  Thus, it has objects with hom-double-categories $\iA(x,y)$, lax composition functors $\iA(y,z)\times \iA(x,y) \to \iA(x,z)$, lax unit functors $1\to \iA(x,x)$, and associativity and unitality tight natural isomorphisms satisfying the usual axioms.
-  We say that it is \textbf{normal} if the composition functors are normal (preserve identities up to isomorphism) and the unit functors $1\to \iA(x,x)$ are strong (preserve identities and composition up to isomorphism), and \textbf{strong} if the composition functors are also strong.
+\begin{defn}[\cite{gg:lowdim-tricats}]
+  A \textbf{locally cubical bicategory} is a \cDbl-enriched bicategory.
+  Thus, it has objects with hom-double-categories $\iA(x,y)$, composition functors $\iA(y,z)\times \iA(x,y) \to \iA(x,z)$, unit functors $1\to \iA(x,x)$, and associativity and unitality tight natural isomorphisms satisfying the usual axioms.
+  % We say that it is \textbf{normal} if the composition functors are normal (preserve identities up to isomorphism) and the unit functors $1\to \iA(x,x)$ are strong (preserve identities and composition up to isomorphism), and \textbf{strong} if the composition functors are also strong.
 \end{defn}
 
 We call the objects of $\iA(A,B)$ the \textbf{morphisms} of \iA and write them $A\oto B$.
@@ -931,26 +931,31 @@ We have in mind the following picture:
 \end{center}
 
 We write transversal composition with $\circ$ in functional order, vertical composition with $\bcomp $ in diagrammatic order, and horizontal composition with $\ocomp$ in diagrammatic order.
-Our examples will always be normal, which means in particular that the unit functor $1:\iA(A,A)$ does nothing more than pick out an identity morphism $1_A$ for each object $A$.
+The unit functor $1:\iA(A,A)$ picks out an identity morphism $1_A$ for each object $A$.
 In addition, every morphism $f$ has an identity tight 2-cell $1_f$ and an identity loose 2-cell $id_f$, every tight 2-cell $\alpha$ has an identity 3-cell $\id_\alpha$, every loose 2-cell $\beta$ has an identity 3-cell $1_\beta$, and we have $\id_{1_f} = 1_{\id_f}$.
-The rest of normality means that $\id_f \ocomp \id_{g} \cong \id_{f\ocomp g}$ (while we always have $1_g \ocomp 1_g = 1_{f\ocomp g}$).
-
-Note that the objects, morphisms, and tight 2-cells of a locally lax-cubical bicategory \iA form an ordinary bicategory under transversal and horizontal composition, which we denote $\cH(\iA)$.
-
-\emph{Strong} locally lax-cubical bicategories are just bicategories enriched in the 2-category of double categories and \emph{strong} double functors, which in~\cite{gg:lowdim-tricats} were called ``locally cubical bicategories''.
-The extra generality of a \emph{normal} over a strong one one consists solely of potential noninvertibility of the interchange morphisms relating horizontal and vertical composition of loose 2-cells:
+We have $\id_f \ocomp \id_{g} \cong \id_{f\ocomp g}$ and $1_g \ocomp 1_g = 1_{f\ocomp g}$, as well as isomorphisms
 \begin{equation}
-  (p\ocomp q) \bcomp (r\ocomp s) \to (p\bcomp r) \ocomp (q\bcomp s).\label{eq:interchange}
+  (p\ocomp q) \bcomp (r\ocomp s) \cong (p\bcomp r) \ocomp (q\bcomp s).\label{eq:interchange}
 \end{equation}
+Note also that the objects, morphisms, and tight 2-cells of a locally ax-cubical bicategory \iA form an ordinary bicategory under transversal and horizontal composition, which we denote $\cH(\iA)$.
+
+There are two examples we care about.
+
+\begin{eg}
+  The cartesian monoidal 2-category \cDbl is in fact closed as a monoidal bicategory, i.e.\ the functors $\dA\times -$ have right biadjoints.
+  As observed in~\cite{gg:lowdim-tricats}, it can therefore be regarded as a bicategory enriched over itself, i.e.\ a locally cubical bicategory.
+  The hom-double-category $\iDbl(A,B)$ consists of strong double functors, tight transformations, loose transformations, and modifications between them.
+\end{eg}
 
 \begin{thm}
-  There is a normal locally lax-cubical bicategory $\fSpan(\dCat)$ described as follows.
+  There is a locally cubical bicategory $\cL(\dCat)$ described as follows.
   \begin{itemize}
-  \item Its objects are categories.
-  \item Its morphisms are spans in \bCat, composed by pullback.
+  \item Its objects are groupoids.
+  \item Its morphisms are spans $A \ot C \to B$ in \bCat such that $A$ and $B$ are groupoids and $C\to A$ is a fibration.
+    Composition is by pullback, which is well-defined since fibrations are closed under pullback and composition.
   \item Its tight 2-cells are span morphisms:
     \[ \xymatrix@R=1pc{ & C \ar[dl] \ar[dr] \ar[dd] \\ A && B \\ &D \ar[ul] \ar[ur] } \]
-    Thus the underlying bicategory is the usual one of spans in \bCat.
+    Thus the underlying bicategory is a sub-bicategory of $\cSpan(\bCat)$.
   \item Its loose 2-cells from $A \ot C \to B$ to $A\ot D \to B$ are profunctors $C\bto D$ equipped with a span of 2-cells in \dCat:
     \[ \xymatrix{ A \ar[d]|{\bullet}_{\hunit A} \ar@{}[dr]|{\Leftarrow} &
       C \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
@@ -961,173 +966,29 @@ The extra generality of a \emph{normal} over a strong one one consists solely of
   \end{itemize}
 \end{thm}
 \begin{proof}
-  Recall from~\cite{gp:intercategories-i,gp:intercategories-ii} that an ``intercategory'' is an \emph{internal} category in \lxdbl whose source and target functors are strict.
-  Thus, a locally lax-cubical bicategory is an intercategory whose double category of objects is discrete.
-  If an intercategory has strictly unital vertical composition (which can usually be obtained by redefining vertical composition at identities), then it has an underlying locally lax-cubical bicategory obtained by discarding all the arrows and cells in its double category of objects.
-  The present example is obtained in this way from the intercategory described in~\cite[6.5]{gp:intercategories-ii}.
+  Recall from~\cite{gp:intercategories-i,gp:intercategories-ii} that an ``intercategory'' is an internal category in the 2-category \lxdbl of double categories and \emph{lax} double functors whose source and target functors are strict.
+  Thus, a locally lax-cubical bicategory is an intercategory whose double category of objects is discrete and whose compostion and unit functors are strong.
+
+  If an intercategory has strictly unital vertical composition (which can usually --- though not always --- be obtained by redefining vertical composition at identities), then we can discard all the arrows and cells in its double category of objects to obtain another intercategory with a discrete double category of objects.
+  Applying this to the example of~\cite[6.5]{gp:intercategories-ii}, we get a structure that is almost like a locally cubical bicategory, but its composition functors are only lax normal rather than strong (though its unit functor is strong).
+  However, when we restrict the objects to groupoids and the spans to have one leg a fibration, then the composition functor becomes strong as well, by \cite[Proposition 49]{garner:double-clubs}.
 \end{proof}
-
-The interchanger~\eqref{eq:interchange} in $\fSpan(\dCat)$ is not generally invertible; a counterexample can be found in in~\cite[6.5]{gp:intercategories-ii}.
-
-% An \textbf{intercategory} is a type of weak \emph{triple} category.
-% It has three kinds of arrow, called \emph{transversal}, \emph{horizontal}, and \emph{vertical}; three kinds of cell, called \emph{horizontal} (horizontal/transversal), \emph{vertical} (vertical/transversal), and \emph{basic} (horizontal/vertical); and also \emph{cubes}.
-% Like in a pseudo double category, composition in the transversal direction is strict, while composition in the horizontal and vertical directions is associative and unital up to transversal isomorphism.
-% Moreover, composition of basic cells satisfies the interchange law (in both binary and nullary versions) only up to a \emph{not-necessarily-invertible} transversal cube.
-
-% It is shown in~\cite[\S6]{gp:intercategories-ii} that there is an intercategory $\fSpan(\dCat)$ whose:
-% \begin{itemize}
-% \item Objects are categories,
-% \item Transversal arrows are functors
-% \item Vertical arrows are profunctors,
-% \item Horizontal arrows are spans of functors,
-% \item Vertical cells are profunctor morphisms (cells in \dCat),
-% \item Horizontal cells are span morphisms (cells in the double category $\dSpan(\bCat)$),
-% \item Basic cells are spans of profunctor morphisms, and
-% \item Cubes are morphisms between spans of profunctor morphisms.
-% \end{itemize}
-% In particular, the double category of objects, transversal arrows, vertical arrows, and vertical cells is \dCat, while the double category of objects, transversal arrows, horizontal arrows, and horizontal cells is $\dSpan(\bCat)$.
-% The nullary interchangers are isomorphisms, but the binary-binary one is not in general.
 
 Now, a linear functor $\bC/A\to \bC/B$ induced by a span $A \ot C \to B$ in $\bC$ can be described in terms of the bicategory $\cSpan(\bC)$, by identifying $\bC/A$ with the hom-category $\cSpan(\bC)(1,A)$ and composing them with the given span $A \ot C \to B$.
-We can do something similar in $\fSpan(\dCat)$, where the slice double category $\dCat/A$ can be identified with the hom-double-category $\fSpan(\dCat)(1,A)$.
+We can do something similar in $\cL(\dCat)$, where the slice double category $\dCat/A$ can be identified with the hom-double-category $\cL(\dCat)(1,A)$.
+The following observation is entirely straightforward.
 
-% \begin{itemize}
-% \item objects are horizontal arrows $1\oto A$,
-% \item tight arrows are horizontal cells between these whose horizontal source and target are identity transversal arrows,
-% \item loose arrows are basic cells between these whose horizontal source and target are identity vertical arrows, and
-% \item cells are cubes whose horizontal source and target are identity vertical cells.
-% \end{itemize}
-% Such a ``hom-double-category'' construction, as natural as it seems, does not work in an arbitrary intercategory, because composition of vertical arrows is not strictly unital, so that these loose arrows cannot be composed.
-% In~\cite{gp:forthcoming} this problem is solved by assuming that basic cells are ``transportable'' along transversal isomorphisms, such as the unit constraints for vertical composition.
-% We will instead assume that vertical composition is strictly unital; this makes things simpler, and is actually more general since it can be achieved by redefining vertical composition if basic cells are transportable.
-% (In many examples such as \dCat, vertical composition is defined only by a universal property, so we might as well choose it to be strictly unital anyway.)
+\begin{thm}
+  Any object $X$ in a locally cubical bicategory \iA induces a representable locally cubical pseudofunctor $\iA(X,-):\iA \to \iDbl$.\qed
+\end{thm}
 
-% For simplicity, we will also always assume our intercategories are \textbf{normal}, meaning that all the nullary interchangers are isomorphisms, as is the case in $\fSpan(\dCat)$.
+In particular, any ``horizontal monad'' on $A\in \iA$ (whose multiplication and unit are tight 2-cells) induces a strong double monad on any hom-double-category $\iA(X,A)$.
+Taking $\iA=\cL(\dCat)$ and $X=1$, we see that \emph{any linear monad on $\bCat/A$ induces a strong double monad on $\dCat/A$}.
+(In a later paper we will show that something similar is true for all polynomial monads.)
 
-\begin{lem}\label{thm:intercat-bicat}
-  Let \iA be a normal locally lax-cubical bicategory, and fix an object $X\in\iA$.
-  Then there is a pseudofunctor $\iA(X,-) : \cH(\iA) \to \lxdbl$.
-\end{lem}
-\begin{proof}
-  A horizontal arrow $F:A\oto B$ induces a functor $1\to \iA(A,B)$, so we have a composite lax functor
-  \[ \iA(X,A) \to \iA(A,B) \times \iA(X,A) \to \iA(X,B) \]
-  Similarly, a tight 2-cell $F\to G$ induces a functor $\dtwo \to \iA(A,B)$, where $\dtwo$ is the double category freely generated by a tight arrow, giving a composite lax functor
-  \[ \dtwo\times \iA(X,A) \to \iA(A,B) \times \iA(X,A) \to \iA(X,B) \]
-  which can be identified with a tight transformation.
-  Functoriality is straightforward.
-\end{proof}
-
-In particular, any ``horizontal monad'' on $A\in \iA$ (whose multiplication and unit are tight 2-cells) induces a (lax) double monad on any hom-double-category $\iA(X,A)$, and in particular on $\iA(1,A)$.
-It follows that \emph{any linear monad on $\bCat/A$ induces a double monad on $\dCat/A$}.
-(In a later paper we will show that the same is true more generally for polynomial monads.)
-
-To construct distributive laws, however, we will need an analogous action that includes the loose 2-cells.
-This is somewhat trickier because the laxness of interchange means that not every such cell induces a loose transformation.
-Put differently, if $\dtwo_{\bL}$ denotes the double category freely generated by a loose arrow, then a \emph{lax} (even normal) functor $A\times \dtwo_{\bL} \to B$ is \emph{not} the same as a loose transformation.
-At an fully abstract level, about the only way to deal with this is is to demand explicitly that the relevant interchangers be invertible.
-
-\begin{defn}
-  A loose 2-cell $\delta:f\bto g$ in a normal locally lax-cubical bicategory is \textbf{very pseudo} if all interchangers of the following form are invertible:
-  \begin{align*}
-    (\alpha\ocomp \delta) \bcomp (\beta\ocomp \gamma) &\to (\alpha\bcomp \beta)  \ocomp (\delta\bcomp \gamma)\\
-    (\alpha\ocomp \gamma) \bcomp (\beta \ocomp \delta) &\to (\alpha\bcomp \beta)  \ocomp (\gamma\bcomp \delta)
-  \end{align*}
-\end{defn}
-
-Note that if the vertical identity on $f:A\oto B$, then the lax functors $\iA(X,f) : \iA(X,A) \to \iA(X,B)$ are all strong.
-
-\begin{lem}\label{thm:vps-transf}
-  If $\delta:f\bto g$ is very pseudo, then it induces a loose transformation $\iA(X,f) \to \iA(X,g)$ for any object $X$.
-\end{lem}
-\begin{proof}
-  For $h:X\to A$, we define the loose component of $\iA(X,\delta)$ at $h$ to be
-  \[ \iA(X,\delta)_h = \id_h \ocomp \delta : h \ocomp f \to h\ocomp g. \]
-  For a loose 2-cell $\alpha:h\bto k$, the pseudonaturality isomorphism is the composite
-  \begin{equation*}
-    (\id_h\ocomp \delta) \bcomp (\alpha \ocomp \id_g)
-    \cong (\id_h\bcomp \alpha) \ocomp (\delta \bcomp \id_g)
-    \cong \alpha \ocomp \delta
-    \cong (\alpha \bcomp \id_k) \ocomp (\id_f\bcomp \delta)
-    \cong (\alpha \ocomp \id_f) \bcomp (\id_k \ocomp \delta)
-  \end{equation*}
-  using the invertible interchangers for $\delta$ together with the unit isomorphisms for vertical composition.
-  Similarly, we define the cell component of $\iA(X,\delta)$ at a tight 2-cell $\eta:f\to g$ to be $\id_\eta \ocomp 1_\delta$.
-  The requisite axioms follow from those for the interchangers, which we neglected to state.
-\end{proof}
-
-We also have important examples:
-
-\begin{lem}\label{thm:gpdfib-vps}
-  A loose 2-cell in $\fSpan(\dCat)$, consisting of a span of cells in $\dCat$:
-  \[ \xymatrix{ A \ar@{<-}[r] \ar[d]|{\bullet}_{\hunit A} \ar@{}[dr]|{\Leftarrow} & 
-    B \ar[r] \ar[d]|{\bullet} \ar@{}[dr]|{\Rightarrow}& 
-    C \ar[d]|{\bullet}^{\hunit C} \\
-    A \ar@{<-}[r] & D \ar[r] & E } \]
-  is very pseudo if $A$ is a groupoid and the functors $B\to A$ and $D\to A$ are fibrations.
-\end{lem}
-\begin{proof}
-  Inspecting the construction of horizontal composites in $\fSpan(\dCat)$ from~\cite[\S6]{gp:intercategories-ii}, we see that this follows from \cite[Proposition 49]{garner:double-clubs}.
-\end{proof}
-
-Now we would like to restrict to the very pseudo 2-cells to obtain a (strong) locally cubical bicategory.
-For this, they of course need to be closed under composition.
-In one direction we can prove this:
-
-\begin{lem}
-  The vertical composite of very-pseudo loose 2-cells is again very pseudo.
-\end{lem}
-\begin{proof}
-  Suppose $\delta$ and $\theta$ are both very pseudo; then for any $\alpha,\beta,\gamma$ the following diagram commutes, by naturality of the vertical unit isomorphisms and one of the axioms for the interchanger:
-  \[ \xymatrix{
-    (\alpha \bcomp \beta) \ocomp (\delta \bcomp \theta \bcomp \gamma) \ar[r] \ar[d]_\cong&
-    (\alpha \ocomp (\delta\bcomp\theta)) \bcomp (\beta \ocomp \gamma) \ar[d]^\cong \\
-    (\alpha \bcomp \id \bcomp \beta) \ocomp (\delta \bcomp \theta \bcomp \gamma) \ar[r] \ar[d]_\cong&
-    ((\alpha \bcomp \id) \ocomp (\delta\bcomp\theta)) \bcomp (\beta \ocomp \gamma) \ar[d]^\cong \\
-    (\alpha \ocomp \delta) \bcomp ((\id \bcomp \beta) \ocomp (\theta\bcomp\gamma)) \ar[r]_\cong &
-    (\alpha \ocomp \delta) \bcomp (\id \ocomp \theta) \bcomp (\beta\ocomp \gamma) 
-  }\]
-  The isomorphisms marked as such in the lower square are invertible because $\delta$ or $\theta$ is very pseudo (and those in the upper square are unit isomorphisms).
-  Therefore, the upper interchanger is also an isomorphism.
-  The dual property has a dual proof.
-\end{proof}
-
-However, there seems no abstract reason why \emph{horizontal} composition should preserve very pseudo 2-cells.
-Fortunately, it is true for the ones we care about from \cref{thm:gpdfib-vps}.
-
-\begin{lem}
-  There is a (strong) locally cubical bicategory $\cL(\dCat)$ whose:
-  \begin{itemize}
-  \item objects are groupoids,
-  \item morphisms are spans $A \ot C \to B$ in which $C\to A$ is a fibration,
-  \item tight 2-cells are span morphisms, as in $\fSpan(\dCat)$,
-  \item loose 2-cells are spans of 2-cells in \dCat:
-    \[ \xymatrix{ A \ar[d]|{\bullet}_{\hunit A} \ar@{}[dr]|{\Leftarrow} &
-      C \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
-      B \ar[d]|{\bullet}^{\hunit B}\\
-      A & D \ar[l] \ar[r] & B. } \]
-  \item Its 3-cells are span morphisms in $\dCat_1$.
-  \end{itemize}
-
-  
-objects are those of \iA and whose hom-double-categories are the sub-double-categories of $\iA(A,B)$ containing only those loose 2-cells cells that are very pseudo, only those morphisms of \iA whose vertical identities are very pseudo, and all tight 2-cells and 3-cells between these.
-  Moreover, for any object $X$ there is a locally cubical pseudofunctor $\iA(X,-):\cL(\iA) \to \cDbl$, where $\cDbl$ denotes the tautological locally cubical bicategory of double categories, strong double functors, tight transformations, and loose transformations.
-\end{lem}
-\begin{proof}
-  All the structure is induced from \iA, and obviously all the interchangers are invertible.
-  Thus, to show that $\cL(\iA)$ is a strong locally cubical bicategory, we only need to check that vertical composition preserves very-pseudo loose 2-cells.
-  [TODO: What about horizontal compostiion?]
-
-  Finally, the locally cubical pseudofunctor $\iA(X,-)$ acts as \cref{thm:intercat-bicat} on objects and tight 2-cells, and as \cref{thm:vps-transf} on loose 2-cells.
-  TODO: Describe its action on 3-cells and say something about functoriality.
-\end{proof}
-
-All this would be in vain if no cells were very pseudo, but fortunately we have some.
-For instance:
-
-
-We end this section by noting that loose distributive laws are a ``locally cubical'' concept, i.e.\ they can be defined in any locally cubical bicategory and are preserved by locally cubical pseudofunctors.
+The punchline is that loose distributive laws are also a ``locally cubical'' concept, i.e.\ they can be defined in any locally cubical bicategory and are preserved by locally cubical pseudofunctors.
 To see this, simply take the definition and replace functors by 1-cells, tight and loose transformations by tight and loose 2-cells, square modifications by square 3-cells, and so on; the pseudonaturality of $\dl$ is replaced by the invertible interchange.
-In particular, therefore, to define a loose distributive law between monads on a slice double category $\dCat/A$, it suffices to define a corresponding structure on $A$ in $\fSpan(\dCat)$.
+In particular, therefore, to define a loose distributive law between monads on a slice double category $\dCat/A$, it suffices to define a corresponding structure on $A$ in $\cL(\dCat)$.
 
 
 \section{Extraordinary naturality}
@@ -1170,7 +1031,7 @@ We will define a loose distributive law on $V\C$ in $\fSpan(\dCat)$, inducing on
 The two monads involved in this distributive law will in fact be the same monad, which we denote $R$.
 Being a horizontal monad in $\fSpan(\dCat)$, it is equivalently a monad in the bicategory $\cSpan(\bCat)$, i.e.\ an internal category in \bCat, i.e.\ a \emph{strict} double category.
 Since its category of objects is $V\C$, its objects are those of $V\C$ and its tight morphisms are the morphisms of $V\C$.
-By definition, its loose morphisms are\dots
+We define its loose morphisms to be
 
 
 
