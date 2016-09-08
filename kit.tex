@@ -703,7 +703,8 @@ If $f:D\to C$ and $g:D\to E$ are functors, then the right Kan extension of $f$ a
 \label{sec:genpoly}
 
 Our formal definition of a kit will be a special case of a general notion called a \emph{generalized polycategory}.
-Generalized polycategories appear only implicitly in the literature (e.g.~\cite{garner:polycats}), so we will have to define them as well; however, we defer their general study to a later paper and take here a reasonably geodesic route to the definition of kit.
+Generalized polycategories appear only implicitly in the literature (e.g.~\cite{garner:polycats}), so we will have to define them as well along the way.
+However, we defer their general study to a later paper, taking here a reasonably geodesic route to the definition of kit.
 
 Roughly speaking, generalized polycategories are to polycategories as generalized multicategories are to multicategories.
 Recall that a \emph{multicategory} is like a category in which a morphism can have a finite list of objects, rather than a single object, as its domain (but still only a single object as codomain).
@@ -728,11 +729,11 @@ Thus, a cell in a double category can be written either as
 \qquad\text{or}\qquad
 \vcenter{\xymatrix{ A \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow}& C \ar[d]|{\bullet} \\ B \ar[r] & D } }
 \]
-We write $\circ$ for tight composition (of arrows or cells), and $\odot$ for loose composition (of arrows or cells).
+We write $\circ$ for tight composition (of arrows or cells), and $\bcomp$ for loose composition (of arrows or cells).
 Similarly, we write $1$ for tight identities (of objects or loose arrows), and $\hunit{A}$ for loose identities (of objects or tight arrows).
 
 The particular double category we have most in mind is \dCat, whose objects are categories, tight arrows are functors, and loose arrows are profunctors.
-We will also be interested in \emph{slice} double categories of \dCat: for any object $A$ of a double category \dD, in the slice $\dD/A$ the category of objects and tight maps is the slice of that of \dD over $A$, and the category of loose arrows and cells is the slice of that of \dD over $\hunit A$.
+We will also be interested in \emph{slice} double categories of \dCat: for any object $A$ of a double category \dD, in the slice $\dD/A$ the category $(\dD/A)_0$ of objects and tight maps is the slice of $\dD_0$ over $A$, and the category $(\dD/A)_1$ of loose arrows and cells is the slice of $\dD_1$ over $\hunit A$.
 
 Between (pseudo) double categories we will be interested in \emph{lax functors}, which are lax in the loose direction and strictly functorial in the tight direction.
 Lax functors admit an obvious notion of \emph{tight transformation}, with tight arrow components $\alpha_A:FA\to GA$ for each object $A$, and 2-cell components
@@ -777,17 +778,17 @@ These are the loose arrows in a double category of functors whose tight arrows a
     \item The following equalities of square modifications hold:
       \begin{align*}
         \Tdlunit \circ \hunit{\Sunit} &= \Sdlunit \circ \hunit{\Tunit} \\ % PDA1
-        \Sdlmult \circ (\Sdlunit S\odot \Sunit_\dl) &=  1_\dl \\ % PDA2
-        \Sdlmult \circ (\dl_{\Sunit} \odot S \Sdlunit) &= 1_\dl \\ % PDA3
-        \Tdlmult \circ (\Tunit_\dl \odot \Tdlunit T) &= 1_\dl \\    % PDA4
-        \Tdlmult \circ (T\Tdlunit \odot \dl_{\Tunit}) &= 1_\dl \\  % PDA5
-        \Sdlmult \circ (\Sdlmult S\odot \Smult_\dl) &= \Sdlmult \circ (\dl_{\Smult} \odot S \Sdlmult) \\ % PDA6
-        \Tdlmult \circ (\Tmult_\dl\odot \Tdlmult T) &= \Tdlmult \circ (T \Tdlmult\odot \dl_{\Tmult}) \\ % PDA7
-        \Sdlmult \circ (\Tdlunit S\odot S\Tdlunit) &= \Tdlunit \circ \hunit{\Smult} \\ % PDA8
-        \Tdlmult \circ (T\Sdlunit\odot \Sdlunit T) &= \Sdlunit \circ \hunit{\Tmult} \\ % PDA9
-        \Sdlmult \circ (\Tdlmult S\odot S\Tdlmult) &= \Tdlmult \circ (T\Sdlmult\odot \Sdlmult T) \circ \dlnat % PDA10
+        \Sdlmult \circ (\Sdlunit S\bcomp \Sunit_\dl) &=  1_\dl \\ % PDA2
+        \Sdlmult \circ (\dl_{\Sunit} \bcomp S \Sdlunit) &= 1_\dl \\ % PDA3
+        \Tdlmult \circ (\Tunit_\dl \bcomp \Tdlunit T) &= 1_\dl \\    % PDA4
+        \Tdlmult \circ (T\Tdlunit \bcomp \dl_{\Tunit}) &= 1_\dl \\  % PDA5
+        \Sdlmult \circ (\Sdlmult S\bcomp \Smult_\dl) &= \Sdlmult \circ (\dl_{\Smult} \bcomp S \Sdlmult) \\ % PDA6
+        \Tdlmult \circ (\Tmult_\dl\bcomp \Tdlmult T) &= \Tdlmult \circ (T \Tdlmult\bcomp \dl_{\Tmult}) \\ % PDA7
+        \Sdlmult \circ (\Tdlunit S\bcomp S\Tdlunit) &= \Tdlunit \circ \hunit{\Smult} \\ % PDA8
+        \Tdlmult \circ (T\Sdlunit\bcomp \Sdlunit T) &= \Sdlunit \circ \hunit{\Tmult} \\ % PDA9
+        \Sdlmult \circ (\Tdlmult S\bcomp S\Tdlmult) &= \Tdlmult \circ (T\Sdlmult\bcomp \Sdlmult T) \circ \dlnat % PDA10
       \end{align*}
-      where $\dlnat : \dl TS \odot TS \dl \toiso TS \dl \odot \dl TS$ is a pseudonaturality constraint of $\dl$.
+      where $\dlnat : \dl TS \bcomp TS \dl \toiso TS \dl \bcomp \dl TS$ is a pseudonaturality constraint of $\dl$.
       In all cases the tight naturality and monad axioms for the transformations $\Tmult,\Tunit,\Smult,\Sunit$ ensures that the boundaries of both sides of the equations agree automatically.
   \end{enumerate}
 \end{defn}
@@ -880,10 +881,10 @@ In a later paper we will do the same for generalized polycategories relative to 
 
 TODO: Define the 2-category of $\dl$-monoids.
 
-We now proceed to define a loose distributive law for which $\dl$-monoids are kits (or, more precisely, ``pre-kits'').
+In the rest of the paper we will define a loose distributive law for which $\dl$-monoids are kits (or, more precisely, ``pre-kits'').
 Of course, first we need a couple of monads.
 In a kit there are actually \emph{four} different kinds of structure that have to be incorporated into these monads: the extraordinary pairing of variables in the domain, the extraordinary pairing in the codomian, the possibility of multiple modules in the domain, and the substitution of functor terms for abstract variables in the codomain.
-To simplify the construction and clarify the essential point (composing extraordinary natural transformations), we will first define a loose distributive law for ``unary kits without substitution'' that includes only the first two; then we will ``mix in'' the other two using a kind of mixed distributive law.
+To simplify the construction and clarify the essential point (composing extraordinary natural transformations), we will first define a loose distributive law for ``unary kits without substitution'' that includes only the first two; then we will add in the other two.
 
 \section{Linear double monads}
 \label{sec:linear-double-monads}
@@ -944,7 +945,7 @@ There are two examples we care about.
 \begin{eg}
   The cartesian monoidal 2-category \cDbl is in fact closed as a monoidal bicategory, i.e.\ the functors $\dA\times -$ have right biadjoints.
   As observed in~\cite{gg:lowdim-tricats}, it can therefore be regarded as a bicategory enriched over itself, i.e.\ a locally cubical bicategory.
-  The hom-double-category $\iDbl(A,B)$ consists of strong double functors, tight transformations, loose transformations, and modifications between them.
+  The hom-double-category $\fDbl(A,B)$ consists of strong double functors, tight transformations, loose transformations, and modifications between them.
 \end{eg}
 
 \begin{thm}
@@ -979,7 +980,7 @@ We can do something similar in $\cL(\dCat)$, where the slice double category $\d
 The following observation is entirely straightforward.
 
 \begin{thm}
-  Any object $X$ in a locally cubical bicategory \iA induces a representable locally cubical pseudofunctor $\iA(X,-):\iA \to \iDbl$.\qed
+  Any object $X$ in a locally cubical bicategory \iA induces a representable locally cubical pseudofunctor $\iA(X,-):\iA \to \fDbl$.\qed
 \end{thm}
 
 In particular, any ``horizontal monad'' on $A\in \iA$ (whose multiplication and unit are tight 2-cells) induces a strong double monad on any hom-double-category $\iA(X,A)$.
@@ -1024,19 +1025,88 @@ Here $f:a\to e$, $g:b\to e$, $h:b\to d$, $k:c\to d$, and $\ell:a\to f$ are morph
 Note that there can only be a morphism between two lists if they have the same length \emph{and} the same number of opposites.
 Formally, if $A=(a_1\e[1],\dots,a_n\e[n])$ and $B=(b_1\ph[1],\dots,b_n\ph[n])$, then a morphism $A\to B$ is a pair $(\sigma,f)$ where $\sigma\in \Sigma_n$ is a permutation such that $\varphi_{\sigma(k)} = \varepsilon_{k}$, and $f=(f_1,\dots,f_n)$ is a list of morphisms with $f_n : a_n \to b_{\sigma(n)}$.
 
-For the rest of this section, let \C be a discrete category.
+For the rest of this section, let \C be a \emph{discrete} category, whose objects will be the cats of our unary kit.
 In particular, therefore $V\C$ is a groupoid.
-We will define a loose distributive law on $V\C$ in $\fSpan(\dCat)$, inducing one on $\dCat/V\C$ whose generalized polycategories are ``unary kits with no nonidentity functors''.
+We will define a loose distributive law on $V\C$ in $\fSpan(\dCat)$, inducing one on $\dCat/V\C$ whose generalized polycategories are ``unary kits without functors''.
 
 The two monads involved in this distributive law will in fact be the same monad, which we denote $R$.
-Being a horizontal monad in $\fSpan(\dCat)$, it is equivalently a monad in the bicategory $\cSpan(\bCat)$, i.e.\ an internal category in \bCat, i.e.\ a \emph{strict} double category.
-Since its category of objects is $V\C$, its objects are those of $V\C$ and its tight morphisms are the morphisms of $V\C$.
-We define its loose morphisms to be
+Being a horizontal monad in $\fSpan(\dCat)$, it is equivalently a monad in the bicategory $\cSpan(\bCat)$, i.e.\ an internal category in \bCat, i.e.\ a \emph{strict} double category $\dR$.
+Since its category of objects $\dR_0$ is $V\C$, its objects are those of $V\C$ and its tight morphisms are the morphisms of $V\C$.
+We now define its loose morphisms and cells.
 
+Let us call an object of $V\C$ \textbf{totally covariant} if it contains no $(-)\o$'s.
+A \textbf{$B$-trivial pre-matching} between $A,B\in V\C$ is an isomorphism $A \cong B E E\o$ in $V\C$ where $E$ is totally covariant and the permutation preserves the relative order of cats in $B$.
+Two pre-matchings are \textbf{equivalent} if they are related by an isomorphism $E\cong E'$ (necessarily unique if it exists); a \textbf{$B$-trivial matching} is an equivalence class of $B$-trivial pre-matchings.
+[Is this passage to equivalence classes the right thing to do?  Does it actually make sense everywhere?]
+
+Now a loose morphism from $A$ to $B$ in our double category (an object of $\dR_1$) is a $B$-trivial matching between $A$ and $B$.
+The loose composite of matchings $A\cong B D D\o$ and $B \cong C E E\o$ is the composite
+\[ A\cong B D D\o \cong C E E\o D D\o \cong C (E D) (E D)\o. \]
+The identity matching is the unique one with $E=()$.
+The cells are commutative squares of two matchings and two isomorphisms, in an obvious sense.
+
+This completes the definition of a strict double category $\dR$ with $\dR_0 = V\C$.
+Note that the source and target functors of \dR are both individually fibrations (though the functor $(s,t):\dR_1 \to \dR_0\times \dR_0$ is not a fibration).
+Thus, in particular it is a monad in $\cL(\dCat)$, and thus induces a strong double monad $R$ on $\dCat/V\C$.
+
+An object of $\dCat/V\C$ is a functor $\E\to V\C$, where the fiber $\E(A)$ over $A=(a_1\e[1],\dots,a_n\e[n])$ is the set of modules with boundary $A$.
+Usually we will assume it to be a discrete fibration (or equivalently a discrete opfibration, since $V\C$ is a groupoid), meaning that we can permute the cats in the boundary of a module.
+The objects of $R\E$ are then obtained by choosing an object of $\E$, pairing up some of the cats in its boundary into covariant and contravariant pairs, and removing them from the boundary of the result.
+Note that the passage from pre-matchings to matchings means that there is no ordering imposed on the paired cats, and $B$-triviality means that the order of the unremoved cats is maintained.
+However, $R\E\to V\C$ is still no longer a \emph{discrete} fibration: an object in the fiber over $B$ consists of a $B$-trivial matching $A\cong BEE\o$ together with an object of $\E(A)$, and if $E$ admits automorphisms then so can such objects.
+
+Now a profunctor $\cM:R\E \bto R\E$ in $\dCat/V\C$ consists of a set of ``morphisms'', each of which is assigned a pair of modules with some of their cats paired up to be its domain and codomain, plus a permutation relating the \emph{unpaired} cats in the domain and the codomain.
+The latter datum is the 2-cell
+\[ \xymatrix{ R\E \ar[d]|{\bullet}_{\cM} \ar[r] \ar@{}[dr]|{\Rightarrow} & V\C \ar[d]|{\bullet}^{\hunit {V\C}} \\ R\E \ar[r] & V \C } \]
+exhibiting $\cM$ as a loose morphism in $\dCat/V\C$.
+These elements of \cM are the extraordinary morphisms between modules, with the pairings in their domain and codomain representing the extraordinary-natural cats.
+The profunctorial action means that the cats in the domains and codomains of morphisms can be permuted, including the extraordinary natural ones.
+
+Now we have to define a loose distributive law of $R$ over itself on $\dCat/V\C$.
+As suggested in \cref{sec:linear-double-monads}, we will do this by defining a loose distributive law of $\dR$ over itself in the locally cubical bicategory $\cL(\dCat)$.
+For clarity, we write $\dS=\dT=\dR$, with \dS as a mnemonic for source and \dT for target; thus our goal is $\dl : \dT \ocomp \dS \bto \dS \ocomp \dT$.
+
+Now $\dT\ocomp \dS$ and $\dS\ocomp \dT$ are spans from $V\C$ to itself, whose objects consist of a $B$-trivial matching $A\cong B D D\o$ and a $C$-trivial matching $B \cong C E E\o$, with the projections selecting $A$ and $C$.
+Of course these have a composite $C$-trivial matching from $A$ to $C$; the additional data beyond the composite is simply a division of the paired cats into those in $D$ and those in $E$.
+The object $B\in V\C$ is actually determined once we know $D$ and the composite, by $B$-triviality of the first matching.
+In particular, the fibers of $\dT\ocomp \dS \to V\C \times V\C$ are discrete.
+
+Our $\delta$ is supposed to be a profunctor $\dT \ocomp \dS \bto \dS \ocomp \dT$, which moreover must be a loose 2-cell in $\cL(\dCat)$ and thus come with cells
+\[ \xymatrix{ V\C \ar[d]|{\bullet}_{\hunit A} \ar@{}[dr]|{\Leftarrow} &
+  \dT\ocomp \dS \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
+  V\C \ar[d]|{\bullet}^{\hunit B}\\
+  V\C & \dS\ocomp\dT \ar[l] \ar[r] & V\C. } \]
+Taken together, this means that for any $A,C$ and $A',C'$, and isomorphisms $A\cong A'$ and $C\cong C'$, plus a $C$-trivial matching from $A$ to $C$ and a $C'$-trivial matching from $A'$ to $C'$, both with the paired cats partitioned into two subsets, we must have a specified ``set of ways to compose''.
+Put differently, the ``type'' of an element of $\dl$ is given by the following data:
+\[ \xymatrix{ A \ar[d]_\cong \ar[r]^-\cong & B D D\o \ar[r]^-\cong & C E E\o D D\o & C \ar[d]^\cong \\
+   A' \ar[r]_-\cong & B' D' (D')\o \ar[r]_-\cong & C' E' (E')\o D' (D')\o & C' }\]
+Note that the isomorphism $C\cong C'$ is not required to ``commute'' with the others.
+
+In fact, any such ``type'' will be inhabited by \emph{at most one} element of $\dl$.
+It is simplest to describe the conditions under which this happens as a partial function from the left half of the diagram $B D D\o \cong A\cong A' \cong B' D' (D')\o$ to the right half.
+Regard this composite isomorphism $B D D\o \cong B' D' (D')\o$ as a bipartite graph, and add additional edges connecting each cat in $D$ or $D'$ to its counterpart in $D\o$ or $(D')\o$.
+In the resulting graph all vertices have degree 1 or 2, so it is a disjoint union of paths and cycles.
+The partial function is defined if and only if there are \emph{no} cycles.
+In this case, each path must start and end at a cat in $B$ or $B'$.
+Every path that connects two cats in $B$ gives us an element of $E$, while every path that connects two cats in $B'$ gives us an element of $E'$.
+The remaining paths connect one cat in $B$ with one in $B'$, specifying the isomorphism $C\cong C'$.
+Note that the variance gets flipped every time a path ``changes direction'', so $E$- and $E'$-paths do indeed connect two copies of a cat with opposite variance, while the remaining ones preserve variance.
+
+To be a profunctor, $\dl$ must also be acted on by permutations on both sides.
+This is evident.
+Thus, we have defined a loose 2-cell $\dl : \dT \ocomp \dS \bto \dS \ocomp \dT$ in $\cL(\dCat)$.
+
+For the remaining data and axioms of a loose distributive law, we note that \dT and \dS play entirely symmetrical roles in the construction.
+Thus, we can cut our work almost in half by symmetry (``almost'' because two of the axioms are self-dual under this symmetry).
+
+[TODO \dots]
 
 
 \section{Substitutions}
 \label{sec:substitutions}
+
+Next we incorporate nontrivial functors into our unary kits.
+We start by describing the structure formed by the cats and functors as a kind of generalized multicategory in its own right.
 
 We extend $V$ to a monad on the double category \dCat in the usual way (in fact, the unique way), by treating the elements of profunctors as if they were ``morphisms''.
 That is, the above diagram could also represent an element of a profunctor $V H : V \D \hto V \C$, if $a,b,c\in\C$ and $d,e,f\in \D$ while $f\in H(a,e)$, $g\in H(b,e)$, and so on.
@@ -1052,218 +1122,233 @@ Since the monoidal structure on \Chat is induced by the concatenation monoidal s
 
 Note that every isomorphism in \Chat consists only of unary arrows.
 By a \textbf{permutation isomorphism} in \Chat we mean an isomorphism in which these unary arrows are all identities; thus it really is nothing but a permutation.
+In fact, the subcategory of permutation isomorphisms in $\Chat$ is isomorphihc to $V\C_0$, where $\C_0$ is the set of objects of $\C$.
 
-Now fix a virtual $V$-algebra \C; its objects and morphisms will be the ``categories and functors'' in our formal category theory.
-Each ``module'' will depend on a list of objects of \C with variance, i.e.\ an object of \Chat, and we can restrict modules along functors.
-Thus, to start with we take the modules to be a functor $\E:\Chat\op\to \bCat$.
-For the present we consider only strict functors here; there is probably no serious obstacle to weakening this, but the technical complications would be greater.
-Moreover, as is well-known any pseudofunctor can be strictified; and in many examples the functor is already strict.
+Now fix a virtual $V$-algebra \C, whose objects will be our cats and functors.
+We define a new linear double monad incorporating restriction along morphisms in \C as follows.
+Say that a \textbf{pre-matching with restriction} between $A,B\in V\C$ is a morphism $B E E\o \to A$ in $\C$ where $E$ is totally covariant.
+Two such pre-matchings are \textbf{equivalent} if they are related by an isomorphism $E\cong E'$ (necessarily unique if it exists); a \textbf{matching with restriction} is an equivalence class of pre-matchings.
 
-The morphisms in the categories $\E(B)$ will be the ``ordinary'' natural transformations.
-To describe the extraordinary ones, we will enhance \E to a generalized polycategory.
-Consider the equipment $\dCat^{\Chat\op}$, whose objects are (strict) functors $\E:\Chat\op\to\bCat$, whose vertical arrows are (strict) natural transformations, and so on.
-Note that the objects of $\dCat^{\Chat\op}$ can be regarded as split fibrations over $\Chat$ or as split opfibrations over $\Chat\op$, and similarly for the rest of its structure.
+Now let \dC be the strict double category whose tight morphisms are the permutation isomorphisms (that is, $\dC_0 = V\C_0$), whose loose morphisms from $A$ to $B$ are matchings with restrictions from $B$ to $A$, and whose cells are commutative squares in $\Chat$.
+[Hmm, does this make sense with the passage to equivalence classes?]
+Then \dC is a monad in $\cT(\dCat)$ on $V\C_0$.
+We will construct a loose distributive law $\dS \ocomp \dC \to \dC\ocomp \dS$ in $\cL(\dCat)$, analogous to the one constructed in the previous section.
 
-\begin{rmk}
-  A functor $\Chat\op\to\bSet$ can equivalently be regarded as a horizontal arrow $1\hto \C$ in the virtual equipment of $V$-monoids.
-  (We owe this observation to Peter LeFanu Lumsdaine.)
-  Therefore, the equipment $\dCat^{\Chat\op}$ can also be regarded as the equipment of \emph{internal} categories in the category whose objects are such horizontal arrows.
-\end{rmk}
+[TODO\dots]
 
-We define a monad $S$ on $\dCat^{\Chat\op}$ by the following pullback:
-\[ \xymatrix{ S \E \ar[r] \ar[d] \pullback & \E \ar[d] \\
-  \Chat\times\Chat \ar[r]^-m \ar[d]^{\pi_2} & \Chat \\
-  \Chat }\]
-Here we regard \E as a split fibration over \Chat, the functor $m$ is defined by $m(A,B) = A A\o B$, and $\pi_2$ denotes the second projection.
-In other words, the objects of $S\E(B)$ are pairs $(A,M)$ where $A\in\Chat$ and $M\in\E(A A\o B)$, and its morphisms are pairs $(f,\phi) : (A,M)\to (A',M')$ with $f:A\to A'$ and $\phi : M \to f^*M'$.
+% Each ``module'' will depend on a list of objects of \C with variance, i.e.\ an object of \Chat, and we can restrict modules along functors.
+% Thus, to start with we take the modules to be a functor $\E:\Chat\op\to \bCat$.
+% For the present we consider only strict functors here; there is probably no serious obstacle to weakening this, but the technical complications would be greater.
+% Moreover, as is well-known any pseudofunctor can be strictified; and in many examples the functor is already strict.
 
-The unit $\E\to S\E$ sends $M\in \E(B)$ to $(\one,M)$; this is well-typed since $\Chat$ is strict monoidal, so $\one\one\o B = B$.
-The multiplication $SS\E\to S\E$ sends $(A,(B,M)) \in S S \E(C)$ to $(AB,\sigma^* M)\in S\E(E)$, where $\sigma : ABA\o B\o C \toiso A A\o B B\o C$ is the obvious permutation.
-The monad laws follow straightforwardly, though here we use the splitness of \E; if \E were only a pseudofunctor then $S$ would be only a pseudomonad.
+% The morphisms in the categories $\E(B)$ will be the ``ordinary'' natural transformations.
+% To describe the extraordinary ones, we will enhance \E to a generalized polycategory.
+% Consider the equipment $\dCat^{\Chat\op}$, whose objects are (strict) functors $\E:\Chat\op\to\bCat$, whose vertical arrows are (strict) natural transformations, and so on.
+% Note that the objects of $\dCat^{\Chat\op}$ can be regarded as split fibrations over $\Chat$ or as split opfibrations over $\Chat\op$, and similarly for the rest of its structure.
 
-We define a monad $T$ on $\dCat^{\Chat\op}$ analogously, but regarding \E as a split opfibration over $\Chat\op$ instead:
-\[ \xymatrix{ T \E \ar[r] \ar[d] \pullback & \E \ar[d] \\
-  \Chat\op\times\Chat\op \ar[r]^-m \ar[d]^{\pi_2} & \Chat\op \\
-  \Chat\op }\]
-Thus, the objects of $T\E(B)$ are the same as those of $S\E(B)$, while its morphisms are pairs $(f,\psi) : (A,M)\to (A',M')$ with $f:A'\to A$ and $\psi : f^* M \to M'$.
+% \begin{rmk}
+%   A functor $\Chat\op\to\bSet$ can equivalently be regarded as a horizontal arrow $1\hto \C$ in the virtual equipment of $V$-monoids.
+%   (We owe this observation to Peter LeFanu Lumsdaine.)
+%   Therefore, the equipment $\dCat^{\Chat\op}$ can also be regarded as the equipment of \emph{internal} categories in the category whose objects are such horizontal arrows.
+% \end{rmk}
 
-Now we have come to the heart of the definition: we will construct a horizontal distributive law $\delta : TS \hto ST$ that encodes the ``loop-free string-diagram compositions'' allowed for extranatural transformations.
-The resulting generalized polycategories will contain an object $\E\in \dCat^{\Chat}$, describing the modules and ordinary natural transformations as before, and also a horizontal arrow $\cM: T\E \hto S\E$, describing the extraordinary natural transformations.
-Here the ``poly-arrows'' from $(A,M)$ to $(C,N)$ over $B\in\Chat$ will represent transformations of the form $M(a,a,b) \to N(c,c,b)$, ordinary-natural in $b$ and extraordinary-natural in the two possible ways in $a$ and $c$.
-Note that here $(A,M)\in S\E$ and $(B,N)\in T\E$; as a mnemonic $S$ stands for ``source'' and $T$ for ``target''.
+% We define a monad $S$ on $\dCat^{\Chat\op}$ by the following pullback:
+% \[ \xymatrix{ S \E \ar[r] \ar[d] \pullback & \E \ar[d] \\
+%   \Chat\times\Chat \ar[r]^-m \ar[d]^{\pi_2} & \Chat \\
+%   \Chat }\]
+% Here we regard \E as a split fibration over \Chat, the functor $m$ is defined by $m(A,B) = A A\o B$, and $\pi_2$ denotes the second projection.
+% In other words, the objects of $S\E(B)$ are pairs $(A,M)$ where $A\in\Chat$ and $M\in\E(A A\o B)$, and its morphisms are pairs $(f,\phi) : (A,M)\to (A',M')$ with $f:A\to A'$ and $\phi : M \to f^*M'$.
 
-(Note that since $A,B,C$ are objects of $\Chat$, hence lists of objects of \C with variance, we are actually allowing ordinary and extraordinary naturality in arbitrarily many variables.)
-In a later section we will further ``mix in'' the monad for symmetric monoidal categories to this distributive law, further enhancing these generalized polycategories to allow multiple objects in the domains of arrows.
+% The unit $\E\to S\E$ sends $M\in \E(B)$ to $(\one,M)$; this is well-typed since $\Chat$ is strict monoidal, so $\one\one\o B = B$.
+% The multiplication $SS\E\to S\E$ sends $(A,(B,M)) \in S S \E(C)$ to $(AB,\sigma^* M)\in S\E(E)$, where $\sigma : ABA\o B\o C \toiso A A\o B B\o C$ is the obvious permutation.
+% The monad laws follow straightforwardly, though here we use the splitness of \E; if \E were only a pseudofunctor then $S$ would be only a pseudomonad.
 
-The fact that the poly-arrows form a horizontal arrow \cM in $\dCat^{\Chat}$ means the following.
-First of all, they are acted on functorially by morphisms $B'\to B$ in $\Chat$: in other words, we can substitute for $b$ in a transformation $M(a,a,b) \to N(c,c,b)$.
-Secondly, for each fixed $B$, we have a profunctorial action of $S\E$ and $T\E$ on both sides, which simultaneously implement substitution for $a$ and $c$ and also composition on both sides with ordinary natural transformations.
-In the case of $T$, for instance, if we have a morphism $(f,\psi) : (C,N)\to (C',N')$ with $f:C'\to C$ and $\psi : f^* N \to N'$, this means a natural transformation $N(f(c'),f(c'),b) \to N'(c',c',b)$, and so we can compose this with an extraordinary natural one $M(a,a,b) \to N(c,c,b)$ by first substituting $c=f(c')$ in the latter.
-Similarly for $S$, if we have $(f,\phi) : (A',M')\to (A,M)$ with $f:A'\to A$ and $\phi : M' \to f^*M$, it means a natural transformation $M'(a',a',b) \to M(f(a'),f(a'),b)$, and we can compose it with $M(a,a,b) \to N(c,c,b)$ by first substituting $a=f(a')$ in the latter.
+% We define a monad $T$ on $\dCat^{\Chat\op}$ analogously, but regarding \E as a split opfibration over $\Chat\op$ instead:
+% \[ \xymatrix{ T \E \ar[r] \ar[d] \pullback & \E \ar[d] \\
+%   \Chat\op\times\Chat\op \ar[r]^-m \ar[d]^{\pi_2} & \Chat\op \\
+%   \Chat\op }\]
+% Thus, the objects of $T\E(B)$ are the same as those of $S\E(B)$, while its morphisms are pairs $(f,\psi) : (A,M)\to (A',M')$ with $f:A'\to A$ and $\psi : f^* M \to M'$.
 
-The way poly-composition will work is the following.
-The objects of $ST\E(E)$ are triples $(A,B,M)$ with $A,B\in \Chat$ and $M\in \E(B B\o A A\o E)$, and its morphisms are triples $(f,g,\xi):(A,B,M) \to (A',B',M')$ with $f:A\to A'$, $g:B'\to B$, and $\xi:g^*M \to f^*M'$, which really means $(gg111)^*M \to (11ff1)^*M'$.
-Note that the monad on the ``outside'' (i.e.\ $S$) corresponds to the object of \Chat on the ``inside'' (i.e.\ $A$): by definition of $S$, an object of $ST\E(E)$ is an object $A\in\Chat$ together with an object of $T\E(A A\o E)$, and then by definition of $T$, the latter is an object $B\in\Chat$ together with an object of $\E(B B\o A A\o E)$.
-Dually, the objects of $TS\E(E)$ are triples $(C,D,N)$ with $C,D\in \Chat$ and $N\in \E(D D\o C C\o E)$, and its morphisms are triples $(h,k,\zeta):(C,D,N) \to (C',D',N')$ with $h:C'\to C$, $k:D\to D'$, and $\zeta:h^*N \to k^*N'$, which really means $(11hh1)^*N \to (kk111)^*N'$.
+% Now we have come to the heart of the definition: we will construct a horizontal distributive law $\delta : TS \hto ST$ that encodes the ``loop-free string-diagram compositions'' allowed for extranatural transformations.
+% The resulting generalized polycategories will contain an object $\E\in \dCat^{\Chat}$, describing the modules and ordinary natural transformations as before, and also a horizontal arrow $\cM: T\E \hto S\E$, describing the extraordinary natural transformations.
+% Here the ``poly-arrows'' from $(A,M)$ to $(C,N)$ over $B\in\Chat$ will represent transformations of the form $M(a,a,b) \to N(c,c,b)$, ordinary-natural in $b$ and extraordinary-natural in the two possible ways in $a$ and $c$.
+% Note that here $(A,M)\in S\E$ and $(B,N)\in T\E$; as a mnemonic $S$ stands for ``source'' and $T$ for ``target''.
 
-Now suppose we want to compose a poly-arrow $\alpha : (B_1,M_1)\to (B_2,M_2)$ with a poly-arrow $\beta : (D_1,N_1) \to (D_2,N_2)$, so that say $M_i\in \E(B_i B_i\o F)$ and $N_i\in \E(D_i D_i\o G)$.
-Note that as elements of our profunctor \cM in $\dCat^{\Chat}$, $\alpha$ and $\beta$ are indexed by \emph{different} objects $F$ and $G$ of \Chat.
-But in order for this composite to make sense, we must have a permutation isomorphism $B_2 B_2\o F \cong D_1 D_1\o G$ that identifies $M_2$ with $N_1$.
-This isomorphism, together with the pairings of objects in $B_2\leftrightarrow B_2\o$ and $D_1 \leftrightarrow D_1\o$, defines a graph that according to the rule of~\cite{ek:gen-funct-calc} must have no loops.
+% (Note that since $A,B,C$ are objects of $\Chat$, hence lists of objects of \C with variance, we are actually allowing ordinary and extraordinary naturality in arbitrarily many variables.)
+% In a later section we will further ``mix in'' the monad for symmetric monoidal categories to this distributive law, further enhancing these generalized polycategories to allow multiple objects in the domains of arrows.
 
-If this is the case, then this graph consists only of ``segments'' with endpoints in $F$ and $G$ respectively.
-The segments connecting two objects in $F$ or two objects in $G$ indicate new extranaturalities appearing in the domain or codomain of the composite, respectively, while those connecting one object in $F$ with one in $G$ indicate ordinary naturalities.
-In other words, the graph yields permutation isomorphisms $F \cong A A\o E$ and $G \cong C C\o E$, and the result of the composition should be a poly-arrow $\beta\alpha : (B_1 A, M_1) \to (D_2 C,N_2)$.
-Formally speaking, what this means is that there should be a way to regard $\alpha$ and $\beta$ as elements of $S\cM : ST\E \hto SS\E$ and $T\cM : TT\E \hto TS\E$ respectively, where the outer monads $S$ and $T$ introduce the inner objects $A$ and $C$ of \Chat as above.
-The concatenations $B_1 A$ and $D_2 C$ then arise from the monad multiplications of $S$ and $T$.
+% The fact that the poly-arrows form a horizontal arrow \cM in $\dCat^{\Chat}$ means the following.
+% First of all, they are acted on functorially by morphisms $B'\to B$ in $\Chat$: in other words, we can substitute for $b$ in a transformation $M(a,a,b) \to N(c,c,b)$.
+% Secondly, for each fixed $B$, we have a profunctorial action of $S\E$ and $T\E$ on both sides, which simultaneously implement substitution for $a$ and $c$ and also composition on both sides with ordinary natural transformations.
+% In the case of $T$, for instance, if we have a morphism $(f,\psi) : (C,N)\to (C',N')$ with $f:C'\to C$ and $\psi : f^* N \to N'$, this means a natural transformation $N(f(c'),f(c'),b) \to N'(c',c',b)$, and so we can compose this with an extraordinary natural one $M(a,a,b) \to N(c,c,b)$ by first substituting $c=f(c')$ in the latter.
+% Similarly for $S$, if we have $(f,\phi) : (A',M')\to (A,M)$ with $f:A'\to A$ and $\phi : M' \to f^*M$, it means a natural transformation $M'(a',a',b) \to M(f(a'),f(a'),b)$, and we can compose it with $M(a,a,b) \to N(c,c,b)$ by first substituting $a=f(a')$ in the latter.
 
-Finally, recall that in a generalized polycategory, the composition is a cell
-\[ \xymatrix{ TT\E \ar[r]|{|}^{T \cM} \ar[d]_{\Tmult} \ar@{}[drrr]|{\Downarrow} &
-  T S \E \ar[r]|{|}^{\delta} & S T \E \ar[r]|{|}^{S \cM} & S S \E \ar[d]^{\Smult}\\
-  T \E \ar[rrr]|{|}_\cM &&& S \E}\]
-This should now make some sense in our case; the one missing ingredient is the horizontal distributive law $\delta$, which evidently must encode the permutation isomorphisms and the fact that the resulting graph is loop-free.
+% The way poly-composition will work is the following.
+% The objects of $ST\E(E)$ are triples $(A,B,M)$ with $A,B\in \Chat$ and $M\in \E(B B\o A A\o E)$, and its morphisms are triples $(f,g,\xi):(A,B,M) \to (A',B',M')$ with $f:A\to A'$, $g:B'\to B$, and $\xi:g^*M \to f^*M'$, which really means $(gg111)^*M \to (11ff1)^*M'$.
+% Note that the monad on the ``outside'' (i.e.\ $S$) corresponds to the object of \Chat on the ``inside'' (i.e.\ $A$): by definition of $S$, an object of $ST\E(E)$ is an object $A\in\Chat$ together with an object of $T\E(A A\o E)$, and then by definition of $T$, the latter is an object $B\in\Chat$ together with an object of $\E(B B\o A A\o E)$.
+% Dually, the objects of $TS\E(E)$ are triples $(C,D,N)$ with $C,D\in \Chat$ and $N\in \E(D D\o C C\o E)$, and its morphisms are triples $(h,k,\zeta):(C,D,N) \to (C',D',N')$ with $h:C'\to C$, $k:D\to D'$, and $\zeta:h^*N \to k^*N'$, which really means $(11hh1)^*N \to (kk111)^*N'$.
 
-In terms of the resource2 type theory, we have been describing the unification judgment
-\[
-\unif{(\Psi_1 \combineU \Psi_1')} {(\Psi_2 \combineU \Psi_2')} {\rho} {(\Delta_0 \vdash \rho_0)}
-\]
-where $\Psi_1 = (B_1 B_1\o F)\o$, $\Psi_1' = B_2 B_2\o F$, $\Psi_2 = (D_1 D_1\o G)\o$, $\Psi_2' = D_2 D_2\o G$,\footnote{Note that right now the semantics we are describing corresponds only to a type theory whose type-contexts are singletons.  In the multivariable case, the cut rule of type theory cuts at only a single type at a time, so that $\Psi_2$ also contains paired variables in the rest of the domain of $\beta$; while the ``basic'' semantic polycategorical composition rule will compose along ``the entire context at once''.} and the permutation isomorphism $B_2 B_2\o F \cong D_1 D_1\o G$ is the renaming $\flip{\Psi_2'} \types \rho : \Psi_1'$; while $\Delta_0 = B_1 B_1\o A A\o E D_2 D_2\o C C\o E$, and the permutation isomorphisms $F \cong A A\o E$ and $G \cong C C\o E$ (together with the identity on $B_1$ and $D_2$) form the output renaming $\Delta_0 \vdash \rho_0 : \Psi_1 \combine \Psi_2$ that describes the ``new'' naturality and extranaturality pairings.
-(In general, renamings in this type theory correspond to permutation isomorphisms in \Chat together with information about ``how to pair up objects'' on either side to regard them as indexing objects of $T\E$ or $S\E$.)
+% Now suppose we want to compose a poly-arrow $\alpha : (B_1,M_1)\to (B_2,M_2)$ with a poly-arrow $\beta : (D_1,N_1) \to (D_2,N_2)$, so that say $M_i\in \E(B_i B_i\o F)$ and $N_i\in \E(D_i D_i\o G)$.
+% Note that as elements of our profunctor \cM in $\dCat^{\Chat}$, $\alpha$ and $\beta$ are indexed by \emph{different} objects $F$ and $G$ of \Chat.
+% But in order for this composite to make sense, we must have a permutation isomorphism $B_2 B_2\o F \cong D_1 D_1\o G$ that identifies $M_2$ with $N_1$.
+% This isomorphism, together with the pairings of objects in $B_2\leftrightarrow B_2\o$ and $D_1 \leftrightarrow D_1\o$, defines a graph that according to the rule of~\cite{ek:gen-funct-calc} must have no loops.
 
-However, it should be clear from the polycategorical setup that our perspective has to be a bit different.
-Rather than regarding $\rho$ as ``input'' and $\Delta_0,\rho_0$ as ``output'', in order to describe $\delta$ we essentially have to do the reverse, being \emph{given} decompositions $F = A A\o E$ and $G = C C\o E$ (allowing us to regard $\alpha$ and $\beta$ as elements of $S\cM$ and $T\cM$ respectively) and characterizing the set of permutation isomorphisms
-\[B_2 B_2\o F = B_2 B_2\o A A\o E \cong D_1 D_1\o C C\o E = D_1 D_1\o G \]
-whose associated graph yields a valid composition giving rise to these decompositions.
-In other words, rather than defining the function $\rho \mapsto \rho_0$, we have to define its preimages.
+% If this is the case, then this graph consists only of ``segments'' with endpoints in $F$ and $G$ respectively.
+% The segments connecting two objects in $F$ or two objects in $G$ indicate new extranaturalities appearing in the domain or codomain of the composite, respectively, while those connecting one object in $F$ with one in $G$ indicate ordinary naturalities.
+% In other words, the graph yields permutation isomorphisms $F \cong A A\o E$ and $G \cong C C\o E$, and the result of the composition should be a poly-arrow $\beta\alpha : (B_1 A, M_1) \to (D_2 C,N_2)$.
+% Formally speaking, what this means is that there should be a way to regard $\alpha$ and $\beta$ as elements of $S\cM : ST\E \hto SS\E$ and $T\cM : TT\E \hto TS\E$ respectively, where the outer monads $S$ and $T$ introduce the inner objects $A$ and $C$ of \Chat as above.
+% The concatenations $B_1 A$ and $D_2 C$ then arise from the monad multiplications of $S$ and $T$.
+
+% Finally, recall that in a generalized polycategory, the composition is a cell
+% \[ \xymatrix{ TT\E \ar[r]|{|}^{T \cM} \ar[d]_{\Tmult} \ar@{}[drrr]|{\Downarrow} &
+%   T S \E \ar[r]|{|}^{\delta} & S T \E \ar[r]|{|}^{S \cM} & S S \E \ar[d]^{\Smult}\\
+%   T \E \ar[rrr]|{|}_\cM &&& S \E}\]
+% This should now make some sense in our case; the one missing ingredient is the horizontal distributive law $\delta$, which evidently must encode the permutation isomorphisms and the fact that the resulting graph is loop-free.
+
+% In terms of the resource2 type theory, we have been describing the unification judgment
+% \[
+% \unif{(\Psi_1 \combineU \Psi_1')} {(\Psi_2 \combineU \Psi_2')} {\rho} {(\Delta_0 \vdash \rho_0)}
+% \]
+% where $\Psi_1 = (B_1 B_1\o F)\o$, $\Psi_1' = B_2 B_2\o F$, $\Psi_2 = (D_1 D_1\o G)\o$, $\Psi_2' = D_2 D_2\o G$,\footnote{Note that right now the semantics we are describing corresponds only to a type theory whose type-contexts are singletons.  In the multivariable case, the cut rule of type theory cuts at only a single type at a time, so that $\Psi_2$ also contains paired variables in the rest of the domain of $\beta$; while the ``basic'' semantic polycategorical composition rule will compose along ``the entire context at once''.} and the permutation isomorphism $B_2 B_2\o F \cong D_1 D_1\o G$ is the renaming $\flip{\Psi_2'} \types \rho : \Psi_1'$; while $\Delta_0 = B_1 B_1\o A A\o E D_2 D_2\o C C\o E$, and the permutation isomorphisms $F \cong A A\o E$ and $G \cong C C\o E$ (together with the identity on $B_1$ and $D_2$) form the output renaming $\Delta_0 \vdash \rho_0 : \Psi_1 \combine \Psi_2$ that describes the ``new'' naturality and extranaturality pairings.
+% (In general, renamings in this type theory correspond to permutation isomorphisms in \Chat together with information about ``how to pair up objects'' on either side to regard them as indexing objects of $T\E$ or $S\E$.)
+
+% However, it should be clear from the polycategorical setup that our perspective has to be a bit different.
+% Rather than regarding $\rho$ as ``input'' and $\Delta_0,\rho_0$ as ``output'', in order to describe $\delta$ we essentially have to do the reverse, being \emph{given} decompositions $F = A A\o E$ and $G = C C\o E$ (allowing us to regard $\alpha$ and $\beta$ as elements of $S\cM$ and $T\cM$ respectively) and characterizing the set of permutation isomorphisms
+% \[B_2 B_2\o F = B_2 B_2\o A A\o E \cong D_1 D_1\o C C\o E = D_1 D_1\o G \]
+% whose associated graph yields a valid composition giving rise to these decompositions.
+% In other words, rather than defining the function $\rho \mapsto \rho_0$, we have to define its preimages.
 
 
 
-\section{The distributive law}
-\label{sec:dl}
+% \section{The distributive law}
+% \label{sec:dl}
 
-%% Garner constructs the distributive law for ordinary polycategories using a ``double club''.
-%% At present I do not think this is possible in our case, because I can't think of any monad that $TS$, $ST$ and the distributive law $\delta$ all live over.
-%% I think it is true that there is a vertical distributive law $TS \to ST$ that happens to be an isomorphism, so that both $TS$ and $ST$ live over the composite monad ($TS$, or equivalently $ST$), which is cartesian; but I don't think that $\delta$ lives over that monad.
-%% Thus, we are forced to be more explicit.
+% %% Garner constructs the distributive law for ordinary polycategories using a ``double club''.
+% %% At present I do not think this is possible in our case, because I can't think of any monad that $TS$, $ST$ and the distributive law $\delta$ all live over.
+% %% I think it is true that there is a vertical distributive law $TS \to ST$ that happens to be an isomorphism, so that both $TS$ and $ST$ live over the composite monad ($TS$, or equivalently $ST$), which is cartesian; but I don't think that $\delta$ lives over that monad.
+% %% Thus, we are forced to be more explicit.
 
-Let $\Chats$ denote the sub-groupoid of \Chat consisting of the permutation isomorphisms.
-Now, given $A,B,C,D,E\in\Chat$, define
-\[ \theta(A,B,C,D,E) = \Chats(B B\o A A\o E, D D\o C C\o E) \]
-and consider \theta to define a functor
-\[ \theta : \Chats\op \times \Chats \times \Chats \times \Chats\op \times \Chats \to \bSet \]
-We now define a sub-functor $\thhat \subseteq \theta$, whose elements we call \emph{matchings}.
-Given any $\sigma\in\theta(A,B,C,D,E)$, consider the graph whose vertices are the occurrences of objects in the concatenated list $B B\o A A\o E D D\o C C\o E$, and whose edges are of two kinds:
-\begin{itemize}
-\item Each object $x$ in $B B\o A A\o E$ is connected by an edge to its image $\sigma(x)$ in $D D\o C C\o E$.
-\item Each object $b\e$ in $B$ is connected by an edge to the corresponding object $b\epbar$ in $B\o$, and similarly each object $d\e$ in $D$ is connected to $d\epbar$ in $D\o$.
-\end{itemize}
-Note that each vertex in $B B\o D D\o$ has degree 2, while each vertex in $A A\o E C C\o E$ has degree 1.
-Thus, this graph is a disjoint union of cycles and segments.
-We say that $\sigma$ is a \textbf{matching} if the following conditions are satisfied.
-\begin{enumerate}
-\item There are no cycles.
-\item If one endpoint of a segment is at an object in one copy of $E$, then its other endpoint is at the same occurrence of the same object in the other copy of $E$ (i.e. not just an occurrence of the same object elsewhere, but the same ordered position within $E$).
-\item If one endpoint of a segment is at an object of $A$ or $C$, then its other endpoint is at the corresponding occurrence of the same object (with opposite variance) in $A\o$ or $C\o$.
-\end{enumerate}
-We write $\thhat(A,B,C,D,E)$ for the subset of $\theta(A,B,C,D,E)$ consisting of the matchings.
-The conditions defining a matching are invariant under permutations acting on $A$, $B$, $C$, $D$, and $E$ separately, so $\thhat$ is also a functor
-\[ \thhat : \Chats\op \times \Chats \times \Chats \times \Chats\op \times \Chats \to \bSet. \]
+% Let $\Chats$ denote the sub-groupoid of \Chat consisting of the permutation isomorphisms.
+% Now, given $A,B,C,D,E\in\Chat$, define
+% \[ \theta(A,B,C,D,E) = \Chats(B B\o A A\o E, D D\o C C\o E) \]
+% and consider \theta to define a functor
+% \[ \theta : \Chats\op \times \Chats \times \Chats \times \Chats\op \times \Chats \to \bSet \]
+% We now define a sub-functor $\thhat \subseteq \theta$, whose elements we call \emph{matchings}.
+% Given any $\sigma\in\theta(A,B,C,D,E)$, consider the graph whose vertices are the occurrences of objects in the concatenated list $B B\o A A\o E D D\o C C\o E$, and whose edges are of two kinds:
+% \begin{itemize}
+% \item Each object $x$ in $B B\o A A\o E$ is connected by an edge to its image $\sigma(x)$ in $D D\o C C\o E$.
+% \item Each object $b\e$ in $B$ is connected by an edge to the corresponding object $b\epbar$ in $B\o$, and similarly each object $d\e$ in $D$ is connected to $d\epbar$ in $D\o$.
+% \end{itemize}
+% Note that each vertex in $B B\o D D\o$ has degree 2, while each vertex in $A A\o E C C\o E$ has degree 1.
+% Thus, this graph is a disjoint union of cycles and segments.
+% We say that $\sigma$ is a \textbf{matching} if the following conditions are satisfied.
+% \begin{enumerate}
+% \item There are no cycles.
+% \item If one endpoint of a segment is at an object in one copy of $E$, then its other endpoint is at the same occurrence of the same object in the other copy of $E$ (i.e. not just an occurrence of the same object elsewhere, but the same ordered position within $E$).
+% \item If one endpoint of a segment is at an object of $A$ or $C$, then its other endpoint is at the corresponding occurrence of the same object (with opposite variance) in $A\o$ or $C\o$.
+% \end{enumerate}
+% We write $\thhat(A,B,C,D,E)$ for the subset of $\theta(A,B,C,D,E)$ consisting of the matchings.
+% The conditions defining a matching are invariant under permutations acting on $A$, $B$, $C$, $D$, and $E$ separately, so $\thhat$ is also a functor
+% \[ \thhat : \Chats\op \times \Chats \times \Chats \times \Chats\op \times \Chats \to \bSet. \]
 
-However, we need a functor defined on \Chat, not just on \Chats.
-Thus, we ``tensor $\thhat$ up'' in the following way:
-\[ \thchk(A,B,C,D,E) = \int^{\Bhat,\Dhat\in\Chats} \Chat(\Bhat,B) \times \Chat(\Dhat,D)\times \thhat(A,\Bhat,C,\Dhat,E) \]
-We will see in a moment that this is sufficient.
-Now we define our putative horizontal distributive law to be
-\begin{equation}\label{eq:delta}
-  \delta_{\E,E}((A,B,M),(C,D,N)) = \sum_{(u,v,\sigma)\in \thchk(A,B,C,D,E)} \E(u^*M,\sigma^*v^*N)
-\end{equation}
-where according to the definition of $\thchk$ we have $u\in \Chat(\Bhat,B)$, $v\in \Chat(\Dhat,D)$, and $\sigma\in\thhat(A,\Bhat,C,\Dhat,E)$.
-Of course, \thchk is a quotient, so its elements are not uniquely written as triples $(u,v,\sigma)$; but it is easy to see that a different representative yields a canonically isomorphic set of morphisms $\E(u^*M,\sigma^*v^*N)$, so $\delta$ is well-defined up to isomorphism.
+% However, we need a functor defined on \Chat, not just on \Chats.
+% Thus, we ``tensor $\thhat$ up'' in the following way:
+% \[ \thchk(A,B,C,D,E) = \int^{\Bhat,\Dhat\in\Chats} \Chat(\Bhat,B) \times \Chat(\Dhat,D)\times \thhat(A,\Bhat,C,\Dhat,E) \]
+% We will see in a moment that this is sufficient.
+% Now we define our putative horizontal distributive law to be
+% \begin{equation}\label{eq:delta}
+%   \delta_{\E,E}((A,B,M),(C,D,N)) = \sum_{(u,v,\sigma)\in \thchk(A,B,C,D,E)} \E(u^*M,\sigma^*v^*N)
+% \end{equation}
+% where according to the definition of $\thchk$ we have $u\in \Chat(\Bhat,B)$, $v\in \Chat(\Dhat,D)$, and $\sigma\in\thhat(A,\Bhat,C,\Dhat,E)$.
+% Of course, \thchk is a quotient, so its elements are not uniquely written as triples $(u,v,\sigma)$; but it is easy to see that a different representative yields a canonically isomorphic set of morphisms $\E(u^*M,\sigma^*v^*N)$, so $\delta$ is well-defined up to isomorphism.
 
-\begin{thm}
-  $\delta$ defines a horizontal distributive law $TS \hto ST$.
-\end{thm}
-\begin{proof}
-  First of all, we must give $\delta_{\E,E}$ the structure of a profunctor from $TS\E(E)$ to $ST\E(E)$.
-  Thus, suppose given a representative $(u,v,\sigma,\phi)\in \delta_{\E,E}((A,B,M),(C,D,N))$, where $(A,B,M)\in ST\E(E)$ and $(C,D,N)\in TS\E(E)$, and also morphisms $(f,g,\xi):(A',B',M') \to (A,B,M)$ and $(h,k,\zeta):(C,D,N)\to (C',D',N')$.
-  Thus we have
-  \begin{mathpar}
-    f:A'\to A \and g:B\to B' \and \xi:g^*M'\to f^*M\\
-    h:C'\to C \and k:D\to D' \and \zeta:h^*N\to k^*N'\\
-    u:\Bhat\to B \and v:\Dhat\to D \and \sigma \in \thhat(A,\Bhat,C,\Dhat,E) \and \phi:u^*M\to \sigma^* v^*N
-  \end{mathpar}
-  Let us write $A=(a_1\e[1]\dots a_n\e[n])$ and $C=(c_1\ph[1]\dots c_m\ph[m])$, and thus also $f=(f_1\dots f_n)$ and $h=(h_1\dots h_m)$.
-  It follows that we have permutation isomorphisms $A' \cong (A'_1)\e[i]\cdots (A'_n)\e[n]$ and $C'\cong (C'_1)\ph[1]\cdots (C'_m)\ph[m]$, where $f_i:A'_i\to a_i$ and $h_j:C'_j \to c_j$.
+% \begin{thm}
+%   $\delta$ defines a horizontal distributive law $TS \hto ST$.
+% \end{thm}
+% \begin{proof}
+%   First of all, we must give $\delta_{\E,E}$ the structure of a profunctor from $TS\E(E)$ to $ST\E(E)$.
+%   Thus, suppose given a representative $(u,v,\sigma,\phi)\in \delta_{\E,E}((A,B,M),(C,D,N))$, where $(A,B,M)\in ST\E(E)$ and $(C,D,N)\in TS\E(E)$, and also morphisms $(f,g,\xi):(A',B',M') \to (A,B,M)$ and $(h,k,\zeta):(C,D,N)\to (C',D',N')$.
+%   Thus we have
+%   \begin{mathpar}
+%     f:A'\to A \and g:B\to B' \and \xi:g^*M'\to f^*M\\
+%     h:C'\to C \and k:D\to D' \and \zeta:h^*N\to k^*N'\\
+%     u:\Bhat\to B \and v:\Dhat\to D \and \sigma \in \thhat(A,\Bhat,C,\Dhat,E) \and \phi:u^*M\to \sigma^* v^*N
+%   \end{mathpar}
+%   Let us write $A=(a_1\e[1]\dots a_n\e[n])$ and $C=(c_1\ph[1]\dots c_m\ph[m])$, and thus also $f=(f_1\dots f_n)$ and $h=(h_1\dots h_m)$.
+%   It follows that we have permutation isomorphisms $A' \cong (A'_1)\e[i]\cdots (A'_n)\e[n]$ and $C'\cong (C'_1)\ph[1]\cdots (C'_m)\ph[m]$, where $f_i:A'_i\to a_i$ and $h_j:C'_j \to c_j$.
 
-  Now each $a_i$ and $c_j$ corresponds to a segment in the graph constructed above from $\sigma$.
-  We modify $\Bhat$ and $\Dhat$ by replacing each occurrence of $a_i$ or $c_j$ in these segments by $A'_i$ or $C'_j$ respectively, yielding new objects $\Bhat',\Dhat'$ of $\Chat$.
-  Then the $f_i$ and $h_j$ induce morphisms $\uhat : \Bhat'\to \Bhat$ and $\vhat:\Dhat'\to\Dhat$, while $\sigma$ induces a new matching $\sigma' \in \thhat(A',\Bhat',C',\Dhat',E)$ with the property that $(hh\vhat\vhat1)\circ \sigma' = \sigma\circ (ff\uhat\uhat1)$.
-  Define $u'$ and $v'$ to be the composites
-  \begin{mathpar}
-    \Bhat' \xto{\uhat} \Bhat \xto{u} B \xto{g} B'\and
-    \Dhat' \xto{\vhat} \Dhat \xto{v} D \xto{k} D'.
-  \end{mathpar}
-  Then $(u',v',\sigma')$ represents an element of $\thchk(A',B',C',D',E)$, which is well-defined independently of all choices.
-  To define the functorial action of $\delta$, it remains, therefore, to construct $\phi' : (u')^* M' \to (\sigma')^*(v')^* N'$, which we take to be the following composite:
-  \[\begin{array}{rcl}
-    (u')^* M' &\xto{\uhat^* u^* \xi}& \uhat^* u^* f^*M\\
-    &=& \uhat^* f^* u^* M\\
-    &\xto{\uhat^* f^* \phi}& \uhat^* f^* \sigma^* v^* N \\
-    &=& (\sigma')^* \vhat^* h^* v^* N\\
-    &=& (\sigma')^* \vhat^* v^* h^* N\\
-    &\xto{(\sigma')^*\vhat^* v^* \zeta}& (\sigma')^*(v')^* N'
-  \end{array}\]
-  Here we have used naturality for $u^* f^* = f^* u^*$ and $v^* h^* = h^* v^*$, and the defining property of $\sigma'$ for $(\sigma')^* \vhat^* h^* = \uhat^* f^* \sigma^*$.
-  We leave it to the reader to verify that this action is associative and unital.
+%   Now each $a_i$ and $c_j$ corresponds to a segment in the graph constructed above from $\sigma$.
+%   We modify $\Bhat$ and $\Dhat$ by replacing each occurrence of $a_i$ or $c_j$ in these segments by $A'_i$ or $C'_j$ respectively, yielding new objects $\Bhat',\Dhat'$ of $\Chat$.
+%   Then the $f_i$ and $h_j$ induce morphisms $\uhat : \Bhat'\to \Bhat$ and $\vhat:\Dhat'\to\Dhat$, while $\sigma$ induces a new matching $\sigma' \in \thhat(A',\Bhat',C',\Dhat',E)$ with the property that $(hh\vhat\vhat1)\circ \sigma' = \sigma\circ (ff\uhat\uhat1)$.
+%   Define $u'$ and $v'$ to be the composites
+%   \begin{mathpar}
+%     \Bhat' \xto{\uhat} \Bhat \xto{u} B \xto{g} B'\and
+%     \Dhat' \xto{\vhat} \Dhat \xto{v} D \xto{k} D'.
+%   \end{mathpar}
+%   Then $(u',v',\sigma')$ represents an element of $\thchk(A',B',C',D',E)$, which is well-defined independently of all choices.
+%   To define the functorial action of $\delta$, it remains, therefore, to construct $\phi' : (u')^* M' \to (\sigma')^*(v')^* N'$, which we take to be the following composite:
+%   \[\begin{array}{rcl}
+%     (u')^* M' &\xto{\uhat^* u^* \xi}& \uhat^* u^* f^*M\\
+%     &=& \uhat^* f^* u^* M\\
+%     &\xto{\uhat^* f^* \phi}& \uhat^* f^* \sigma^* v^* N \\
+%     &=& (\sigma')^* \vhat^* h^* v^* N\\
+%     &=& (\sigma')^* \vhat^* v^* h^* N\\
+%     &\xto{(\sigma')^*\vhat^* v^* \zeta}& (\sigma')^*(v')^* N'
+%   \end{array}\]
+%   Here we have used naturality for $u^* f^* = f^* u^*$ and $v^* h^* = h^* v^*$, and the defining property of $\sigma'$ for $(\sigma')^* \vhat^* h^* = \uhat^* f^* \sigma^*$.
+%   We leave it to the reader to verify that this action is associative and unital.
 
-  Second, we must show that $\delta_{\E,E}$ is contravariantly functorial in $E\in\Chat$.
-  This is similar to how we dealt with $f$ and $h$ in the preceding argument, using a map $E'\to E$ to modify $\Bhat$ and $\Dhat$ to $\Bhat'$ and $\Dhat'$.
-  Since this affects exactly the segments in the graph of $\sigma$ that the preceding argument did \emph{not} affect, it commutes with those functorial actions.
-  Thus, $\delta_\E$ is a horizontal arrow $TS\E \hto ST\E$ in $\dCat^{\Chat\op}$.
+%   Second, we must show that $\delta_{\E,E}$ is contravariantly functorial in $E\in\Chat$.
+%   This is similar to how we dealt with $f$ and $h$ in the preceding argument, using a map $E'\to E$ to modify $\Bhat$ and $\Dhat$ to $\Bhat'$ and $\Dhat'$.
+%   Since this affects exactly the segments in the graph of $\sigma$ that the preceding argument did \emph{not} affect, it commutes with those functorial actions.
+%   Thus, $\delta_\E$ is a horizontal arrow $TS\E \hto ST\E$ in $\dCat^{\Chat\op}$.
 
-  Third, we must check that $\delta$ defines a horizontal (pseudonatural) transformation.
-  Let $H:\E\hto \F$ be a horizontal arrow in $\dCat^{\Chat\op}$; we will show that $\delta_\E \otimes STH$ and $TSH\otimes \delta_\F$ are both isomorphic to the same thing, namely the obvious extension of~\eqref{eq:delta}:
-  \[ \delta_{H,E}((A,B,M),(C,D,N)) = \sum_{(u,v,\sigma)\in \thchk(A,B,C,D,E)} H(u^*M,\sigma^*v^*N) \]
+%   Third, we must check that $\delta$ defines a horizontal (pseudonatural) transformation.
+%   Let $H:\E\hto \F$ be a horizontal arrow in $\dCat^{\Chat\op}$; we will show that $\delta_\E \otimes STH$ and $TSH\otimes \delta_\F$ are both isomorphic to the same thing, namely the obvious extension of~\eqref{eq:delta}:
+%   \[ \delta_{H,E}((A,B,M),(C,D,N)) = \sum_{(u,v,\sigma)\in \thchk(A,B,C,D,E)} H(u^*M,\sigma^*v^*N) \]
 
-  (TODO)
+%   (TODO)
 
-  Fourth, we must construct the four modifications from \cref{def:hdl}.
-  (TODO)
+%   Fourth, we must construct the four modifications from \cref{def:hdl}.
+%   (TODO)
 
-  Finally, we must check the axioms that were not mentioned in \cref{def:hdl}.
-  We leave this to the diligent reader who wrote out those axioms.
-\end{proof}
+%   Finally, we must check the axioms that were not mentioned in \cref{def:hdl}.
+%   We leave this to the diligent reader who wrote out those axioms.
+% \end{proof}
+
 
 \section{Multivariable morphisms}
 \label{sec:multivar}
 
-We will now define another monad $R$ on $\dCat^{\Chat\op}$ that incorporates multivariable morphisms.
-Roughly, $R$ is like the monad for symmetric strict monoidal categories: the objects of $R\cD$ should be finite lists of objects of \cD, and its morphisms should be pairs consisting of a list of morphisms of \cD and a permutation.
-Since \Chat is in particular a symmetric strict monoidal category, we could try to extend this monad to $\dCat^{\Chat\op}$ by interpreting the objects of the latter as (split) fibrations over $\Chat$ and sending $\E\to \Chat$ to the composite
-\[ R\E \to R\Chat \to \Chat \]
-Unfortunately, this composite is no longer a fibration.
-Thus, we need to ``tensor it up'' by an unbiased form of Day convolution.
+[TODO\dots]
 
-More precisely, given a functor $\E:\Chat\op\to \bCat$, we define $R\E$ by
-\[ R\E(B) = \sum_n \int^{A_1,\dots,A_n\in\Chat} \Chat(B,A_1 A_2\cdots A_n) \times \E(A_1)\times \E(A_2)\times \cdots\times \E(A_n) \]
-The summand $n=0$ is empty unless $B=\one$ in which case it is the terminal category.
-The summand $n=1$ is $\int^{A\in\Chat} \Chat(B,A) \times \E(A)$, which by the co-Yoneda lemma is isomorphic to $\E(B)$; thus inclusion of this summand gives the unit $\E\to R\E$ of the monad $R$.
-The multiplication $RR\E\to R\E$ is defined in a straightforward way by rearrangement, addition of the $n$'s, and product and composition in $\Chat$.
+% We will now define another monad $R$ on $\dCat^{\Chat\op}$ that incorporates multivariable morphisms.
+% Roughly, $R$ is like the monad for symmetric strict monoidal categories: the objects of $R\cD$ should be finite lists of objects of \cD, and its morphisms should be pairs consisting of a list of morphisms of \cD and a permutation.
+% Since \Chat is in particular a symmetric strict monoidal category, we could try to extend this monad to $\dCat^{\Chat\op}$ by interpreting the objects of the latter as (split) fibrations over $\Chat$ and sending $\E\to \Chat$ to the composite
+% \[ R\E \to R\Chat \to \Chat \]
+% Unfortunately, this composite is no longer a fibration.
+% Thus, we need to ``tensor it up'' by an unbiased form of Day convolution.
 
-Note, though, that in fact this formula can be simplified.
-Since a morphism $B\to A_1 A_2 \cdots A_n$ in \Chat necessarily factors as a permutation isomorphism $B\cong B_1 B_2 \cdots B_n$ followed by a product of morphisms $B_i \to A_i$, and this factorization is unique up to the action of permutations on the $B_i$, we can also write
-\begin{equation*}
-  R\E(B) = \sum_n \int^{B_1,\dots,B_n \in \Chats} 
-    \Chats(B,B_1 B_2\cdots B_n)\times \E(B_1)\times \E(B_2)\times\cdots \times \E(B_n)
-  % R\E(B) = \sum_n \left(\sum_{\sigma \in \Chats(B,B_1 B_2\cdots B_n)}
-  %   \E(B_1)\times \E(B_2)\times\cdots \times \E(B_n)\right) \Big/\sim
-\end{equation*}
-% where the equivalene relation $\sim$ is defined by
-% \[   (\sigma(\tau_1\tau_2\cdots \tau_n),M_1,M_2,\dots,M_n) \sim
-%   (\sigma,\tau_1^*M_1,\tau_2^*M_2,\dots,\tau_n^*M_n)
-% \]
-% for any $\tau_i \in \Chats(B_i,B_i')$.
-with the action of \Chat on $R\E$ defined by commuting past the isomorphisms.
+% More precisely, given a functor $\E:\Chat\op\to \bCat$, we define $R\E$ by
+% \[ R\E(B) = \sum_n \int^{A_1,\dots,A_n\in\Chat} \Chat(B,A_1 A_2\cdots A_n) \times \E(A_1)\times \E(A_2)\times \cdots\times \E(A_n) \]
+% The summand $n=0$ is empty unless $B=\one$ in which case it is the terminal category.
+% The summand $n=1$ is $\int^{A\in\Chat} \Chat(B,A) \times \E(A)$, which by the co-Yoneda lemma is isomorphic to $\E(B)$; thus inclusion of this summand gives the unit $\E\to R\E$ of the monad $R$.
+% The multiplication $RR\E\to R\E$ is defined in a straightforward way by rearrangement, addition of the $n$'s, and product and composition in $\Chat$.
+
+% Note, though, that in fact this formula can be simplified.
+% Since a morphism $B\to A_1 A_2 \cdots A_n$ in \Chat necessarily factors as a permutation isomorphism $B\cong B_1 B_2 \cdots B_n$ followed by a product of morphisms $B_i \to A_i$, and this factorization is unique up to the action of permutations on the $B_i$, we can also write
+% \begin{equation*}
+%   R\E(B) = \sum_n \int^{B_1,\dots,B_n \in \Chats} 
+%     \Chats(B,B_1 B_2\cdots B_n)\times \E(B_1)\times \E(B_2)\times\cdots \times \E(B_n)
+%   % R\E(B) = \sum_n \left(\sum_{\sigma \in \Chats(B,B_1 B_2\cdots B_n)}
+%   %   \E(B_1)\times \E(B_2)\times\cdots \times \E(B_n)\right) \Big/\sim
+% \end{equation*}
+% % where the equivalene relation $\sim$ is defined by
+% % \[   (\sigma(\tau_1\tau_2\cdots \tau_n),M_1,M_2,\dots,M_n) \sim
+% %   (\sigma,\tau_1^*M_1,\tau_2^*M_2,\dots,\tau_n^*M_n)
+% % \]
+% % for any $\tau_i \in \Chats(B_i,B_i')$.
+% with the action of \Chat on $R\E$ defined by commuting past the isomorphisms.
 
 \bibliography{all}
 \bibliographystyle{alpha}
