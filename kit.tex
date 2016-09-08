@@ -1072,14 +1072,16 @@ The object $B\in V\C$ is actually determined once we know $D$ and the composite,
 In particular, the fibers of $\dT\ocomp \dS \to V\C \times V\C$ are discrete.
 
 Our $\delta$ is supposed to be a profunctor $\dT \ocomp \dS \bto \dS \ocomp \dT$, which moreover must be a loose 2-cell in $\cL(\dCat)$ and thus come with cells
-\[ \xymatrix{ V\C \ar[d]|{\bullet}_{\hunit A} \ar@{}[dr]|{\Leftarrow} &
+\[ \xymatrix{ V\C \ar[d]|{\bullet}_{\hunit {V\C}} \ar@{}[dr]|{\Leftarrow} &
   \dT\ocomp \dS \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
-  V\C \ar[d]|{\bullet}^{\hunit B}\\
+  V\C \ar[d]|{\bullet}^{\hunit {V\C}}\\
   V\C & \dS\ocomp\dT \ar[l] \ar[r] & V\C. } \]
 Taken together, this means that for any $A,C$ and $A',C'$, and isomorphisms $A\cong A'$ and $C\cong C'$, plus a $C$-trivial matching from $A$ to $C$ and a $C'$-trivial matching from $A'$ to $C'$, both with the paired cats partitioned into two subsets, we must have a specified ``set of ways to compose''.
 Put differently, the ``type'' of an element of $\dl$ is given by the following data:
-\[ \xymatrix{ A \ar[d]_\cong \ar[r]^-\cong & B D D\o \ar[r]^-\cong & C E E\o D D\o & C \ar[d]^\cong \\
-   A' \ar[r]_-\cong & B' D' (D')\o \ar[r]_-\cong & C' E' (E')\o D' (D')\o & C' }\]
+\begin{equation}
+  \xymatrix{ A \ar[d]_\cong \ar[r]^-\cong & B D D\o \ar[r]^-\cong & C E E\o D D\o & C \ar[d]^\cong \\
+    A' \ar[r]_-\cong & B' D' (D')\o \ar[r]_-\cong & C' E' (E')\o D' (D')\o & C' }\label{eq:dl-type-1}
+\end{equation}
 Note that the isomorphism $C\cong C'$ is not required to ``commute'' with the others.
 
 In fact, any such ``type'' will be inhabited by \emph{at most one} element of $\dl$.
@@ -1092,8 +1094,7 @@ Every path that connects two cats in $B$ gives us an element of $E$, while every
 The remaining paths connect one cat in $B$ with one in $B'$, specifying the isomorphism $C\cong C'$.
 Note that the variance gets flipped every time a path ``changes direction'', so $E$- and $E'$-paths do indeed connect two copies of a cat with opposite variance, while the remaining ones preserve variance.
 
-To be a profunctor, $\dl$ must also be acted on by permutations on both sides.
-This is evident.
+To be a profunctor, $\dl$ must also be acted on by permutations on both sides, compatibly with the projections to $\hunit{V\C}$ on both sides; but this is evident.
 Thus, we have defined a loose 2-cell $\dl : \dT \ocomp \dS \bto \dS \ocomp \dT$ in $\cL(\dCat)$.
 
 For the remaining data and axioms of a loose distributive law, we note that \dT and \dS play entirely symmetrical roles in the construction.
@@ -1132,7 +1133,34 @@ Two such pre-matchings are \textbf{equivalent} if they are related by an isomorp
 Now let \dC be the strict double category whose tight morphisms are the permutation isomorphisms (that is, $\dC_0 = V\C_0$), whose loose morphisms from $A$ to $B$ are matchings with restrictions from $B$ to $A$, and whose cells are commutative squares in $\Chat$.
 [Hmm, does this make sense with the passage to equivalence classes?]
 Then \dC is a monad in $\cT(\dCat)$ on $V\C_0$.
-We will construct a loose distributive law $\dS \ocomp \dC \to \dC\ocomp \dS$ in $\cL(\dCat)$, analogous to the one constructed in the previous section.
+We will construct a loose distributive law $\dC \ocomp \dS \to \dS\ocomp \dC$ in $\cL(\dCat)$, analogous to the one constructed in the previous section.
+
+As a loose 2-cell in $\cL(\dCat)$, this will look like
+\[ \xymatrix{ V\C_0 \ar[d]|{\bullet}_{\hunit {V\C_0}} \ar@{}[dr]|{\Leftarrow} &
+  \dC\ocomp \dS \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
+  V\C_0 \ar[d]|{\bullet}^{\hunit {V\C_0}}\\
+  V\C & \dS\ocomp\dC \ar[l] \ar[r] & V\C_0. } \]
+Now the ``type'' of an element of $\dl$ is given by the following data, in which some of the isomorphisms from~\eqref{eq:dl-type-1} have been replaced by morphisms in $\Chat$:
+\[ \xymatrix{ A \ar[d]_\cong \ar[r]^-\cong & B D D\o & C E E\o D D\o \ar[l] & C \ar[d]^\cong \\
+   A' & B' D' (D')\o \ar[l] \ar[r]_-\cong & C' E' (E')\o D' (D')\o & C' }\]
+As before, any such ``type'' will be inhabited by at most one element of $\dl$, and we can describe the conditions under which this happens as a partial function from the left half of the diagram to the right half.
+Thus, suppose given the left half, including in particular a composite morphism $B' D' (D')\o \to A'\cong A \cong B D D\o$ in $\Chat$.
+By definition of $\Chat$, this consists of a morphism $f_b:F_b \to b$ of \C for each $b\in B$ and two morphisms $g_d:G_d\to d$ and $h_d:H_d \to d$ for each $d\in D$, together with an isomorphism
+\begin{equation}\label{eq:subiso}
+  B' D' (D')\o \toiso F_{b_1}\e[1]\cdots F_{b_n}\e[n] G_{d_1}\cdots G_{d_m} H_{d_1}\o \cdots H_{d_m}\o
+\end{equation}
+The conditions are then:
+\begin{enumerate}
+\item $g_d = h_d$ for each $d$ (and in particular, $G_d = H_d$).
+\item Regard the isomorphism~\eqref{eq:subiso} as a bipartite graph, and add additional edges connecting each cat in $D$ to its counterpart in $D\o$, and each cat in each $G_d$ to its counterpart in $H_d\o$ (which is equal to $G_d\o$).
+  Again this is a disjoint union of paths and cycles, and we require that there are no cycles.
+\end{enumerate}
+When these conditions hold, each path in the above graph must start and end at a cat in $B'$ or some $F_b$.
+Every path that connects two cats in $B'$ gives us an element of $E'$, and we define $C'$ to be the remaining cats in $B'$, giving the matching $B' \cong C' E' (E')\o$.
+Every path that connects two cats in some $F_b$'s (perhaps for different $b$'s) gives us an element of $E$, and we define $C$ to be the remaining cats in any of the $F_b$'s.
+This yields an isomorphism $C E E\o \cong F_{b_1}\e[1]\cdots F_{b_n}\e[n]$, and we define the morphism $C E E\o \to B$ to be given by this isomorphism together with the $f_b$'s.
+Finally, the remaining paths in the graph connect one cat in $B'$ with one in some $F_b$, specifying the isomorphism $C\cong C'$.
+As before, the actions of permutation isomorphisms are trivial, so we have a loose 2-cell in $\cL(\dCat)$.
 
 [TODO\dots]
 
