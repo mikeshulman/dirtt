@@ -1027,10 +1027,10 @@ Formally, if $A=(a_1\e[1],\dots,a_n\e[n])$ and $B=(b_1\ph[1],\dots,b_n\ph[n])$, 
 
 For the rest of this section, let \C be a \emph{discrete} category, whose objects will be the cats of our unary kit.
 In particular, therefore $V\C$ is a groupoid.
-We will define a loose distributive law on $V\C$ in $\fSpan(\dCat)$, inducing one on $\dCat/V\C$ whose generalized polycategories are ``unary kits without functors''.
+We will define a loose distributive law on $V\C$ in $\cL(\dCat)$, inducing one on $\dCat/V\C$ whose generalized polycategories are ``unary kits without functors''.
 
 The two monads involved in this distributive law will in fact be the same monad, which we denote $R$.
-Being a horizontal monad in $\fSpan(\dCat)$, it is equivalently a monad in the bicategory $\cSpan(\bCat)$, i.e.\ an internal category in \bCat, i.e.\ a \emph{strict} double category $\dR$.
+Being a horizontal monad in $\cL(\dCat)$, it is equivalently a monad in the bicategory $\cSpan(\bCat)$, i.e.\ an internal category in \bCat, i.e.\ a \emph{strict} double category $\dR$.
 Since its category of objects $\dR_0$ is $V\C$, its objects are those of $V\C$ and its tight morphisms are the morphisms of $V\C$.
 We now define its loose morphisms and cells.
 
@@ -1123,11 +1123,11 @@ Since the monoidal structure on \Chat is induced by the concatenation monoidal s
 
 Note that every isomorphism in \Chat consists only of unary arrows.
 By a \textbf{permutation isomorphism} in \Chat we mean an isomorphism in which these unary arrows are all identities; thus it really is nothing but a permutation.
-In fact, the subcategory of permutation isomorphisms in $\Chat$ is isomorphihc to $V\C_0$, where $\C_0$ is the set of objects of $\C$.
+In fact, the subcategory of permutation isomorphisms in $\Chat$ is isomorphic to $V\C_0$, where $\C_0$ is the set of objects of $\C$.
 
-Now fix a virtual $V$-algebra \C, whose objects will be our cats and functors.
+Now fix a virtual $V$-algebra \C, whose objects and arrows will be our cats and functors.
 We define a new linear double monad incorporating restriction along morphisms in \C as follows.
-Say that a \textbf{pre-matching with restriction} between $A,B\in V\C$ is a morphism $B E E\o \to A$ in $\C$ where $E$ is totally covariant.
+Say that a \textbf{pre-matching with restriction} between $A,B\in V\C$ is a morphism $B E E\o \to A$ in $V\C$ where $E$ is totally covariant.
 Two such pre-matchings are \textbf{equivalent} if they are related by an isomorphism $E\cong E'$ (necessarily unique if it exists); a \textbf{matching with restriction} is an equivalence class of pre-matchings.
 
 Now let \dC be the strict double category whose tight morphisms are the permutation isomorphisms (that is, $\dC_0 = V\C_0$), whose loose morphisms from $A$ to $B$ are matchings with restrictions from $B$ to $A$, and whose cells are commutative squares in $\Chat$.
