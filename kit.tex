@@ -46,8 +46,9 @@ $#1\copy \z@
 \let\xoto\xcircrightarrow
 \makeatother
 
-\newcommand{\bcomp}{\mathbin{\raisebox{1pt}{\scriptsize$\bullet$}}}
-\let\ocomp\otimes
+\let\tc\cdot
+\newcommand{\bc}{\mathbin{\raisebox{1pt}{\scriptsize$\bullet$}}}
+\let\oc\circ
 
 \newcommand{\C}{\cC}
 \newcommand{\D}{\cD}
@@ -67,7 +68,7 @@ $#1\copy \z@
 \newcommand{\Hbikl}[2]{\mathbb{H}\text{-}\mathsf{biKl}(#1,#2)}
 
 % Horizontal units
-\newcommand{\hunit}[1]{\mathsf{U}_{#1}}
+\newcommand{\hunit}[1]{\Id_{#1}}
 % Monads
 \newcommand{\Tmult}{\nu}
 \newcommand{\Tunit}{\iota}
@@ -126,6 +127,7 @@ $#1\copy \z@
 \newcommand{\subst}[3]{{#1}[#2 \mapsfrom #3]}
 \newcommand{\ev}{\mathsf{ev}}
 \renewcommand{\id}{\mathsf{id}}
+\newcommand{\Id}{\mathsf{Id}}
 
 \newcommand{\repr}[1]{{#1}_\bullet}
 \newcommand{\corepr}[1]{{#1}^\bullet}
@@ -729,14 +731,20 @@ Thus, a cell in a double category can be written either as
 \qquad\text{or}\qquad
 \vcenter{\xymatrix{ A \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow}& C \ar[d]|{\bullet} \\ B \ar[r] & D } }
 \]
-We write $\circ$ for tight composition (of arrows or cells), and $\bcomp$ for loose composition (of arrows or cells).
+We write tight composition (of arrows or cells) with $\tc$ or juxtaposition in functional order, and loose composition (of arrows or cells) with $\bc$ in diagrammatic order.
 Similarly, we write $1$ for tight identities (of objects or loose arrows), and $\hunit{A}$ for loose identities (of objects or tight arrows).
 
-The particular double category we have most in mind is \dCat, whose objects are categories, tight arrows are functors, and loose arrows are profunctors.
+The particular double category we have most in mind is \dCat, where:
+\begin{itemize}
+\item The objects are categories,
+\item The tight arrows are functors,
+\item A loose arrow $A\bto B$ is a profunctor, i.e.\ a functor $B\op\times A\to\bSet$, and
+\item The 2-cells are natural transformations of the obvious sort.
+\end{itemize}
 We will also be interested in \emph{slice} double categories of \dCat: for any object $A$ of a double category \dD, in the slice $\dD/A$ the category $(\dD/A)_0$ of objects and tight maps is the slice of $\dD_0$ over $A$, and the category $(\dD/A)_1$ of loose arrows and cells is the slice of $\dD_1$ over $\hunit A$.
 
-Between (pseudo) double categories we will be interested in \emph{lax functors}, which are lax in the loose direction and strictly functorial in the tight direction.
-Lax functors admit an obvious notion of \emph{tight transformation}, with tight arrow components $\alpha_A:FA\to GA$ for each object $A$, and 2-cell components
+Between (pseudo) double categories we mainly will be interested in \emph{strong} or \emph{pseudo double functors}, which are strictly functorial in the tight direction and functorial up to tight isomorphism in the loose direction.
+Such functors admit an obvious notion of \emph{tight transformation}, with tight arrow components $\alpha_A:FA\to GA$ for each object $A$, and 2-cell components
 \[ \vcenter{\xymatrix{ FA \ar[r]|{\bullet}^{FM} \ar[d]_{\alpha_A} \ar@{}[dr]|{\Downarrow}& FB \ar[d]^{\alpha_B} \\ GA \ar[r]|{\bullet}_{GM} & GB } } \]
 for each loose arrow $A\xbto{M} B$.
 This yields a strict 2-category of double categories.
@@ -744,51 +752,56 @@ By a \textbf{double monad} we mean a monad in this 2-category.
 
 Distributive laws can also be defined internal to any 2-category; this yields a notion of \textbf{tight distributive law}.
 However, for generalized polycategories we are interested in \emph{loose distributive laws}, which we now define.
-If $F$ and $G$ are lax double functors between pseudo double categories, a \textbf{loose transformation} $\alpha:F\bto G$ consists of a loose arrow $\alpha_X : F X \bto G X$ for each object $X$ of the domain, forming a pseudonatural transformation between the loose parts of $F$ and $G$, together with for each tight arrow $f:X\to Y$ in the domain, a cell
+If $F$ and $G$ are double functors between pseudo double categories, a \textbf{loose transformation} $\alpha:F\bto G$ consists of a loose arrow $\alpha_X : F X \bto G X$ for each object $X$ of the domain, forming a pseudonatural transformation between the loose parts of $F$ and $G$, together with for each tight arrow $f:X\to Y$ in the domain, a cell
 \[ \xymatrix{ F X \ar[r]|-{\bullet}^-{\alpha_X} \ar[d]_{F f} \ar@{}[dr]|{\alpha_f} & G X \ar[d]^{G f} \\
 F Y \ar[r]|-{\bullet}_-{\alpha_Y} & G Y} \]
 satisfying some evident axioms; see~\cite{gp:something} wherein this is called a \emph{vertical transformation}.
 These are the loose arrows in a double category of functors whose tight arrows are tight transformations, and whose cells are an evident kind of ``square modification''.
 
+In the followin definition, we write composition of double functors (and whiskering of tight and loose transformations by double functors) with $\oc$, to distinguish it from the composition $\tc$ and $\bc$ in the tight and loose direction.
+A further reason for this will become apparent in \cref{sec:linear-double-monads}.
+
 \begin{defn}\label{def:hdl}
   Let $T$ and $S$ be monads on a double category \K.
   A \textbf{loose distributive law} between $(T,\Tmult,\Tunit)$ and $(S,\Smult,\Sunit)$ consists of the following:
   \begin{enumerate}
-    \item A loose transformation $\dl : T S \bto S T$.
+    \item A loose transformation $\dl : T\oc S \bto S \oc T$.
     \item Square modifications
       \begin{mathpar}
-        \xymatrix{ T T S \ar[r]|{\bullet}^{T \dl} \ar[d]_{\Tmult S}
+        \xymatrix{ T \oc T\oc S \ar[r]|{\bullet}^{T\oc \dl} \ar[d]_{\Tmult \oc S}
           \ar@{}[drr]|{\Tdlmult} &
-          T S T \ar[r]|{\bullet}^{\dl T} & S T T \ar[d]^{S \Tmult} \\
-          T S \ar[rr]|{\bullet}_{\dl}&& ST}\and
-        \xymatrix{ T S S \ar[r]|{\bullet}^{\dl S} \ar[d]_{T \Smult}
+          T\oc S\oc T \ar[r]|{\bullet}^{\dl\oc T} & S\oc T\oc T \ar[d]^{S \oc \Tmult} \\
+          T\oc S \ar[rr]|{\bullet}_{\dl}&& S\oc T}\and
+        \xymatrix{ S \ar[d]_{\Tunit\oc S} \ar[r]|{\bullet}^{\hunit S}  \ar@{}[dr]|{\Tdlunit} & S \ar[d]^{S\oc \Tunit} \\
+          T\oc  S \ar[r]|{\bullet}_{\dl} & S \oc T}\and
+        \xymatrix{ T\oc S\oc S \ar[r]|{\bullet}^{\dl \oc S} \ar[d]_{T \oc \Smult}
           \ar@{}[drr]|{\Sdlmult} &
-          S T S \ar[r]|{\bullet}^{S \dl} & S S T \ar[d]^{\Smult T} \\
-          T S \ar[rr]|{\bullet}_{\dl}&& ST}\and
+          S \oc T\oc S \ar[r]|{\bullet}^{S\oc \dl} & S\oc S\oc T \ar[d]^{\Smult\oc T} \\
+          T\oc S \ar[rr]|{\bullet}_{\dl}&& S\oc T}\and
         % \xymatrix{ & S \ar[dl]_{\Tunit S} \ar[dr]^{S \Tunit} \ar@{}[d]|{\Tdlunit} \\
         %   T S \ar[rr]|{\bullet}_{\dl} && S T}\and
         % \xymatrix{ & T \ar[dl]_{T\Sunit} \ar[dr]^{\Sunit T} \ar@{}[d]|{\Sdlunit} \\
         %   T S \ar[rr]|{\bullet}_{\dl} && S T}
-        \xymatrix{ S \ar[d]_{\Tunit S} \ar[r]|{\bullet}^{\hunit S}  \ar@{}[dr]|{\Tdlunit} & S \ar[d]^{S \Tunit} \\
-          T S \ar[r]|{\bullet}_{\dl} & S T}\and
-        \xymatrix{ T \ar[d]_{T\Sunit} \ar[r]|{\bullet}^{\hunit T} \ar@{}[dr]|{\Sdlunit} & T \ar[d]^{\Sunit T}  \\
-          T S \ar[r]|{\bullet}_{\dl} & S T}
+        \xymatrix{ T \ar[d]_{T\oc \Sunit} \ar[r]|{\bullet}^{\hunit T} \ar@{}[dr]|{\Sdlunit} & T \ar[d]^{\Sunit \oc T}  \\
+          T\oc S \ar[r]|{\bullet}_{\dl} & S \oc T}
       \end{mathpar}
-      (These are versions of the diagrams that would have to \emph{commute} if $\dl$ were an ordinary tight distributive law.)
+      These are versions of the diagrams that would have to \emph{commute} if $\dl$ were an ordinary tight distributive law.
     \item The following equalities of square modifications hold:
-      \begin{align*}
-        \Tdlunit \circ \hunit{\Sunit} &= \Sdlunit \circ \hunit{\Tunit} \\ % PDA1
-        \Sdlmult \circ (\Sdlunit S\bcomp \Sunit_\dl) &=  1_\dl \\ % PDA2
-        \Sdlmult \circ (\dl_{\Sunit} \bcomp S \Sdlunit) &= 1_\dl \\ % PDA3
-        \Tdlmult \circ (\Tunit_\dl \bcomp \Tdlunit T) &= 1_\dl \\    % PDA4
-        \Tdlmult \circ (T\Tdlunit \bcomp \dl_{\Tunit}) &= 1_\dl \\  % PDA5
-        \Sdlmult \circ (\Sdlmult S\bcomp \Smult_\dl) &= \Sdlmult \circ (\dl_{\Smult} \bcomp S \Sdlmult) \\ % PDA6
-        \Tdlmult \circ (\Tmult_\dl\bcomp \Tdlmult T) &= \Tdlmult \circ (T \Tdlmult\bcomp \dl_{\Tmult}) \\ % PDA7
-        \Sdlmult \circ (\Tdlunit S\bcomp S\Tdlunit) &= \Tdlunit \circ \hunit{\Smult} \\ % PDA8
-        \Tdlmult \circ (T\Sdlunit\bcomp \Sdlunit T) &= \Sdlunit \circ \hunit{\Tmult} \\ % PDA9
-        \Sdlmult \circ (\Tdlmult S\bcomp S\Tdlmult) &= \Tdlmult \circ (T\Sdlmult\bcomp \Sdlmult T) \circ \dlnat % PDA10
-      \end{align*}
-      where $\dlnat : \dl TS \bcomp TS \dl \toiso TS \dl \bcomp \dl TS$ is a pseudonaturality constraint of $\dl$.
+      \begin{alignat*}{2}
+        \Tdlunit \tc \hunit{\Sunit} &= \Sdlunit \tc \hunit{\Tunit} &\qquad % PDA1
+        \Sdlmult \tc ((\Sdlmult\oc S)\bc \Smult_\dl) &= \Sdlmult \tc (\dl_{\Smult} \bc (S\oc \Sdlmult)) \\ % PDA6
+        \Sdlmult \tc ((\Sdlunit \oc S)\bc \Sunit_\dl) &=  1_\dl &\qquad % PDA2
+        \Tdlmult \tc (\Tmult_\dl\bc (\Tdlmult\oc T)) &= \Tdlmult \tc ((T\oc \Tdlmult)\bc \dl_{\Tmult}) \\ % PDA7
+        \Sdlmult \tc (\dl_{\Sunit} \bc (S\oc \Sdlunit)) &= 1_\dl &\qquad % PDA3
+        \Sdlmult \tc ((\Tdlunit\oc S)\bc S\Tdlunit) &= \Tdlunit \tc \hunit{\Smult} \\ % PDA8
+        \Tdlmult \tc (\Tunit_\dl \bc (\Tdlunit\oc T)) &= 1_\dl &\qquad    % PDA4
+        \Tdlmult \tc ((T\oc\Sdlunit)\bc (\Sdlunit\oc T)) &= \Sdlunit \tc \hunit{\Tmult} \\ % PDA9
+        \Tdlmult \tc ((T\oc\Tdlunit) \bc \dl_{\Tunit}) &= 1_\dl &\qquad  % PDA5
+        \Sdlmult \tc ((\Tdlmult \oc S)\bc (S\oc \Tdlmult)) &= \Tdlmult \tc ((T\oc\Sdlmult)\bc (\Sdlmult\oc T)) \tc \dlnat % PDA10
+      \end{alignat*}
+      where
+      \[\dlnat : (\dl\oc T\oc S) \bc (T\oc S\oc \dl) \toiso (T\oc S\oc \dl) \bc (\dl\oc T\oc S)\]
+      is a pseudonaturality constraint of $\dl$.
       In all cases the tight naturality and monad axioms for the transformations $\Tmult,\Tunit,\Smult,\Sunit$ ensures that the boundaries of both sides of the equations agree automatically.
   \end{enumerate}
 \end{defn}
@@ -813,8 +826,10 @@ In \cref{fig:hdl-data,fig:hdl-axioms} we sketch them instead using an informal s
 In~\cite{cs:genmulti} the theory of generalized multicategories relative to a double monad is developed in two steps, by first constructing a ``horizontal Kleisli virtual double category'' and then considering monoids therein.
 In a later paper we will do the same for generalized polycategories relative to a loose distributive law, but at present it suffices to define the end result explicitly.
 
+In the following definitions we write application of double functors and transformations to objects by juxtaposition, so that for instance the components of $\dl:T\oc S \bto S \oc T$ are of the form $\dl_A : T S A \bto S T A$.
+
 \begin{defn}
-  Let $\dl : T S \bto S T$ be a loose distributive law between double monads.
+  Let $\dl : T\oc S \bto S\oc T$ be a loose distributive law between double monads.
   A \textbf{$\dl$-monoid} consists of an object $A$ and a loose arrow $M:TA\bto SA$ together with unit and multiplication cells
   \[ \xymatrix{
     A \ar[d]_{\Tunit_A} \ar[r]|{\bullet}^{\hunit A}  \ar@{}[dr]|{e\Downarrow} & A \ar[d]^{\Sunit_A} \\
@@ -902,22 +917,22 @@ This has finite products, so we can regard it as cartesian monoidal.
 
 \begin{defn}[\cite{gg:lowdim-tricats}]
   A \textbf{locally cubical bicategory} is a \cDbl-enriched bicategory.
-  Thus, it has objects with hom-double-categories $\iA(x,y)$, composition functors $\iA(y,z)\times \iA(x,y) \to \iA(x,z)$, unit functors $1\to \iA(x,x)$, and associativity and unitality tight natural isomorphisms satisfying the usual axioms.
+  Thus, it has objects with hom-double-categories $\iA(x,y)$, strong composition functors $\iA(y,z)\times \iA(x,y) \to \iA(x,z)$, strong unit functors $1\to \iA(x,x)$, and associativity and unitality tight natural isomorphisms satisfying the usual axioms.
   % We say that it is \textbf{normal} if the composition functors are normal (preserve identities up to isomorphism) and the unit functors $1\to \iA(x,x)$ are strong (preserve identities and composition up to isomorphism), and \textbf{strong} if the composition functors are also strong.
 \end{defn}
 
 We call the objects of $\iA(A,B)$ the \textbf{morphisms} of \iA and write them $A\oto B$.
-We call the tight and loose arrows of $\iA(A,B)$ \textbf{tight 2-cells} and \textbf{loose 2-cells} of \iA, and write them as $A\to B$ and $A\bto B$ respectively, and we call the cells of $\iA(A,B)$ \textbf{3-cells} of \iA.
+We call the tight and loose arrows of $\iA(A,B)$ \textbf{tight 2-cells} and \textbf{loose 2-cells} of \iA, and write them as $f\to g$ and $f\bto g$ respectively, and we call the cells of $\iA(A,B)$ \textbf{3-cells} of \iA.
 We refer to composition of tight 2-cells in $\iA(A,B)$ (and composition of 3-cells in the tight direction) as \textbf{transversal}, composition of loose 2-cells in $\iA(A,B)$ (and composition of 3-cells in the loose direction) as \textbf{vertical}, and the action of the composition functors $\iA(B,C)\times \iA(A,B) \to \iA(A,C)$ as \textbf{horizontal}.
 We have in mind the following picture:
 \begin{center}
 \begin{tikzpicture}[yscale=.6]
   \node (A) at (-1,0) {};
   \node (B) at (4,0) {};
-  \node (y) at (2,1) {};
-  \node (x) at (1,2) {};
-  \node (z) at (1,-1) {};
-  \node (w) at (2,-2) {};
+  \node (y) at (2,1) {$\circ$};
+  \node (x) at (1,2) {$\circ$};
+  \node (z) at (1,-1) {$\circ$};
+  \node (w) at (2,-2) {$\circ$};
   \draw[->] (A) to[out=60,in=-180,looseness=.7] (x) to[out=0,in=120] (B);
   \draw[->] (A) to[out=-60,in=-180] (z) to[out=0,in=-150] (B);
   \draw[white,very thick] (A) to[out=-40,in=-180] (w) to[out=0,in=-120] (B);
@@ -931,16 +946,18 @@ We have in mind the following picture:
 \end{tikzpicture}
 \end{center}
 
-We write transversal composition with $\circ$ in functional order, vertical composition with $\bcomp $ in diagrammatic order, and horizontal composition with $\ocomp$ in diagrammatic order.
-The unit functor $1:\iA(A,A)$ picks out an identity morphism $1_A$ for each object $A$.
-In addition, every morphism $f$ has an identity tight 2-cell $1_f$ and an identity loose 2-cell $id_f$, every tight 2-cell $\alpha$ has an identity 3-cell $\id_\alpha$, every loose 2-cell $\beta$ has an identity 3-cell $1_\beta$, and we have $\id_{1_f} = 1_{\id_f}$.
-We have $\id_f \ocomp \id_{g} \cong \id_{f\ocomp g}$ and $1_g \ocomp 1_g = 1_{f\ocomp g}$, as well as isomorphisms
+We write transversal composition with $\tc$ or juxtaposition in functional order, vertical composition with $\bc $ in diagrammatic order, and horizontal composition with $\oc$ in functional order.
+The unit functors $1\to\iA(A,A)$ pick out an identity morphism $\id_A$ for each object $A$.
+In addition, every morphism $f$ has an identity tight 2-cell $1_f$ and an identity loose 2-cell $\Id_f$, every tight 2-cell $\alpha$ has an identity 3-cell $\Id_\alpha$, every loose 2-cell $\beta$ has an identity 3-cell $1_\beta$, and we have $\Id_{1_f} = 1_{\Id_f}$.
+We have $\Id_f \oc \Id_{g} \cong \Id_{f\oc g}$ and $1_g \oc 1_g = 1_{f\oc g}$, as well as isomorphisms
 \begin{equation}
-  (p\ocomp q) \bcomp (r\ocomp s) \cong (p\bcomp r) \ocomp (q\bcomp s).\label{eq:interchange}
+  (p\oc q) \bc (r\oc s) \cong (p\bc r) \oc (q\bc s).\label{eq:interchange}
 \end{equation}
-Note also that the objects, morphisms, and tight 2-cells of a locally ax-cubical bicategory \iA form an ordinary bicategory under transversal and horizontal composition, which we denote $\cH(\iA)$.
+Note that the objects, morphisms, and tight 2-cells of a locally cubical bicategory \iA form an ordinary bicategory under transversal and horizontal composition, which we denote $\cH(\iA)$.
+On the other hand, a locally cubical bicategory can be regarded as a degenerate sort of \emph{intercategory}~\cite{gp:intercategories-i}.
+We will not need this point of view very much, but our notation is chosen to match theirs (except that we write $\oc$ in functional rather than diagrammatic order).
 
-There are two examples we care about.
+There are two main examples we care about.
 
 \begin{eg}
   The cartesian monoidal 2-category \cDbl is in fact closed as a monoidal bicategory, i.e.\ the functors $\dA\times -$ have right biadjoints.
@@ -968,7 +985,7 @@ There are two examples we care about.
 \end{thm}
 \begin{proof}
   Recall from~\cite{gp:intercategories-i,gp:intercategories-ii} that an ``intercategory'' is an internal category in the 2-category \lxdbl of double categories and \emph{lax} double functors whose source and target functors are strict.
-  Thus, a locally lax-cubical bicategory is an intercategory whose double category of objects is discrete and whose compostion and unit functors are strong.
+  As observed in~\cite[3.5]{gp:intercategories-ii}, a locally cubical bicategory is an intercategory whose double category of objects is discrete and whose compostion and unit functors are strong.
 
   If an intercategory has strictly unital vertical composition (which can usually --- though not always --- be obtained by redefining vertical composition at identities), then we can discard all the arrows and cells in its double category of objects to obtain another intercategory with a discrete double category of objects.
   Applying this to the example of~\cite[6.5]{gp:intercategories-ii}, we get a structure that is almost like a locally cubical bicategory, but its composition functors are only lax normal rather than strong (though its unit functor is strong).
@@ -987,9 +1004,20 @@ In particular, any ``horizontal monad'' on $A\in \iA$ (whose multiplication and 
 Taking $\iA=\cL(\dCat)$ and $X=1$, we see that \emph{any linear monad on $\bCat/A$ induces a strong double monad on $\dCat/A$}.
 (In a later paper we will show that something similar is true for all polynomial monads.)
 
-The punchline is that loose distributive laws are also a ``locally cubical'' concept, i.e.\ they can be defined in any locally cubical bicategory and are preserved by locally cubical pseudofunctors.
-To see this, simply take the definition and replace functors by 1-cells, tight and loose transformations by tight and loose 2-cells, square modifications by square 3-cells, and so on; the pseudonaturality of $\dl$ is replaced by the invertible interchange.
-In particular, therefore, to define a loose distributive law between monads on a slice double category $\dCat/A$, it suffices to define a corresponding structure on $A$ in $\cL(\dCat)$.
+The punchline is that loose distributive laws are \emph{essentially} a ``locally cubical'' concept.
+If literally true, this would mean they could be defined in any locally cubical bicategory and are preserved by locally cubical pseudofunctors.
+To see this, simply take \cref{def:hdl} and replace functors by 1-cells, tight and loose transformations by tight and loose 2-cells, square modifications by square 3-cells, and so on.
+We chose our notations for composition so that the pictures would require no changes; the pseudonaturality of $\dl$ is replaced by the interchanger~\eqref{eq:interchange}.
+
+The reason this is not \emph{exactly} true is that in stating \cref{def:hdl} we used the fact that composition of pseudo double functors is strictly associative and unital, whereas in a general locally cubical bicategory, $\oc$ is only associative and unital up to isomorphism.
+One is tempted to say ``just insert the associativity and unitality constraints everywhere'', but this doesn't work because these are \emph{tight} 2-cells, whereas in the domain of (say) $\Sdlmult$ we would need an associativity to appear in the \emph{middle} of a composite of two \emph{loose} isomorphisms.
+
+The solution to this is fairly standard in double-category theory, and goes by various names such as ``fibrancy'', ``framing'', or ``transportability'': we require that the relevant tight 2-cells have \emph{loose companions}.
+[TODO: Define.]
+
+With this modification, we \emph{can} define a loose distributive law in any fibrant locally cubical bicategory, and they will be preserved by any locally cubical functor (since any strong double functor preserves companions).
+This applies in particular to the functor $\cL(\dCat)(1,-)$, so that to define a loose distributive law between monads on a slice double category $\dCat/A$, it suffices to define a corresponding structure on $A$ in $\cL(\dCat)$.
+The latter is a combinatorial structure amenable to concrete description.
 
 
 \section{Extraordinary naturality}
@@ -1053,7 +1081,7 @@ An object of $\dCat/V\C$ is a functor $\E\to V\C$, where the fiber $\E(A)$ over 
 Usually we will assume it to be a discrete fibration (or equivalently a discrete opfibration, since $V\C$ is a groupoid), meaning that we can permute the cats in the boundary of a module.
 The objects of $R\E$ are then obtained by choosing an object of $\E$, pairing up some of the cats in its boundary into covariant and contravariant pairs, and removing them from the boundary of the result.
 Note that the passage from pre-matchings to matchings means that there is no ordering imposed on the paired cats, and $B$-triviality means that the order of the unremoved cats is maintained.
-However, $R\E\to V\C$ is still no longer a \emph{discrete} fibration: an object in the fiber over $B$ consists of a $B$-trivial matching $A\cong BEE\o$ together with an object of $\E(A)$, and if $E$ admits automorphisms then so can such objects.
+However, $R\E\to V\C$ is still no longer a \emph{discrete} fibration: an object in the fiber over $B$ consists of a $B$-trivial matching $A\cong BEE\o$ together with an object of $\E(A)$, and if $E$ admits automorphisms in $V\C$ then so can such objects.
 
 Now a profunctor $\cM:R\E \bto R\E$ in $\dCat/V\C$ consists of a set of ``morphisms'', each of which is assigned a pair of modules with some of their cats paired up to be its domain and codomain, plus a permutation relating the \emph{unpaired} cats in the domain and the codomain.
 The latter datum is the 2-cell
@@ -1064,18 +1092,18 @@ The profunctorial action means that the cats in the domains and codomains of mor
 
 Now we have to define a loose distributive law of $R$ over itself on $\dCat/V\C$.
 As suggested in \cref{sec:linear-double-monads}, we will do this by defining a loose distributive law of $\dR$ over itself in the locally cubical bicategory $\cL(\dCat)$.
-For clarity, we write $\dS=\dT=\dR$, with \dS as a mnemonic for source and \dT for target; thus our goal is $\dl : \dT \ocomp \dS \bto \dS \ocomp \dT$.
+For clarity, we write $\dS=\dT=\dR$, with \dS as a mnemonic for source and \dT for target; thus our goal is $\dl : \dT \oc \dS \bto \dS \oc \dT$.
 
-Now $\dT\ocomp \dS$ and $\dS\ocomp \dT$ are spans from $V\C$ to itself, whose objects consist of a $B$-trivial matching $A\cong B D D\o$ and a $C$-trivial matching $B \cong C E E\o$, with the projections selecting $A$ and $C$.
+Now $\dT\oc \dS$ and $\dS\oc \dT$ are spans from $V\C$ to itself, whose objects consist of a $B$-trivial matching $A\cong B D D\o$ and a $C$-trivial matching $B \cong C E E\o$, with the projections selecting $A$ and $C$.
 Of course these have a composite $C$-trivial matching from $A$ to $C$; the additional data beyond the composite is simply a division of the paired cats into those in $D$ and those in $E$.
 The object $B\in V\C$ is actually determined once we know $D$ and the composite, by $B$-triviality of the first matching.
-In particular, the fibers of $\dT\ocomp \dS \to V\C \times V\C$ are discrete.
+In particular, the fibers of $\dT\oc \dS \to V\C \times V\C$ are discrete.
 
-Our $\delta$ is supposed to be a profunctor $\dT \ocomp \dS \bto \dS \ocomp \dT$, which moreover must be a loose 2-cell in $\cL(\dCat)$ and thus come with cells
+Our $\delta$ is supposed to be a profunctor $\dT \oc \dS \bto \dS \oc \dT$, which moreover must be a loose 2-cell in $\cL(\dCat)$ and thus come with cells
 \[ \xymatrix{ V\C \ar[d]|{\bullet}_{\hunit {V\C}} \ar@{}[dr]|{\Leftarrow} &
-  \dT\ocomp \dS \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
+  \dT\oc \dS \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
   V\C \ar[d]|{\bullet}^{\hunit {V\C}}\\
-  V\C & \dS\ocomp\dT \ar[l] \ar[r] & V\C. } \]
+  V\C & \dS\oc\dT \ar[l] \ar[r] & V\C. } \]
 Taken together, this means that for any $A,C$ and $A',C'$, and isomorphisms $A\cong A'$ and $C\cong C'$, plus a $C$-trivial matching from $A$ to $C$ and a $C'$-trivial matching from $A'$ to $C'$, both with the paired cats partitioned into two subsets, we must have a specified ``set of ways to compose''.
 Put differently, the ``type'' of an element of $\dl$ is given by the following data:
 \begin{equation}
@@ -1084,9 +1112,9 @@ Put differently, the ``type'' of an element of $\dl$ is given by the following d
 \end{equation}
 Note that the isomorphism $C\cong C'$ is not required to ``commute'' with the others.
 
-In fact, any such ``type'' will be inhabited by \emph{at most one} element of $\dl$.
+As the first step in our definition, we specify that any such ``type'' will be inhabited by \emph{at most one} element of $\dl$.
 It is simplest to describe the conditions under which this happens as a partial function from the left half of the diagram $B D D\o \cong A\cong A' \cong B' D' (D')\o$ to the right half.
-Regard this composite isomorphism $B D D\o \cong B' D' (D')\o$ as a bipartite graph, and add additional edges connecting each cat in $D$ or $D'$ to its counterpart in $D\o$ or $(D')\o$.
+Regard this composite isomorphism $B D D\o \cong B' D' (D')\o$ as a bipartite graph, and add additional edges connecting each cat in $D$ or $D'$ to its counterpart in $D\o$ or $(D')\o$, respectively.
 In the resulting graph all vertices have degree 1 or 2, so it is a disjoint union of paths and cycles.
 The partial function is defined if and only if there are \emph{no} cycles.
 In this case, each path must start and end at a cat in $B$ or $B'$.
@@ -1095,9 +1123,9 @@ The remaining paths connect one cat in $B$ with one in $B'$, specifying the isom
 Note that the variance gets flipped every time a path ``changes direction'', so $E$- and $E'$-paths do indeed connect two copies of a cat with opposite variance, while the remaining ones preserve variance.
 
 To be a profunctor, $\dl$ must also be acted on by permutations on both sides, compatibly with the projections to $\hunit{V\C}$ on both sides; but this is evident.
-Thus, we have defined a loose 2-cell $\dl : \dT \ocomp \dS \bto \dS \ocomp \dT$ in $\cL(\dCat)$.
+Thus, we have defined a loose 2-cell $\dl : \dT \oc \dS \bto \dS \oc \dT$ in $\cL(\dCat)$.
 
-For the remaining data and axioms of a loose distributive law, we note that \dT and \dS play entirely symmetrical roles in the construction.
+For the remaining data and axioms of a loose distributive law from \cref{def:hdl}, we note that \dT and \dS play entirely symmetrical roles in the construction.
 Thus, we can cut our work almost in half by symmetry (``almost'' because two of the axioms are self-dual under this symmetry).
 
 [TODO \dots]
@@ -1132,14 +1160,14 @@ Two such pre-matchings are \textbf{equivalent} if they are related by an isomorp
 
 Now let \dC be the strict double category whose tight morphisms are the permutation isomorphisms (that is, $\dC_0 = V\C_0$), whose loose morphisms from $A$ to $B$ are matchings with restrictions from $B$ to $A$, and whose cells are commutative squares in $\Chat$.
 [Hmm, does this make sense with the passage to equivalence classes?]
-Then \dC is a monad in $\cT(\dCat)$ on $V\C_0$.
-We will construct a loose distributive law $\dC \ocomp \dS \to \dS\ocomp \dC$ in $\cL(\dCat)$, analogous to the one constructed in the previous section.
+Then \dC is a monad in $\cL(\dCat)$ on $V\C_0$.
+We will construct a loose distributive law $\dC \oc \dS \bto \dS\oc \dC$ in $\cL(\dCat)$, analogous to the one constructed in the previous section.
 
 As a loose 2-cell in $\cL(\dCat)$, this will look like
 \[ \xymatrix{ V\C_0 \ar[d]|{\bullet}_{\hunit {V\C_0}} \ar@{}[dr]|{\Leftarrow} &
-  \dC\ocomp \dS \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
+  \dC\oc \dS \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
   V\C_0 \ar[d]|{\bullet}^{\hunit {V\C_0}}\\
-  V\C & \dS\ocomp\dC \ar[l] \ar[r] & V\C_0. } \]
+  V\C_0 & \dS\oc\dC \ar[l] \ar[r] & V\C_0. } \]
 Now the ``type'' of an element of $\dl$ is given by the following data, in which some of the isomorphisms from~\eqref{eq:dl-type-1} have been replaced by morphisms in $\Chat$:
 \[ \xymatrix{ A \ar[d]_\cong \ar[r]^-\cong & B D D\o & C E E\o D D\o \ar[l] & C \ar[d]^\cong \\
    A' & B' D' (D')\o \ar[l] \ar[r]_-\cong & C' E' (E')\o D' (D')\o & C' }\]
@@ -1347,6 +1375,43 @@ As before, the actions of permutation isomorphisms are trivial, so we have a loo
 
 \section{Multivariable morphisms}
 \label{sec:multivar}
+
+Finally, we incorporate the possibility of module morphisms with multiple modules in the domain.
+This takes us out of the realm of linear functors (though polynomial functors would suffice), so we use a different technique.
+Let $P$ denote the monad on \dCat for symmetric strict monoidal categories.
+With $V$ and \C as in the previous section $V\C_0$ is a $P$-algebra.
+Therefore, $P$ induces a monad on $\dCat/V\C_0$ (this is true for any monad algebra and any comma object in a 2-category), which we also denote $P$.
+We claim that this monad $P$ is connected to the monad $S$ (a.k.a. $R$ and $T$) defined in \cref{sec:extranat} by a \emph{tight} distributive law $\sigma : P S \to S P$.
+
+For a category $\E$ over $V\C_0$, the objects of $P S \E$ are finite lists $(M_1,\dots,M_n)$ of objects of $S\E$, each of which is an object $M_i \in \E(A_i)$ where $A_i\in V\C_0$ is equipped with a $B_i$-trivial matching $A_i\cong B_i E_i E_i\o$.
+Such an object sits over $B_1\dots B_n$ in $V\C_0$.
+
+On the other hand, the objects of $S P \E$ are finite lists $(M_1,\dots,M_n)$ of objects $M_i \in \E(A_i)$, equipped with a $B$-trivial matching $A_1\cdots A_n \cong B E E\o$.
+Thus $\sigma$ on objects has merely to concatenate the matchings and rearrange them, defining $B = B_1\cdots B_n$ and $E = E_1\cdots E_n$:
+\[ A_1\cdots A_n \toiso B_1 E_1 E_1\o \cdots B_n E_n E_n\o \toiso (B_1\cdots B_n)(E_1\cdots E_n)(E_1\cdots E_n)\o \]
+The action of $\sigma$ on morphisms and profunctors is analogous, and its naturality and compatibility with the monad structures of $P$ and $S$ is straightforward.
+
+We also have a similar tight distributive law $\tau : P C \to C P$, where $C$ is the monad on $\dCat/V\C_0$ from \cref{sec:substitutions}.
+The only difference is that we have to concatenate morphisms of $\Chat$ rather than merely permutation isomorphisms.
+
+We intend to assemble these two tight distributive laws with the loose distributive law $\dl:C S \bto S C$ into a loose distributive law $C(SP) \bto (SP)C$, which will finally be the one that characterizes pre-kits as generalized polycategories.
+The basic idea is contained in~\cite{cheng:iterated-dls} where it is shown that given three monads $T_1,T_2,T_3$ and distributive laws $\lambda_{ij}:T_i T_j \to T_j T_i$ for $i>j$ satisfying the Yang-Baxter equation
+\[ \xymatrix{
+& T_2 T_3 T_1 \ar[r]^{T_2 \lambda_{3 1}} &
+T_2 T_1 T_3 \ar[dr]^{\lambda_{2 1} T_3} \\
+T_3 T_2 T_1 \ar[ur]^{\lambda_{3 2} T_1} \ar[dr]_{T_3 \lambda_{2 1}} &&&
+T_1 T_2 T_3 \\
+& T_3 T_1 T_2 \ar[r]_{\lambda_{3 1} T_2} &
+T_1 T_3 T_2 \ar[ur]_{T_1 \lambda_{3 2}}
+}\]
+there is (among other things) a composite distributive law $T_3(T_1 T_2) \to (T_1 T_2) T_3$.
+Our present situation is complicated by the fact that two of our distributive laws are tight and one is loose.
+Moreover, just as in the definition of loose distributive laws, instead of a \emph{commutative} Yang-Baxter diagram it is more natural to ask for a (not necessarily invertible) ``Yang-Baxterator'' modification satisfying its own laws.
+This leads us to the following definition.
+
+\begin{defn}
+  
+\end{defn}
 
 [TODO\dots]
 
