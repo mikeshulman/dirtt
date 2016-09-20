@@ -731,7 +731,7 @@ Thus, a cell in a double category can be written either as
 \qquad\text{or}\qquad
 \vcenter{\xymatrix{ A \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow}& C \ar[d]|{\bullet} \\ B \ar[r] & D } }
 \]
-We write tight composition (of arrows or cells) with $\tc$ or juxtaposition in functional order, and loose composition (of arrows or cells) with $\bc$ in diagrammatic order.
+We write tight composition (of arrows or cells) with $\tc$ or juxtaposition in applicative order, and loose composition (of arrows or cells) with $\bc$ in diagrammatic order.\footnote{Applicative order means that the composite of $f:A\to B$ and $g:B\to C$ is $g\tc f$, while diagrammatic order means that the composite of $M:A\bto B$ and $N:B\bto C$ is $M\bc N$.}
 Similarly, we write $1$ for tight identities (of objects or loose arrows), and $\hunit{A}$ for loose identities (of objects or tight arrows).
 
 The particular double category we have most in mind is \dCat, where:
@@ -743,14 +743,15 @@ The particular double category we have most in mind is \dCat, where:
 \end{itemize}
 We will also be interested in \emph{slice} double categories of \dCat: for any object $A$ of a double category \dD, in the slice $\dD/A$ the category $(\dD/A)_0$ of objects and tight maps is the slice of $\dD_0$ over $A$, and the category $(\dD/A)_1$ of loose arrows and cells is the slice of $\dD_1$ over $\hunit A$.
 
-Between (pseudo) double categories we mainly will be interested in \emph{strong} or \emph{pseudo double functors}, which are strictly functorial in the tight direction and functorial up to tight isomorphism in the loose direction.
+Between (pseudo) double categories we will mainly be interested in \emph{strong} or \emph{pseudo double functors}, which are strictly functorial in the tight direction and functorial up to tight isomorphism in the loose direction.
 Such functors admit an obvious notion of \emph{tight transformation}, with tight arrow components $\alpha_A:FA\to GA$ for each object $A$, and 2-cell components
 \[ \vcenter{\xymatrix{ FA \ar[r]|{\bullet}^{FM} \ar[d]_{\alpha_A} \ar@{}[dr]|{\Downarrow}& FB \ar[d]^{\alpha_B} \\ GA \ar[r]|{\bullet}_{GM} & GB } } \]
 for each loose arrow $A\xbto{M} B$.
-This yields a strict 2-category of double categories.
+This yields a strict 2-category of double categories which we denote \cDbl.
 By a \textbf{double monad} we mean a monad in this 2-category.
+(Many of the definitions make sense even for double monads whose underlying double functors are \emph{lax}, but all the ones we will be interested in are strong.)
 
-Distributive laws can also be defined internal to any 2-category; this yields a notion of \textbf{tight distributive law}.
+Distributive laws can also be defined internal to any 2-category; interpreted in \cDbl this yields a notion of \textbf{tight distributive law}.
 However, for generalized polycategories we are interested in \emph{loose distributive laws}, which we now define.
 If $F$ and $G$ are double functors between pseudo double categories, a \textbf{loose transformation} $\alpha:F\bto G$ consists of a loose arrow $\alpha_X : F X \bto G X$ for each object $X$ of the domain, forming a pseudonatural transformation between the loose parts of $F$ and $G$, together with for each tight arrow $f:X\to Y$ in the domain, a cell
 \[ \xymatrix{ F X \ar[r]|-{\bullet}^-{\alpha_X} \ar[d]_{F f} \ar@{}[dr]|{\alpha_f} & G X \ar[d]^{G f} \\
@@ -758,8 +759,9 @@ F Y \ar[r]|-{\bullet}_-{\alpha_Y} & G Y} \]
 satisfying some evident axioms; see~\cite{gp:something} wherein this is called a \emph{vertical transformation}.
 These are the loose arrows in a double category of functors whose tight arrows are tight transformations, and whose cells are an evident kind of ``square modification''.
 
-In the followin definition, we write composition of double functors (and whiskering of tight and loose transformations by double functors) with $\oc$, to distinguish it from the composition $\tc$ and $\bc$ in the tight and loose direction.
+In the following definitions, we write composition of double functors (and whiskering of tight and loose transformations by double functors) with $\oc$, to distinguish it from the compositions $\tc$ and $\bc$ in the tight and loose direction respectively.
 A further reason for this will become apparent in \cref{sec:linear-double-monads}.
+For brevity, we will also omit mention of the associativity and unit constraints for loose composition, and the functoriality constraints for double functors.
 
 \begin{defn}\label{def:hdl}
   Let $T$ and $S$ be monads on a double category \K.
@@ -809,14 +811,14 @@ A further reason for this will become apparent in \cref{sec:linear-double-monads
 The data and axioms of a loose distributive law may appear rather formidable when written out unforgivingly as above.
 In \cref{fig:hdl-data,fig:hdl-axioms} we sketch them instead using an informal string diagram calculus, in which the monads $T$ and $S$ are written as a red and a blue string respectively and the loose transformation $\dl$ is a ``string crossing''.
 
-\begin{figure}
+\begin{figure}[p]
   \centering
   \includegraphics{hdl-data.png}
   \caption{The data of a loose distributive law}
   \label{fig:hdl-data}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{hdl-axioms.png}
   \caption{The axioms of a loose distributive law}
@@ -894,7 +896,137 @@ In the following definitions we write application of double functors and transfo
     TA \ar[rrrrrr]|{\bullet} &&&&&& S A}\]
 \end{defn}
 
-TODO: Define the 2-category of $\dl$-monoids.
+(In the last axiom, note that we needed to use the loose pseudonaturality of $\dl$ to make the domains match up.)
+
+\begin{defn}
+  If $(A,M,e_M,m_M)$ and $(B,N,e_N,m_N)$ are $\dl$-monoids, a \textbf{$\dl$-monoid morphism} consists of a tight arrow $f:A\to B$ and a cell
+  \[ \xymatrix{ T A \ar[r]|{\bullet}^M \ar[d]_{T f} \ar@{}[dr]|{\fbar\Downarrow} & S A \ar[d]^{S f} \\ T B \ar[r]|{\bullet}_{N} & S B } \]
+  such that $\fbar \tc e_M = e_N$ and $\fbar \tc m_M = m_N \tc (T\fbar \bc \dl_f \bc S\fbar)$.
+\end{defn}
+
+\begin{defn}
+  If $(f,\fbar)$ and $(g,\gbar)$ are $\dl$-monoid morphisms from $(A,M,e_M,m_M)$ to $(B,N,e_N,m_N)$, a \textbf{$\dl$-monoid transformation} $\al:f\Rightarrow g$ consists of a cell
+  \[ \xymatrix{ A \ar[r]|{\bullet}^{\hunit A} \ar[d]_{\Tunit_B \tc g %= T g \tc \Tunit_A
+} \ar@{}[dr]|{\al\Downarrow} & A \ar[d]^{\Sunit_B \tc f %= S f \tc \Sunit_A
+} \\ T B \ar[r]|{\bullet}_{N} & S B } \]
+  such that the following two composites are equal:
+  \[
+  \xymatrix@C=1.5pc{
+    T A \ar[rrr]|{\bullet}^M \ar@{=}[d] \ar@{}[drrr]|{\cong} &&& S A \ar@{=}[d]\\
+    T A \ar[r]|{\bullet}^{T\hunit A} \ar[d]_{Tg} \ar@{}[ddr]|{T\al} &
+    T A \ar[d]|{T f} \ar@{}[dr]|{\hunit{T f}} \ar[r]|{\bullet}^{\hunit{TA}} &
+    T A \ar[d]|{T f} \ar@{}[dr]|{\fbar} \ar[r]|{\bullet}^M &
+    S A \ar[d]^{S f}\\
+    T B \ar[d]_{T\Tunit_B } &
+    T B \ar[d]|{T\Sunit_B} \ar[r]|{\bullet}^{\hunit{T B}} \ar@{}[dr]|{\Sdlunit_B} &
+    T B \ar[d]|{\Sunit_{TB}} \ar[r]|{\bullet}^{N} \ar@{}[dr]|{\Sunit_N} & S B \ar[d]^{\Sunit_{S B}}\\
+    T T B \ar[r]|{\bullet}^{T M} \ar[d]_{\Tmult_B} \ar@{}[drrr]|{m_N\Downarrow} &
+    T S B \ar[r]|{\bullet}^{\dl_B} & S T B \ar[r]|{\bullet}^{S N} & S S B \ar[d]^{\Smult_B}\\
+    T B \ar[rrr]|{\bullet}_N &&& S B
+    }
+    \quad
+    \xymatrix@C=1.5pc{
+    T A \ar[rrr]|{\bullet}^M \ar@{=}[d] \ar@{}[drrr]|{\cong} &&& S A \ar@{=}[d]\\
+    T A \ar[r]|{\bullet}^{M} \ar[d]_{T g} \ar@{}[dr]|{\gbar} &
+    S A \ar[d]|{S g} \ar@{}[dr]|{\hunit{S g}} \ar[r]|{\bullet}^{\hunit{SA}} &
+    S A \ar[d]|{S g}  \ar@{}[ddr]|{S\al} \ar[r]|{\bullet}^{S\hunit A} &
+    S A \ar[d]^{S f}\\
+    T B \ar[d]_{\Tunit_{TB}} \ar[r]|{\bullet}^{N} \ar@{}[dr]|{\Tunit_M} &
+    S B \ar[d]|{\Tunit_{SB}} \ar[r]|{\bullet}^{\hunit{S B}} \ar@{}[dr]|{\Tdlunit_B} &
+    S B \ar[d]|{S \Tunit_B}  & S B \ar[d]^{S\Sunit_B}\\
+    T T B \ar[r]|{\bullet}^{T M} \ar[d]_{\Tmult_B} \ar@{}[drrr]|{m_N\Downarrow} &
+    T S B \ar[r]|{\bullet}^{\dl_B} & S T B \ar[r]|{\bullet}^{S N} & S S B \ar[d]^{\Smult_B}\\
+    T B \ar[rrr]|{\bullet}_N &&& S B
+  }
+  % \xymatrix@C=1.5pc{
+  %   T A \ar[rrr]|{\bullet}^M \ar@{=}[d] \ar@{}[drrr]|{\cong} &&& S A \ar@{=}[d]\\
+  %   T A \ar[r]|{\bullet}^{T\hunit A} \ar[d]_{Tg} \ar@{}[ddr]|{T\al} &
+  %   T A \ar[d]|{T\Sunit_A} \ar@{}[dr]|{\Sdlunit_A} \ar[r]|{\bullet}^{\hunit{TA}} &
+  %   T A \ar[d]|{\Sunit_{TA}} \ar@{}[dr]|{\Sunit_M} \ar[r]|{\bullet}^M &
+  %   S A \ar[d]^{\Sunit_{SA} }\\
+  %   T B \ar[d]_{T\Tunit_B } &
+  %   T S A \ar[d]|{T S f} \ar[r]|{\bullet}^{\dl_A} \ar@{}[dr]|{\dl_f} &
+  %   S T A \ar[d]|{S T f} \ar[r]|{\bullet}^{S M} \ar@{}[dr]|{S\fbar} & S S A \ar[d]^{S S f}\\
+  %   TTB \ar[r]|{\bullet}^{T M} \ar[d]_{\Tmult_B} \ar@{}[drrr]|{m_N\Downarrow} &
+  %   T S B \ar[r]|{\bullet}^{\dl_B} & S T B \ar[r]|{\bullet}^{S N} & S S B \ar[d]^{\Smult_B}\\
+  %   T B \ar[rrr]|{\bullet}_N &&& S B
+  %   }
+  %   \quad
+  %   \xymatrix@C=1.5pc{
+  %   T A \ar[rrr]|{\bullet}^M \ar@{=}[d] \ar@{}[drrr]|{\cong} &&& S A \ar@{=}[d]\\
+  %   T A \ar[r]|{\bullet}^{M} \ar[d]_{\Tunit_{TA}} \ar@{}[dr]|{\Tunit_M} &
+  %   S A \ar[d]|{\Tunit_{SA}} \ar@{}[dr]|{\Tdlunit_A} \ar[r]|{\bullet}^{\hunit{SA}} &
+  %   S A \ar[d]|{S\Tunit_A}  \ar@{}[ddr]|{S\al} \ar[r]|{\bullet}^{S\hunit A} &
+  %   S A \ar[d]^{S f}\\
+  %   T T A \ar[d]_{T T g} \ar[r]|{\bullet}^{T M} \ar@{}[dr]|{T\gbar} &
+  %   T S A \ar[d]|{T S g} \ar[r]|{\bullet}^{\dl_A} \ar@{}[dr]|{\dl_g} &
+  %   S T A \ar[d]|{S T g}  & S B \ar[d]^{S\Sunit_B}\\
+  %   T T B \ar[r]|{\bullet}^{T M} \ar[d]_{\Tmult_B} \ar@{}[drrr]|{m_N\Downarrow} &
+  %   T S B \ar[r]|{\bullet}^{\dl_B} & S T B \ar[r]|{\bullet}^{S N} & S S B \ar[d]^{\Smult_B}\\
+  %   T B \ar[rrr]|{\bullet}_N &&& S B
+  %   }
+  \]
+  %$m_B \tc (T\al \bc \dl_f \bc S\fbar)\tc(\Sdlunit \bc \Sunit_M) = m_B (\gbar \bc \al)$.
+\end{defn}
+
+\begin{thm}
+  $\dl$-monoids, $\dl$-monoid morphisms, and $\dl$-monoid transformations form a 2-category.
+\end{thm}
+\begin{proof}
+  Composition of morphisms is easy: simply compose both the tight arrow and cell components.
+
+  We define the postwhiskering of a transformation $\al:f\Rightarrow g$ by a morphism $h:N\to P$ to be $\hbar\tc \al$.
+  The transformation axiom follows by postcomposing that for $\al$ with $\hbar$ and using the morphism axiom $\hbar \tc m_N = m_P \tc (T\hbar \bc \dl_h \bc S\hbar)$, the naturality of $\Tunit,\Sunit$, and the modification/naturality of $\Tdlunit,\Sdlunit$.
+  For associativity of postwhiskering, we have $\kbar \tc (\hbar \tc \al) = (\kbar \tc \hbar)\tc \al = \overline{k\tc h} \tc\al$, and similarly for identities.
+
+  We define the prewhiskering of a transformation $\al:f\Rightarrow g$ by a morphism $h:P\to M$ to be $\al \tc \hunit{h}$.
+  The transformation axiom follows by precomposing that for \al with $\hbar$ and using the naturality of the constraints for loose composition and for the pseudofunctoriality of $T$ and $S$.
+  For associativity we have $(\al\tc\hunit{k})\tc\hunit{h} = \al\tc(\hunit{k}\tc\hunit{h}) = \al\tc\hunit{k\tc h}$, and similarly for identities.
+
+  The identity transformation on a morphism $f:M\to N$ is the cell $e_N \tc \hunit{f}$.
+  We define the composite of two transformations $\al:f\Rightarrow g$ and $\be:g\Rightarrow h$ to be the following composite (precomposed with a unit isomorphism):
+  \[
+  \xymatrix{
+    A \ar[d]_h \ar[r]|{\bullet}^{\hunit A} \ar@{}[ddr]|{\beta} &
+    A \ar[d]_g \ar[r]|{\bullet}^{\hunit A} \ar@{}[dr]|{\hunit g} &
+    A \ar[d]^g \ar[r]|{\bullet}^{\hunit A} \ar@{}[ddr]|{\alpha} &
+    A\ar[d]^f \\
+    B \ar[d]_{\Tunit_b} &
+    B \ar[d]|{\Sunit_B} \ar@{}[ddr]|{\Tdlunit \tc \hunit{\Sunit} =\atop \Sdlunit \tc \hunit{\Tunit}} \ar[r]|{\bullet}^{\hunit B} &
+    B \ar[d]|{\Tunit_B} & 
+    B\ar[d]^{\Sunit_B}\\
+    T B \ar[d]_{\Tunit_{TB}} \ar[r]|{\bullet}^N \ar@{}[dr]|{\Tunit_N} &
+    S B \ar[d]|{\Tunit_{SB}} &
+    T B \ar[d]|{\Sunit_{TB}} \ar[r]|{\bullet}^N \ar@{}[dr]|{\Sunit_N} &
+    S B \ar[d]^{\Sunit_{SB}} \\
+    T T B \ar[r]|{\bullet}^{T N} \ar[d]_{\Tmult_B} \ar@{}[drrr]|{m_N\Downarrow} &
+    T S B \ar[r]|{\bullet}^{\dl_B} & S T B \ar[r]|{\bullet}^{S N} & S S B \ar[d]^{\Smult_B}\\
+    T B \ar[rrr]|{\bullet}_N &&& S B
+    }
+  \]
+  % \[ \xymatrix{
+  %   A \ar[r]|{\bullet}^{\hunit A} \ar[d]_{\Tunit_A} \ar@{}[dr]|{\Tunit_{\hunit A}} &
+  %   A \ar[r]|{\bullet}^{\hunit A} \ar[d]|{\Tunit_A} \ar@{}[ddr]|{\Tdlunit \tc \hunit{\Sunit} =\atop \Sdlunit \tc \hunit{\Tunit}} &
+  %   A \ar[r]|{\bullet}^{\hunit A} \ar[d]|{\Sunit_A} \ar@{}[dr]|{\Sunit_{\hunit A}} &
+  %   A  \ar[d]^{\Sunit_A} \\
+  %   T A \ar[r]|{\bullet}^{T\hunit A} \ar[d]_{Th} \ar@{}[ddr]|{T\be} &
+  %   T A \ar[d]|{T \Sunit_A} &
+  %   S A \ar[d]|{S \Tunit_A} \ar[r]|{\bullet}^{S\hunit A} \ar@{}[ddr]|{S\al} &
+  %   S A \ar[d]^{S f}\\
+  %   T B \ar[d]_{T\Tunit_B} &
+  %   T S A \ar[d]|{T S g} \ar[r]|{\bullet}^{\dl_A} \ar@{}[dr]|{\dl_g} &
+  %   S T A \ar[d]|{S T g} &
+  %   S B \ar[d]^{S\Tunit_B}\\
+  %   T T B \ar[r]|{\bullet}^{T N} \ar[d]_{\Tmult_B} \ar@{}[drrr]|{m_N\Downarrow} &
+  %   T S B \ar[r]|{\bullet}^{\dl_B} & S T B \ar[r]|{\bullet}^{S N} & S S B \ar[d]^{\Smult_B}\\
+  %   T B \ar[rrr]|{\bullet}_N &&& S B}\]
+  The transformation axiom for this follows by using the associativity axiom for the $\dl$-monoid $N$ and the transformation axioms for $\al$ and $\be$.
+  Associativity of this composite similarly follows from associativity for $N$, while unitality follows from the unit axiom for $N$.
+  [TODO: I haven't really checked these.]
+
+  It remains to show that all three kinds of composition satisfy the interchange law.
+  [Also TODO]
+\end{proof}
 
 In the rest of the paper we will define a loose distributive law for which $\dl$-monoids are kits (or, more precisely, ``pre-kits'').
 Of course, first we need a couple of monads.
@@ -946,7 +1078,7 @@ We have in mind the following picture:
 \end{tikzpicture}
 \end{center}
 
-We write transversal composition with $\tc$ or juxtaposition in functional order, vertical composition with $\bc $ in diagrammatic order, and horizontal composition with $\oc$ in functional order.
+We write transversal composition with $\tc$ or juxtaposition in applicative order, vertical composition with $\bc $ in diagrammatic order, and horizontal composition with $\oc$ in applicative order.
 The unit functors $1\to\iA(A,A)$ pick out an identity morphism $\id_A$ for each object $A$.
 In addition, every morphism $f$ has an identity tight 2-cell $1_f$ and an identity loose 2-cell $\Id_f$, every tight 2-cell $\alpha$ has an identity 3-cell $\Id_\alpha$, every loose 2-cell $\beta$ has an identity 3-cell $1_\beta$, and we have $\Id_{1_f} = 1_{\Id_f}$.
 We have $\Id_f \oc \Id_{g} \cong \Id_{f\oc g}$ and $1_g \oc 1_g = 1_{f\oc g}$, as well as isomorphisms

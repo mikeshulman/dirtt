@@ -130,8 +130,9 @@
 % Bar: \Abar is \overline{A}, \abar is \overline{a}
 \def\definebar#1{\ea\gdef\csname #1bar\endcsname{\ensuremath{\overline{#1}}\xspace}}
 \foreachLetter{1}{27}{\definebar}
-\foreachletter{1}{8}{\definebar} % \hbar is something else!
-\foreachletter{9}{15}{\definebar} % \obar is something else!
+% \foreachletter{1}{8}{\definebar} % \hbar is something else!
+\foreachletter{1}{15}{\definebar} % \hbar is something else, but I don't care
+% \foreachletter{9}{15}{\definebar} % \obar is something else!
 \foreachletter{16}{27}{\definebar}
 % Tilde: \Atil is \widetilde{A}, \atil is \widetilde{a}
 \def\definetil#1{\ea\gdef\csname #1til\endcsname{\ensuremath{\widetilde{#1}}\xspace}}
