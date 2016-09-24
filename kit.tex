@@ -1032,6 +1032,76 @@ In the rest of the paper we will define a loose distributive law for which $\dl$
 Of course, first we need a couple of monads.
 In a kit there are actually \emph{four} different kinds of structure that have to be incorporated into these monads: the extraordinary pairing of variables in the domain, the extraordinary pairing in the codomian, the possibility of multiple modules in the domain, and the substitution of functor terms for abstract variables in the codomain.
 To simplify the construction and clarify the essential point (composing extraordinary natural transformations), we will first define a loose distributive law for ``unary kits without substitution'' that includes only the first two; then we will add in the other two.
+% TODO: Update this description
+
+\section{A monad with a fixed base}
+\label{sec:monad-cat}
+
+Let $V$ be the monad on $\bCat$ whose algebras are symmetric strict monoidal categories equipped with a strict symmetric monoidal strict involution, i.e.\ a strict symmetric monoidal functor $(-)\o : \C\to\C$ such that $(a\o)\o =a$ functorially.
+Concretely, the objects of $V\C$ are finite lists of objects of $\C$, some of which are marked with a formal $(\blank)\o$, such as $(a,b\o,b,c\o,a)$.
+It will also sometimes be convenient to write such a list as $(a\p,b\m,b\p,c\m,a\p)$, where $a\p=a$ and $a\m=a\o$; we can then write $a\e$ to mean either $a\p$ or $a\m$ depending on whether $\varepsilon=+$ or $\varepsilon=-$.
+We write $\varepsilon^*$ for the reversed variance, i.e.\ $+^*=-$ and $-^*=+$.
+
+Since $V\C$ is monoidal with an involution, its objects can be concatenated and oppositized (by distributing the opposite over the list), so for instance
+\[(a,b\o)(c\o,d,a) = (a,b\o,c\o,d,a) \quad\text{and}\quad (b\o,a,a)\o = (b,a\o,a\o).\]
+Its unit object is $\one = ()$.
+The morphisms of $V\C$ are given by finite lists of morphisms of $\C$ labeled by permutations which respect the opposites, e.g.\ a morphism $(a,b\o,b,c\o,a) \to (d,e,d\o,f,e\o)$ might be:
+\begin{tikzc}
+  \node (A1) at (0,3) {$a$};
+  \node (Bo2) at (1,3) {$b\o$};
+  \node (B3) at (2,3) {$b$};
+  \node (Co4) at (3,3) {$c\o$};
+  \node (A5) at (4,3) {$a$};
+  \node (D1') at (0,0) {$d$};
+  \node (B2') at (1,0) {$e$};
+  \node (Do3') at (2,0) {$d\o$};
+  \node (C4') at (3,0) {$f$};
+  \node (Ao5') at (4,0) {$e\o$};
+  \draw[->] (A1) to[out=-90,in=90] node[ed,swap,pos=.2] {$f$} (B2');
+  \draw[->] (Bo2) to[out=-90,in=90] node[ed,swap,pos=.1] {$g\o$} (Ao5');
+  \draw[->] (B3) to[out=-90,in=90] node[ed,swap,pos=.9] {$h$} (D1');
+  \draw[->] (Co4) to[out=-90,in=90] node[ed,swap,pos=.8] {$k\o$} (Do3');
+  \draw[->] (A5) to[out=-90,in=90] node[ed,pos=.2] {$\ell$} (C4');
+\end{tikzc}
+Here $f:a\to e$, $g:b\to e$, $h:b\to d$, $k:c\to d$, and $\ell:a\to f$ are morphisms in $\C$.
+Note that there can only be a morphism between two lists if they have the same length \emph{and} the same number of opposites.
+Formally, if $A=(a_1\e[1],\dots,a_n\e[n])$ and $B=(b_1\ph[1],\dots,b_n\ph[n])$, then a morphism $A\to B$ is a pair $(\sigma,f)$ where $\sigma\in \Sigma_n$ is a permutation such that $\varphi_{\sigma(k)} = \varepsilon_{k}$, and $f=(f_1,\dots,f_n)$ is a list of morphisms with $f_n : a_n \to b_{\sigma(n)}$.
+
+Let \C be a \emph{discrete} category, whose objects will be the cats of a kit.
+In particular, therefore $V\C$ is a groupoid.
+The modules will form a discrete fibration $\E\to V\C$, which in particular is an object of the slice category $\bCat/V\C$.
+In this section we will define a monad $R$ on $\bCat/V\C$ that incorporates the ``pairing'' aspect of the domains and codomains in an extraordinary-natural transformation; this will be the crucial ingredient in the monads we will eventually use to define kits as generalized polycategories.
+
+In general, one way to define a monad on a slice category $\bC/X$ is to give an internal category $R_1 \toto X$ in \bC with $X$ as its object-of-objects.
+There is then a monad on $\bC/X$ whose algebras are ``internal diagrams'' over this internal category, with the monad action itself being $Y \mapsto Y\times_X R_1$.
+When $\bC=\bCat$ as in our case, this means we need to define a \emph{strict double category} $\dR$, with $\dR_0 = V\C$ as its category of objects and tight morphisms.
+
+Let us call an object of $V\C$ \textbf{totally covariant} if it contains no $(-)\o$'s.
+A \textbf{$B$-trivial pre-matching} between $A,B\in V\C$ is an isomorphism $A \cong B E E\o$ in $V\C$ where $E$ is totally covariant and the permutation preserves the relative order of cats in $B$.
+Two pre-matchings are \textbf{equivalent} if they are related by an isomorphism $E\cong E'$ (necessarily unique if it exists); a \textbf{$B$-trivial matching} is an equivalence class of $B$-trivial pre-matchings.
+[Is this passage to equivalence classes the right thing to do?  Does it actually make sense everywhere?]
+
+Now a loose morphism from $A$ to $B$ in $\dR$ (that is, an object of $\dR_1$) is a $B$-trivial matching between $A$ and $B$.
+The loose composite of matchings $A\cong B D D\o$ and $B \cong C E E\o$ is the composite
+\[ A\cong B D D\o \cong C E E\o D D\o \cong C (E D) (E D)\o. \]
+The identity matching is the unique one with $E=()$.
+The cells are commutative squares of two matchings and two isomorphisms, in an obvious sense.
+
+This completes the definition of a strict double category $\dR$ with $\dR_0 = V\C$.
+Note that the source and target functors of \dR are both individually fibrations (though the functor $(s,t):\dR_1 \to \dR_0\times \dR_0$ is not a fibration).
+%Thus, in particular it is a monad in $\cL(\dCat)$, and thus induces a strong double monad $R$ on $\dCat/V\C$.
+
+An object of $\bCat/V\C$ is a functor $\E\to V\C$.
+We think of the fiber $\E(A)$ over $A=(a_1\e[1],\dots,a_n\e[n])$ as the set of modules with boundary $A$, and generally assume $\E\to V\C$ to be a discrete fibration (or equivalently a discrete opfibration, since $V\C$ is a groupoid); thus we can functorially permute the cats in the boundary of a module.
+The objects of $R\E$ are then obtained by choosing an object of $\E$, pairing up some of the cats in its boundary into covariant and contravariant pairs, and removing them from the boundary of the result.
+Note that the passage from pre-matchings to matchings means that there is no ordering imposed on the paired cats, and $B$-triviality means that the order of the unremoved cats is maintained.
+However, $R\E\to V\C$ is still no longer a \emph{discrete} fibration: an object in the fiber over $B$ consists of a $B$-trivial matching $A\cong BEE\o$ together with an object of $\E(A)$, and if $E$ admits automorphisms in $V\C$ then so can such objects.
+
+\section{A monad with a varying base}
+\label{sec:monad-with-varying}
+
+
+
 
 \section{Linear double monads}
 \label{sec:linear-double-monads}
@@ -1042,87 +1112,122 @@ Functors between slice categories of this sort are sometimes called \textbf{line
 
 However, we need not only monads on the ordinary category \bCat, but on the double category \dCat; and also loose distributive laws between these.
 For this it is convenient to have a structure that describes ``spans in \dCat'' analogous to the bicategory of spans in the 1-category \bCat.
-There are several ways one could organize such a structure, but for us the important one will be the following.
+The answer is the ``intercategory'' $\fSpan(\dCat)$ defined in~\cite[6.5]{gp:intercategories-ii}.
 
-Let \cDbl denote the 2-category of pseudo double categories and strong double functors.
-This has finite products, so we can regard it as cartesian monoidal.
+An \textbf{intercategory} is a type of weak \emph{triple} category.
+It has three kinds of arrow, called \emph{transversal}, \emph{horizontal}, and \emph{vertical}, and written with arrows $\to$, $\oto$, and $\bto$ respectively.
+It likewise has three kinds of cell, called \emph{horizontal} (horizontal/transversal), \emph{vertical} (vertical/transversal), and \emph{basic} (horizontal/vertical); and also \emph{cubes}.
 
-\begin{defn}[\cite{gg:lowdim-tricats}]
-  A \textbf{locally cubical bicategory} is a \cDbl-enriched bicategory.
-  Thus, it has objects with hom-double-categories $\iA(x,y)$, strong composition functors $\iA(y,z)\times \iA(x,y) \to \iA(x,z)$, strong unit functors $1\to \iA(x,x)$, and associativity and unitality tight natural isomorphisms satisfying the usual axioms.
-  % We say that it is \textbf{normal} if the composition functors are normal (preserve identities up to isomorphism) and the unit functors $1\to \iA(x,x)$ are strong (preserve identities and composition up to isomorphism), and \textbf{strong} if the composition functors are also strong.
+Like in a pseudo double category, composition in the transversal direction is strict, while composition in the horizontal and vertical directions is associative and unital up to transversal isomorphism.
+We write transversal composition with $\tc$ or juxtaposition in applicative order, vertical composition with $\bc $ in diagrammatic order, and horizontal composition with $\oc$ in applicative order.
+Every object $A$ has a transversal identity $1_A:A\to A$, a horizontal identity $\id_A:A\oto A$, and a vertical identity $\Id_A:A\bto A$.
+Likewise, every arrow has two identity cells of different types, and every cell has one identity cube.
+% In addition, every morphism $f$ has an identity tight 2-cell $1_f$ and an identity loose 2-cell $\Id_f$, every tight 2-cell $\alpha$ has an identity 3-cell $\Id_\alpha$, every loose 2-cell $\beta$ has an identity 3-cell $1_\beta$, and we have $\Id_{1_f} = 1_{\Id_f}$.
+%We have $\Id_f \oc \Id_{g} \cong \Id_{f\oc g}$ and $1_g \oc 1_g = 1_{f\oc g}$, as well as isomorphisms
+(We are adhering to the notation and terminology of~\cite{gp:intercategories}, except that we write $\oc$ in applicative rather than diagrammatic order.)
+
+The horizontal and vertical cells in an intercategory form two ordinary pseudo double categories under their two possible kinds of composition.
+Composition of basic cells, on the other hand, satisfies the interchange law (in both binary and nullary versions) only up to a \emph{not-necessarily-invertible} transversal cube.
+In the binary/binary case, this is a morphism
+\begin{equation}
+  \chi : (p\oc q) \bc (r\oc s) \to (p\bc r) \oc (q\bc s).\label{eq:interchange}
+\end{equation}
+The binary/nullary, nullary/binary, and nullary/nullary versions are
+\begin{equation}
+\id_v \bc \id_{v'} \to \id_{v\bc v'} \qquad
+\Id_{h\oc h'} \to \Id_h \oc \Id_{h'} \qquad
+\Id_{\id_A} \to \id_{\Id_A}\label{eq:nullary-interchange}
+\end{equation}
+In our main example (to be described in a moment), all these are isomorphisms, but~\eqref{eq:interchange} is not in general.
+We will primarily be interested in cases where it is, but in order to have a entire well-behaved structure, we need to allow cases where it isn't as well.
+
+Our specific example is that constructed in~\cite[\S6]{gp:intercategories-ii}: there is an intercategory $\fSpan(\dCat)$ whose:
+\begin{itemize}
+\item Objects are categories,
+\item Transversal arrows are functors,
+\item Vertical arrows are profunctors,
+\item Horizontal arrows are spans of functors,
+\item Vertical cells are profunctor morphisms (cells in \dCat, i.e.\ morphisms in $\dCat_1$),
+\item Horizontal cells are span morphisms (cells in the double category $\dSpan(\bCat)$),
+\item Basic cells are spans of profunctor morphisms (spans in $\dCat_1$), and
+\item Cubes are morphisms between spans of profunctor morphisms (cells in $\dSpan(\dCat_1)$).
+\end{itemize}
+In particular, the double category of objects, transversal arrows, vertical arrows, and vertical cells is \dCat, while the double category of objects, transversal arrows, horizontal arrows, and horizontal cells is $\dSpan(\bCat)$.
+As mentioned above, the nullary interchangers~\eqref{eq:nullary-interchange} are isomorphisms in $\fSpan(\dCat)$, but the binary-binary one~\eqref{eq:interchange} is not in general; a very simple counterexample is given in~\cite[6.5]{gp:intercategories-ii}.
+
+Now, a linear functor $\bC/A\to \bC/B$ induced by a span $A \ot C \to B$ in $\bC$ can be described in terms of the double category $\dSpan(\bC)$, by identifying $\bC/A$ with the hom-category of loose morphisms $1\bto A$ and composing them with the given span $A \ot C \to B$.
+To do something similar in $\fSpan(\dCat)$ we would like to identify a slice double category $\dCat/A$ with a ``hom-double-category'' whose
+\begin{itemize}
+\item objects are horizontal arrows $1\oto A$,
+\item tight arrows are horizontal cells between these whose horizontal source and target are identity transversal arrows,
+\item loose arrows are basic cells between these whose horizontal source and target are identity vertical arrows, and
+\item cells are cubes whose horizontal source and target are identity vertical cells.
+\end{itemize}
+Such a ``hom-double-category'' construction, as natural as it seems, does not work in an arbitrary intercategory, because composition of vertical arrows is not strictly unital, so that these loose arrows cannot be composed.
+However, it is always possible to re-define vertical composition to make it strictly unital; and this seems especially harmless in \dCat, where composition of profunctors is (being a coend) only defined up to isomorphism by a universal property anyway.\footnote{In fact, there is even an easy-to-define equivalent of \dCat that is a totally \emph{strict} double category, in which the loose arrows are cocontinuous functors between presheaf categories.}
+(Another approach is to assume that basic cells are ``transportable'' along transversal isomorphisms, such as the unit constraints for vertical composition.)
+
+We will assume this has been done, so that the above hom-double-category exists.
+Moreover, for simplicity we will always assume our intercategories are \textbf{normal}, meaning that all the nullary interchangers are isomorphisms, as is the case in $\fSpan(\dCat)$.
+Now we can describe the action of linear functors with the following abstract picture.
+
+\begin{lem}\label{thm:intercat-bicat}
+  Let \iA be a normal intercategory with strictly unital vertical composition, and fix an object $X\in\iA$.
+  Let $\cH(\iA)$ denote the bicategory whose objects are those of \iA, whose morphisms are the horizontal arrows of \iA, and whose 2-cells are the ``globular'' horizontal cells (those whose horizontal source and target are identity transversal arrows).
+  Then there is a pseudofunctor $\hom_\iA(X,-) : \cH(\iA) \to \lxdbl$, where $\lxdbl$ is the 2-category of double categories and lax double functors.
+\end{lem}
+\begin{proof}
+  Each object $A$ is sent to the above hom-double-category $\hom_\iA(X,A)$.
+  A horizontal arrow $f:A\oto B$ acts on all the data in $\hom_\iA(X,A)$ by composing horizontally with $f$ or an appropriate identity of it.
+  This is strictly functorial on tight arrows, since horizontal cells satisfy strict interchange, and laxly functorial on loose arrows, since basic cells interchange only laxly.
+  (The reader is invited to check that the orientations are set up to make it lax in this direction rather than colax.)
+  A globular horizontal cell similarly induces a tight transformation in the same way that postcomposition with a 2-cell in a bicategory is a natural transformation, and functoriality follows by associativity of horizontal composition in \iA.
+\end{proof}
+
+In particular, any ``horizontal monad'' on $A\in \iA$ induces a monad on any $\hom_X(X,A)$, and in particular on $\hom_\iA(1,A)$.
+It follows that any linear monad on $\bCat/A$ induces a double monad on $\dCat/A$.
+(In a later paper we will show that the same is true more generally for polynomial monads.)
+
+We will need something more general than this, however.
+The underlying data of a kit will consist of a functor $\E \to V\C$, where $\C$ is a set or category of kits, $\E$ is a category of modules, $V$ is a functor constructing ``lists with variance'', and the functor $\E \to V\C$ sends each module to its boundary.
+With this in mind, we could probably define a kit using monads and loose distributive laws on the slice double category $\dCat/V\C$ for a $\C$ fixed in advance.
+However, for two reasons we prefer instead to work with a double category in which $\C$ as well as $\E$ can vary.
+Firstly, this allows us to describe morphisms between kits (which of course don't have to be the identity on cats) as $\dl$-monoid morphisms; and secondly, it allows us to also include a generalized multicategory of functors between cats in the construction ``all at once'', by having a monad that acts nontrivially on the $\C$ part.
+
+With this goal in mind, let \iA be a normal intercategory with strictly unital vertical composition, and $X$ an object.
+Then there is a double category $X/\iA$
+
+
+Now to construct distributive laws, we need to consider an analogous action by ``horizontally globular'' basic cells.
+This is somewhat trickier because not every such cell induces a loose transformation; the culprit is again the laxness of interchange.
+At an fully abstract level, about all we can do is demand explicitly that the relevant interchangers be invertible.
+
+\begin{defn}
+  A globular basic cell in a normal intercategory:
+  \[ \xymatrix{A \ar@{=}[d] \ar[r]|{\circ}^f \ar@{}[dr]|{\delta} & B \ar@{=}[d] \\ A \ar[r]|{\circ}_g & B } \]
+  is \textbf{pseudo for postcomposition} if the interchangers for composites of the following form are invertible whenever $\gamma$ is globular in the same way:
+  \[
+  \begin{array}{c|c}
+    \alpha&\delta\\\hline\beta& \gamma %\mathrm{Id}_g
+  \end{array}\qquad
+  \begin{array}{c|c}
+    \alpha& \gamma %&\mathrm{Id}_f
+    \\\hline\beta&\delta
+  \end{array}
+  \]
 \end{defn}
 
-We call the objects of $\iA(A,B)$ the \textbf{morphisms} of \iA and write them $A\oto B$.
-We call the tight and loose arrows of $\iA(A,B)$ \textbf{tight 2-cells} and \textbf{loose 2-cells} of \iA, and write them as $f\to g$ and $f\bto g$ respectively, and we call the cells of $\iA(A,B)$ \textbf{3-cells} of \iA.
-We refer to composition of tight 2-cells in $\iA(A,B)$ (and composition of 3-cells in the tight direction) as \textbf{transversal}, composition of loose 2-cells in $\iA(A,B)$ (and composition of 3-cells in the loose direction) as \textbf{vertical}, and the action of the composition functors $\iA(B,C)\times \iA(A,B) \to \iA(A,C)$ as \textbf{horizontal}.
-We have in mind the following picture:
-\begin{center}
-\begin{tikzpicture}[yscale=.6]
-  \node (A) at (-1,0) {};
-  \node (B) at (4,0) {};
-  \node (y) at (2,1) {$\circ$};
-  \node (x) at (1,2) {$\circ$};
-  \node (z) at (1,-1) {$\circ$};
-  \node (w) at (2,-2) {$\circ$};
-  \draw[->] (A) to[out=60,in=-180,looseness=.7] (x) to[out=0,in=120] (B);
-  \draw[->] (A) to[out=-60,in=-180] (z) to[out=0,in=-150] (B);
-  \draw[white,very thick] (A) to[out=-40,in=-180] (w) to[out=0,in=-120] (B);
-  \draw[->] (A) to[out=-40,in=-180] (w) to[out=0,in=-120] (B);
-  \draw[darrow] (x) -- (y);
-  \draw[darrow] (z) -- (w);
-  \draw[barrow] (x) -- (z);
-  \draw[barrow] (y) -- (w);
-  \draw[darrow] (1.3,.2) -- (1.7,-.2); \draw (1.3,.2) -- (1.7,-.2);
-  \draw[->] (A) to[out=30,in=-180] (y) to[out=0,in=150] (B);
-\end{tikzpicture}
-\end{center}
+Note that if the vertical identity on $f:A\oto B$ is pseudo for postcomposition, then the double functors induced by $f$ as above are in fact strong.
 
-We write transversal composition with $\tc$ or juxtaposition in applicative order, vertical composition with $\bc $ in diagrammatic order, and horizontal composition with $\oc$ in applicative order.
-The unit functors $1\to\iA(A,A)$ pick out an identity morphism $\id_A$ for each object $A$.
-In addition, every morphism $f$ has an identity tight 2-cell $1_f$ and an identity loose 2-cell $\Id_f$, every tight 2-cell $\alpha$ has an identity 3-cell $\Id_\alpha$, every loose 2-cell $\beta$ has an identity 3-cell $1_\beta$, and we have $\Id_{1_f} = 1_{\Id_f}$.
-We have $\Id_f \oc \Id_{g} \cong \Id_{f\oc g}$ and $1_g \oc 1_g = 1_{f\oc g}$, as well as isomorphisms
-\begin{equation}
-  (p\oc q) \bc (r\oc s) \cong (p\bc r) \oc (q\bc s).\label{eq:interchange}
-\end{equation}
-Note that the objects, morphisms, and tight 2-cells of a locally cubical bicategory \iA form an ordinary bicategory under transversal and horizontal composition, which we denote $\cH(\iA)$.
-On the other hand, a locally cubical bicategory can be regarded as a degenerate sort of \emph{intercategory}~\cite{gp:intercategories-i}.
-We will not need this point of view very much, but our notation is chosen to match theirs (except that we write $\oc$ in functional rather than diagrammatic order).
-
-There are two main examples we care about.
-
-\begin{eg}
-  The cartesian monoidal 2-category \cDbl is in fact closed as a monoidal bicategory, i.e.\ the functors $\dA\times -$ have right biadjoints.
-  As observed in~\cite{gg:lowdim-tricats}, it can therefore be regarded as a bicategory enriched over itself, i.e.\ a locally cubical bicategory.
-  The hom-double-category $\fDbl(A,B)$ consists of strong double functors, tight transformations, loose transformations, and modifications between them.
-\end{eg}
-
-\begin{thm}
-  There is a locally cubical bicategory $\cL(\dCat)$ described as follows.
-  \begin{itemize}
-  \item Its objects are groupoids.
-  \item Its morphisms are spans $A \ot C \to B$ in \bCat such that $A$ and $B$ are groupoids and $C\to A$ is a fibration.
-    Composition is by pullback, which is well-defined since fibrations are closed under pullback and composition.
-  \item Its tight 2-cells are span morphisms:
-    \[ \xymatrix@R=1pc{ & C \ar[dl] \ar[dr] \ar[dd] \\ A && B \\ &D \ar[ul] \ar[ur] } \]
-    Thus the underlying bicategory is a sub-bicategory of $\cSpan(\bCat)$.
-  \item Its loose 2-cells from $A \ot C \to B$ to $A\ot D \to B$ are profunctors $C\bto D$ equipped with a span of 2-cells in \dCat:
-    \[ \xymatrix{ A \ar[d]|{\bullet}_{\hunit A} \ar@{}[dr]|{\Leftarrow} &
-      C \ar[l] \ar[d]|{\bullet} \ar[r] \ar@{}[dr]|{\Rightarrow} &
-      B \ar[d]|{\bullet}^{\hunit B}\\
-      A & D \ar[l] \ar[r] & B. } \]
-    These are composed by pullback in $\dCat_1$.
-  \item Its 3-cells are span morphisms in $\dCat_1$.
-  \end{itemize}
-\end{thm}
+\begin{lem}
+  If $\delta$ as above is pseudo for postcomposition, then it induces a loose transformation $\hom_\iA(X,f) \to \hom_\iA(X,g)$ for any object $X$.
+\end{lem}
 \begin{proof}
-  Recall from~\cite{gp:intercategories-i,gp:intercategories-ii} that an ``intercategory'' is an internal category in the 2-category \lxdbl of double categories and \emph{lax} double functors whose source and target functors are strict.
-  As observed in~\cite[3.5]{gp:intercategories-ii}, a locally cubical bicategory is an intercategory whose double category of objects is discrete and whose compostion and unit functors are strong.
-
-  If an intercategory has strictly unital vertical composition (which can usually --- though not always --- be obtained by redefining vertical composition at identities), then we can discard all the arrows and cells in its double category of objects to obtain another intercategory with a discrete double category of objects.
-  Applying this to the example of~\cite[6.5]{gp:intercategories-ii}, we get a structure that is almost like a locally cubical bicategory, but its composition functors are only lax normal rather than strong (though its unit functor is strong).
-  However, when we restrict the objects to groupoids and the spans to have one leg a fibration, then the composition functor becomes strong as well, by \cite[Proposition 49]{garner:double-clubs}.
+  TODO.
 \end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 Now, a linear functor $\bC/A\to \bC/B$ induced by a span $A \ot C \to B$ in $\bC$ can be described in terms of the bicategory $\cSpan(\bC)$, by identifying $\bC/A$ with the hom-category $\cSpan(\bC)(1,A)$ and composing them with the given span $A \ot C \to B$.
 We can do something similar in $\cL(\dCat)$, where the slice double category $\dCat/A$ can be identified with the hom-double-category $\cL(\dCat)(1,A)$.
@@ -1155,65 +1260,6 @@ The latter is a combinatorial structure amenable to concrete description.
 \section{Extraordinary naturality}
 \label{sec:extranat}
 
-Let $V$ be the monad on $\bCat$ whose algebras are symmetric strict monoidal categories equipped with a strict symmetric monoidal strict involution, i.e.\ a strict symmetric monoidal functor $(-)\o : \C\to\C$ such that $(a\o)\o =a$ functorially.
-Concretely, the objects of $V\C$ are finite lists of objects of $\C$, some of which are marked with a formal $(\blank)\o$, such as $(a,b\o,b,c\o,a)$.
-It will also sometimes be convenient to write such a list as $(a\p,b\m,b\p,c\m,a\p)$, where $a\p=a$ and $a\m=a\o$; we can then write $a\e$ to mean either $a\p$ or $a\m$ depending on whether $\varepsilon=+$ or $\varepsilon=-$.
-We write $\varepsilon^*$ for the reversed variance, i.e.\ $+^*=-$ and $-^*=+$.
-
-Since $V\C$ is monoidal with an involution, its objects can be concatenated and oppositized (by distributing the opposite over the list), so for instance
-\[(a,b\o)(c\o,d,a) = (a,b\o,c\o,d,a) \quad\text{and}\quad (b\o,a,a)\o = (b,a\o,a\o).\]
-Its unit object is $\one = ()$.
-The morphisms of $V\C$ are given by finite lists of morphisms of $\C$ labeled by permutations which respect the opposites, e.g.\ a morphism $(a,b\o,b,c\o,a) \to (d,e,d\o,f,e\o)$ might be:
-\begin{tikzc}
-  \node (A1) at (0,3) {$a$};
-  \node (Bo2) at (1,3) {$b\o$};
-  \node (B3) at (2,3) {$b$};
-  \node (Co4) at (3,3) {$c\o$};
-  \node (A5) at (4,3) {$a$};
-  \node (D1') at (0,0) {$d$};
-  \node (B2') at (1,0) {$e$};
-  \node (Do3') at (2,0) {$d\o$};
-  \node (C4') at (3,0) {$f$};
-  \node (Ao5') at (4,0) {$e\o$};
-  \draw[->] (A1) to[out=-90,in=90] node[ed,swap,pos=.2] {$f$} (B2');
-  \draw[->] (Bo2) to[out=-90,in=90] node[ed,swap,pos=.1] {$g\o$} (Ao5');
-  \draw[->] (B3) to[out=-90,in=90] node[ed,swap,pos=.9] {$h$} (D1');
-  \draw[->] (Co4) to[out=-90,in=90] node[ed,swap,pos=.8] {$k\o$} (Do3');
-  \draw[->] (A5) to[out=-90,in=90] node[ed,pos=.2] {$\ell$} (C4');
-\end{tikzc}
-Here $f:a\to e$, $g:b\to e$, $h:b\to d$, $k:c\to d$, and $\ell:a\to f$ are morphisms in $\C$.
-Note that there can only be a morphism between two lists if they have the same length \emph{and} the same number of opposites.
-Formally, if $A=(a_1\e[1],\dots,a_n\e[n])$ and $B=(b_1\ph[1],\dots,b_n\ph[n])$, then a morphism $A\to B$ is a pair $(\sigma,f)$ where $\sigma\in \Sigma_n$ is a permutation such that $\varphi_{\sigma(k)} = \varepsilon_{k}$, and $f=(f_1,\dots,f_n)$ is a list of morphisms with $f_n : a_n \to b_{\sigma(n)}$.
-
-For the rest of this section, let \C be a \emph{discrete} category, whose objects will be the cats of our unary kit.
-In particular, therefore $V\C$ is a groupoid.
-We will define a loose distributive law on $V\C$ in $\cL(\dCat)$, inducing one on $\dCat/V\C$ whose generalized polycategories are ``unary kits without functors''.
-
-The two monads involved in this distributive law will in fact be the same monad, which we denote $R$.
-Being a horizontal monad in $\cL(\dCat)$, it is equivalently a monad in the bicategory $\cSpan(\bCat)$, i.e.\ an internal category in \bCat, i.e.\ a \emph{strict} double category $\dR$.
-Since its category of objects $\dR_0$ is $V\C$, its objects are those of $V\C$ and its tight morphisms are the morphisms of $V\C$.
-We now define its loose morphisms and cells.
-
-Let us call an object of $V\C$ \textbf{totally covariant} if it contains no $(-)\o$'s.
-A \textbf{$B$-trivial pre-matching} between $A,B\in V\C$ is an isomorphism $A \cong B E E\o$ in $V\C$ where $E$ is totally covariant and the permutation preserves the relative order of cats in $B$.
-Two pre-matchings are \textbf{equivalent} if they are related by an isomorphism $E\cong E'$ (necessarily unique if it exists); a \textbf{$B$-trivial matching} is an equivalence class of $B$-trivial pre-matchings.
-[Is this passage to equivalence classes the right thing to do?  Does it actually make sense everywhere?]
-
-Now a loose morphism from $A$ to $B$ in our double category (an object of $\dR_1$) is a $B$-trivial matching between $A$ and $B$.
-The loose composite of matchings $A\cong B D D\o$ and $B \cong C E E\o$ is the composite
-\[ A\cong B D D\o \cong C E E\o D D\o \cong C (E D) (E D)\o. \]
-The identity matching is the unique one with $E=()$.
-The cells are commutative squares of two matchings and two isomorphisms, in an obvious sense.
-
-This completes the definition of a strict double category $\dR$ with $\dR_0 = V\C$.
-Note that the source and target functors of \dR are both individually fibrations (though the functor $(s,t):\dR_1 \to \dR_0\times \dR_0$ is not a fibration).
-Thus, in particular it is a monad in $\cL(\dCat)$, and thus induces a strong double monad $R$ on $\dCat/V\C$.
-
-An object of $\dCat/V\C$ is a functor $\E\to V\C$, where the fiber $\E(A)$ over $A=(a_1\e[1],\dots,a_n\e[n])$ is the set of modules with boundary $A$.
-Usually we will assume it to be a discrete fibration (or equivalently a discrete opfibration, since $V\C$ is a groupoid), meaning that we can permute the cats in the boundary of a module.
-The objects of $R\E$ are then obtained by choosing an object of $\E$, pairing up some of the cats in its boundary into covariant and contravariant pairs, and removing them from the boundary of the result.
-Note that the passage from pre-matchings to matchings means that there is no ordering imposed on the paired cats, and $B$-triviality means that the order of the unremoved cats is maintained.
-However, $R\E\to V\C$ is still no longer a \emph{discrete} fibration: an object in the fiber over $B$ consists of a $B$-trivial matching $A\cong BEE\o$ together with an object of $\E(A)$, and if $E$ admits automorphisms in $V\C$ then so can such objects.
 
 Now a profunctor $\cM:R\E \bto R\E$ in $\dCat/V\C$ consists of a set of ``morphisms'', each of which is assigned a pair of modules with some of their cats paired up to be its domain and codomain, plus a permutation relating the \emph{unpaired} cats in the domain and the codomain.
 The latter datum is the 2-cell
