@@ -50,12 +50,21 @@ $#1\copy \z@
 \newcommand{\bc}{\mathbin{\raisebox{1pt}{\scriptsize$\bullet$}}}
 \let\oc\circ
 
+\newcommand{\A}{\cA}
+\newcommand{\B}{\cB}
 \newcommand{\C}{\cC}
 \newcommand{\D}{\cD}
+\newcommand{\X}{\cX}
+\newcommand{\Y}{\cY}
+\newcommand{\Z}{\cZ}
+\newcommand{\I}{\cI}
 \renewcommand{\Chat}{\ensuremath{\widehat{\C}}\xspace}
 \newcommand{\Chats}{\ensuremath{\Chat_{\Sigma}}\xspace}
 \newcommand{\thhat}{\ensuremath{\widehat{\theta}}\xspace}
 \newcommand{\thchk}{\ensuremath{\widecheck{\theta}}\xspace}
+\renewcommand{\Khat}{\ensuremath{\widehat{\cK}}\xspace}
+\renewcommand{\Kbar}{\ensuremath{\overline{\bbK}}\xspace}
+\renewcommand{\Kchk}{\ensuremath{\widecheck{\bbK}}\xspace}
 \newcommand{\E}{\cE}
 \newcommand{\F}{\cF}
 \newcommand{\G}{\cG}
@@ -87,7 +96,7 @@ $#1\copy \z@
 \newcommand{\one}{\done}
 \newcommand{\bone}{\mathbf{1}}
 
-\autodefs{\cMod\dCat\bCat\dSpan\cSpan\dMod\bSet\bGraph\dMod\cMod\fSpan\cDbl\cLx\fDbl}
+\autodefs{\cMod\dCat\bCat\dSpan\cSpan\dMod\bSet\bGraph\dMod\cMod\fSpan\cDbl\cLx\fDbl\cHom\cProf\ndom\ncod}
 \let\Mod\dMod
 \let\mod\cMod
 \def\modk{\mod_\K}
@@ -108,15 +117,29 @@ $#1\copy \z@
 \newcommand{\e}[1][]{^{\varepsilon_{#1}}}
 \newcommand{\epbar}{^{\varepsilon^*}}
 \renewcommand{\ph}[1][]{^{\varphi_{#1}}}
+\newcommand{\ps}[1][]{^{\psi_{#1}}}
 \newcommand{\phe}[2]{^{\varphi_{#1}\varepsilon_{#2}}}
 % \let\vec\overrightarrow
 % \let\Vec\Overrightarrow
 %\renewcommand{\Vec}[1]{\overset{\Rightarrow}{#1}}
 
+\makeatletter
+\let\vdash\Longrightarrow
 \def\types{\;\vdash\;} % turnstile
 \let\mto\vdash    % As a hom operator on modules
+\def\typesv#1{\;\vdash_{#1}\;}
+
+\def\mtoo#1{\xRightarrow[#1]{}}
+
+\def\modkv#1{\modk({\thctx #1\ethctx})}
+\def\thctx#1\ethctx{\@@ctx#1,,}
+\def\thincolon#1:#2\endtc{#1\mathord{:}#2}
+\def\@@ctx#1,{\@ifmtarg{#1}{\let\next=\relax}{\thincolon#1\endtc\let\next=\@@@ctx}\next}
+\def\@@@ctx#1,{\@ifmtarg{#1}{\let\next=\relax}{,\thincolon#1\endtc\let\next=\@@@ctx}\next}
+
 \def\mhom#1#2{\left( #1 \vphantom{\big|}\mto #2 \right)}
 \def\mhomc#1#2#3{\left( #1 \mid #2 \vphantom{\big|}\mto #3 \right)}
+\def\mhomv#1#2#3{\cHom_{#1}(#2;#3)}
 \def\cb{\;\mid\;} % context break
 \newcommand\combine{,}
 \newcommand\combineU{\sqcup}
@@ -124,7 +147,7 @@ $#1\copy \z@
 \newcommand{\unif}[4]{#1\doteq #2\,\mathsf{ via }\,#3\cb #4}
 \newcommand{\coend}{\begingroup\textstyle\int\endgroup}
 \newcommand{\tend}{\begingroup\textstyle\int\endgroup}
-\newcommand{\subst}[3]{{#1}[#2 \mapsfrom #3]}
+\newcommand{\subst}[3]{{#1}_{[#2 \mapsfrom #3]}}
 \newcommand{\ev}{\mathsf{ev}}
 \renewcommand{\id}{\mathsf{id}}
 \newcommand{\Id}{\mathsf{Id}}
@@ -168,7 +191,7 @@ The differences between a kit and a compact closed equipment, and hence the reas
   %% The quasicategorical case is probably easiest to do by going via a compact ordinary equipment, adding opposites to the Riehl-Verity construction.  But this approach probably works for 2Cat-Gray, and might for higher ones using the lax monoidal structures.
 \item A kit eliminates the ``two-sided bias'' of a bicategory or an equipment.
   Two-sidedness is appropriate and necessary for one-variable category theory, since in examples such as categories enriched in a non-symmetric monoidal category (or in a bicategory) the only ``modules'' that can be defined are covariant in exactly one variable and contravariant in exactly one other variable.
-  But for multivariable category theory, where a module can naturally be covariant in many variables and contravariant in many other variables, it feels artificial to divide these variables into a ``domain'' and a ``codomain'', forcing us to pass back and forth across dualization equivalences when we want to compare a profunctor $A \hto B\times C$ with a profunctor $C\op\times A \hto B$, while intuitively (and in most examples) there is really only one notion involved, namely a functor $B\op \times C\op \times A \to \bSet$.
+  But for multivariable category theory, where a module can naturally be covariant in many variables and contravariant in many other variables, it feels artificial to divide these variables into a ``domain'' and a ``codomain'', forcing us to pass back and forth across dualization equivalences when we want to compare a profunctor $\A \hto \B\times \C$ with a profunctor $\C\op\times \A \hto \B$, while intuitively (and in most examples) there is really only one notion involved, namely a functor $\B\op \times \C\op \times \A \to \bSet$.
   % TODO: Is this true?
 %  (Lest the reader worry about generality, categories enriched in a non-symmetric monoidal category do still form a kit; it just happens to be a kit all of whose modules depend on one covariant variable and one contravariant one.
 %  More generally, any equipment can be regarded directly as a kit in this way.)
@@ -191,6 +214,7 @@ A kit is composed of four sorts of things, which we discuss in turn.
 \subsection{Cats}
 
 There is a class of objects, which we call \textbf{cats}, since they play the role of categories.
+We denote them by uppercase script letters such as $\A,\B,\C$.
 
 \subsection{Functors}
 
@@ -201,12 +225,12 @@ The functors in a kit are functors of many variables, some covariant and some co
 More precisely, the domain of a functor is a finite list of cats, some of which are annotated with the formal symbol $(-)\o$ to indicate contravariance.
 (This does not yet represent an operation of ``oppositization'' on cats; it is just a formal marker for contravariance.
 Similarly, we do not in general assume a ``tensor product'' of cats; as we will see later, these operations can be characterized by universal properties in terms of the multivariable functors.)
-The codomain of a functor, by contrast, is a single cat; thus we might have for instance $f:(A,B\o,C) \to D$.
-If the list contains only one cat, we generally omit the parentheses, writing $f:A\to B$.
+The codomain of a functor, by contrast, is a single cat; thus we might have for instance $F:(\A,\B\o,\C) \to \D$.
+If the list contains only one cat, we generally omit the parentheses, writing $F:\A\to \B$.
 
 Functors can be composed in a ``multicategorical'' way that keeps track of variance.
-For instance, if in addition to $f:(A,B\o,C) \to D$ we have $g:X \to A$ and $h:(Y\o,Z)\to B$ and $k:()\to C$ (yes, lists can have length zero), then there is a composite $f\circ (g,h,k) : (X,Y,Z\o)\to D$.
-Finally, like in a symmetric multicategory, we have symmetric group actions on the domains of functors, so that from $f:(A,B\o,C) \to D$ we can obtain a functor $(B\o,C,A)\to D$ and so on.
+For instance, if in addition to $F:(\A,\B\o,\C) \to \D$ we have $G:\X \to \A$ and $H:(\Y\o,\Z)\to \B$ and $K:()\to \C$ (yes, lists can have length zero), then there is a composite $F\circ (G,H,K) : (\X,\Y,\Z\o)\to \D$.
+Finally, like in a symmetric multicategory, we have symmetric group actions on the domains of functors, so that from $F:(\A,\B\o,\C) \to \D$ we can obtain a functor $(\B\o,\C,\A)\to \D$ and so on.
 
 In particular, we have a category of cats and unary functors, which we denote $\K_1$.
 Later on we will enhance this to a 2-category.
@@ -215,28 +239,28 @@ Later on we will enhance this to a 2-category.
 
 Now we have a second class of objects, which we call \textbf{modules}; these represent presheaves, profunctors, and more general ``functors into the base of enrichment''.
 Each module is indexed by a finite list of cats with variance (the same sort of list that appears as the domain of a functor).
-We write $\modk(A,B\o,C)$ for the category (see below) of modules indexed by a list $(A,B\o,C)$.
-Modules can be restricted along functors; thus if $M\in \modk(A,B\o,C)$, and $g,h,k$ are as above, we have $(g,h,k)^*M \in \modk(X,Y,Z\o)$.
-We will also write $(g,h,k)^*M$ as $M(g,h,k)$.
+We write $\modk(\A,\B\o,\C)$ for the category (see below) of modules indexed by a list $(\A,\B\o,\C)$.
+Modules can be restricted along functors; thus if $M\in \modk(\A,\B\o,\C)$, and $G,H,K$ are functors as above, we have $(G,H,K)^*M \in \modk(\X,\Y,\Z\o)$.
+We will also write $(G,H,K)^*M$ as $M(G,H,K)$.
 This restriction is strictly functorial with respect to functor composition (one could consider generalizations of a kit where it is only weakly functorial, but in most examples it is strict, and in other cases it can be modified to become so).
 
-The symmetric groups also act on modules; thus if $M\in \modk(A,B\o,C)$ we have a module $\sigma^*M\in \modk(B\o,C,A)$ and so on.
+The symmetric groups also act on modules; thus if $M\in \modk(\A,\B\o,\C)$ we have a module $\sigma^*M\in \modk(\B\o,\C,\A)$ and so on.
 As with restriction, we assume for simplicity that this action is strict.
-Formally, the symmetric group action is combined with the restriction along functors, by representing the collection of modules as a functor defined on a category whose objects are lists of cats with variance and whose morphisms are lists of functors together with a permutation of their combined input.
+%Formally, the symmetric group action is combined with the restriction along functors, by representing the collection of modules as a functor defined on a category whose objects are lists of cats with variance and whose morphisms are lists of functors together with a permutation of their combined input.
 
 \subsection{Module morphisms}
 
 Finally we have module morphisms; this is where all the subtlety and difficulty lies.
 The simplest sort of morphism between modules is an ``ordinary'' one between modules indexed by the same list of cats.
-These form the morphisms of the categories such as $\modk(A,B\o,C)$, and restriction along functors is of course functorial on these categories.
+These form the morphisms of the categories such as $\modk(\A,\B\o,\C)$, and restriction along functors is of course functorial on these categories.
 
 The next simplest sort of module morphism is a ``multivariable'' one that represents a potential ``tensor product of modules'' multicategorically, similarly to how the multivariable functors represent a potential tensor product of categories.
-Since our intended models include categories enriched over a non-cartesian base, the individual categories such as $\modk(A,B\o,C)$ are not necessarily monoidal (that is, we can't necessarily take a pointwise tensor product of presheaves), but we can expect ``external'' products such as $\modk(A) \times \modk(B) \to \modk(A,B)$.
+Since our intended models include categories enriched over a non-cartesian base, the individual categories such as $\modk(\A,\B\o,\C)$ are not necessarily monoidal (that is, we can't necessarily take a pointwise tensor product of presheaves), but we can expect ``external'' products such as $\modk(\A) \times \modk(\B) \to \modk(\A,\B)$.
 Thus, representing these multicategorically we have multivariable module morphisms such as $(M_1,M_2,\dots,M_n) \to N$, where $M_i\in \modk(\Psi_i)$ and $N\in\modk(\Psi_1,\Psi_2,\cdots,\Psi_n)$, where $(\Psi_1,\Psi_2,\cdots,\Psi_n)$ indicates the concatenated list of cats with variance.
 As with functors, the symmetric groups act on the domains of such morphisms.
 
 However, in order to really do multivariable category theory, we also need ``extra\-ordinary'' natural transformations as in~\cite{ek:gen-funct-calc}.
-For instance, given $M\in\modk(A,A\o,B)$ and $N\in \modk(C,C\o,B)$ we want to speak about a transformation $\alpha:M\to N$ that is ordinary natural in $B$ and extraordinary natural in $A$ and $C$ on either side.
+For instance, given $M\in\modk(\A,\A\o,\B)$ and $N\in \modk(\C,\C\o,\B)$ we want to speak about a transformation $\alpha:M\to N$ that is ordinary natural in $\B$ and extraordinary natural in $\A$ and $\C$ on either side.
 In plain set-based category theory this means we have components $\alpha_{a,b,c}:M(a,a,b) \to N(c,c,b)$ such that the following naturality squares commute for all $f:a_1\to a_2$, $g:b_1\to b_2$, $h:c_1\to c_2$, and $a,b,c$:
 \begin{mathpar}
   \xymatrix{ M(a,a,b_1) \ar[d]_{M(1,1,g)} \ar[r]^{\alpha} &
@@ -251,12 +275,12 @@ In plain set-based category theory this means we have components $\alpha_{a,b,c}
 \end{mathpar}
 Thus, a kit includes a set of ``extraordinary'' module morphisms from $M$ to $N$ whenever $M\in \modk(\Psi_1, \Psi_1\o, \Psi_2)$ and $N\in\modk(\Psi_3, \Psi_3\o, \Psi_2)$.
 Here the $\Psi_i$ are lists of cats with variance, and $\Psi\o$ denotes reversal of all the variances in $\Psi$.
-Of course, in general the cats we want to match up extraordinarily may not appear in exactly this order (e.g.\ we could have $M\in \modk(A,B,A\o)$ and $N\in \modk(B,C\o,C)$), but we can first act on the modules by a permutation.
+Of course, in general the cats we want to match up extraordinarily may not appear in exactly this order (e.g.\ we could have $M\in \modk(\A,\B,\A\o)$ and $N\in \modk(\B,\C\o,\C)$), but we can first act on the modules by a permutation.
 
 The extraordinary morphisms, like the ordinary ones that form the arrows of the categories $\modk(\Psi)$, can be restricted along functors, in a functorial way.
 Specifically, given $M\in \modk(\Psi_1, \Psi_1\o,\Psi_2)$ and $N\in\modk(\Psi_3, \Psi_3\o,\Psi_2)$ as above, determining a type of extraordinary module morphism from $M$ to $N$, then such module morphisms can be restricted along any lists of functors $f_i:\Psi_i' \to \Psi_i$ (for $i=1,2,3$).
 Here $f_i$ consists of a functor with codomain $A$ for each cat $A$ in $\Psi_i$, and $\Psi_i'$ is the concatenated list of the domains of these functors, with the variance of each $A$ in $\Psi_i$ applied to the domain of the corresponding functor.
-Thus for instance if $g:(A,B\o) \to C$ and $h:D\to E$, we would have $(g,h):(A,B\o,D\o) \to (C,E\o)$.
+Thus for instance if $G:(\A,\B\o) \to \C$ and $H:\D\to \E$, we would have $(G,H):(\A,\B\o,\D\o) \to (\C,\E\o)$.
 Note that just as the domain and codomain of an ordinary module morphism have to be restricted along the same functor (since restriction defines functors $\modk(\Psi) \to \modk(\Psi')$), the two occurrences of a cat in the domain or codomain in an extraordinary morphism also have to be restricted along the same functor.
 
 Finally, we can have multivariable extraordinary morphisms as well, where the domain is a list of modules rather than a single one.
@@ -272,9 +296,10 @@ In \cref{sec:composing} we will describe the rules informally; but first we digr
 
 It turns out to be quite convenient to use a different notation for modules and their morphisms.
 Rather than writing
-\[ M \in \modk(A,B\o,C) \]
-we allow ourselves to think of $M$ as a functor that takes ``values'' on ``variables'' belonging to $A,B,C$, and write
-\[ \ctx{a:A,b:B\o,c:C} \types M(a,b,c) \in\modk. \]
+\[ M \in \modk(\A,\B\o,\C) \]
+we allow ourselves to think of $M$ as a functor that takes ``values'' on ``variables'' belonging to $\A,\B,\C$, and write
+% \[ \ctx{a:\A,b:\B\o,c:\C} \types M(a,b,c) \in\modk. \]
+\[ M(a,b,c) \in \modkv{a:\A,b:\B\o,c:\C} \]
 Note that the cats in a kit are still just abstract objects; we are not asserting that they have ``elements'' in any sense.
 These ``variables'' are purely schematic.
 This is very much like the ``abstract index notation'' of tensor calculus that allows us to write $T^{a b}_{c}$ for an element of a tensor space $V \otimes V\otimes V^*$ without needing to actually pick a basis of $V$ to make $a,b,c$ into actual numerical indices of components.
@@ -282,56 +307,71 @@ This is very much like the ``abstract index notation'' of tensor calculus that a
 One reason this ``abstract variable notation'' is useful is when restricting modules along functors.
 In the previous example with $M$ as above and
 \begin{mathpar}
-  g:X \to A \and h:(Y\o,Z)\to B \and k:()\to C
+  G:\X \to \A \and H:(\Y\o,\Z)\to \B \and K:()\to \C
 \end{mathpar}
-instead of $(g,h,k)^*M$ or $M(g,h,k)$ we can write
-\[ \ctx{x:X,y:Y,z:Z\o}\types M(g(x),h(y,z),k)\in\modk \]
-This indicates much more clearly how the functors $g,h,k$ match up with the dependence of $M$ on $A,B\o,C$ and how the resulting dependence on $X,Y,Z\o$ feeds into $g,h,k$.
+instead of $(G,H,K)^*M$ or $M(G,H,K)$ we can write
+% \[ \ctx{x:\X,y:\Y,z:\Z\o}\types M(G(x),H(y,z),K)\in\modk \]
+\[ M(G(x),H(y,z),K)\in\modkv{x:\X,y:\Y,z:\Z\o} \]
+This indicates much more clearly how the functors $G,H,K$ match up with the dependence of $M$ on $\A,\B\o,\C$ and how the resulting dependence on $\X,\Y,\Z\o$ feeds into $G,H,K$.
 The strict functoriality of restriction with respect to functor composition means that this notation behaves as we expect on such composites; for instance, if we have
 \begin{mathpar}
-  \ctx{c:C}\types M(c)\in\modk \and g:B\to C \and f:A\to B
+  % \ctx{c:\C}\types M(c)\in\modk \and G:\B\to \C \and F:\A\to \B
+  M(c)\in\modkv{c:\C} \and G:\B\to \C \and F:\A\to \B
 \end{mathpar}
-then the three restrictions $g^*M$, $f^*g^*M$, and $(g\circ f)^*M$ are represented in this notation as
+then the three restrictions $G^*M$, $F^*G^*M$, and $(G\circ F)^*M$ are represented in this notation as
 \begin{mathpar}
-  \ctx{b:B}\types M(g(b)) \in\modk\\
-  \ctx{a:A}\types M(g(f(a))) \in\modk\and
-  \ctx{a:A}\types M((g\circ f)(a)) \in\modk
+  % \ctx{b:\B}\types M(G(b)) \in\modk\\
+  % \ctx{a:\A}\types M(G(F(a))) \in\modk\and
+  % \ctx{a:\A}\types M((G\circ F)(a)) \in\modk
+  M(G(b)) \in\modkv{b:\B}\\
+  M(G(F(a))) \in\modkv{a:\A}\and
+  M((G\circ F)(a)) \in\modkv{a:\A}
 \end{mathpar}
 where the second and third are, as we expect, equal.
 
-\begin{rmk}\label{rmk:turnstile}
-  To avoid confusion between functors and abstract variables, we emphasize that the symbol $\types$ always indicates the use of abstract variables, and in its absence we always revert back to the notation $M(g,h,k)$.
-\end{rmk}
+% \begin{rmk}\label{rmk:turnstile}
+%   To avoid confusion between functors and abstract variables, we emphasize that the symbol $\types$ always indicates the use of abstract variables, and in its absence we always revert back to the notation $M(G,H,K)$.
+% \end{rmk}
 
 The second place that abstract variable notation is useful is when describing module morphisms, and especially extraordinary ones.
 We said above that extraordinary module morphisms go from $M$ to $N$ whenever $M\in \modk(\Psi_1, \Psi_1\o, \Psi_2)$ and $N\in\modk (\Psi_3, \Psi_3\o, \Psi_2)$.
-We also mentioned that we generally have to apply a permutation in order to put the lists of cats in exactly this form, such as if $M\in \modk(A,B,A\o)$ and $N\in \modk(B,C,C\o)$.
+We also mentioned that we generally have to apply a permutation in order to put the lists of cats in exactly this form, such as if $M\in \modk(\A,\B,\A\o)$ and $N\in \modk(\B,\C,\C\o)$.
 In practice, instead of actually acting on $M$ and $N$ by symmetric groups, it is easier to just indicate how the cats should be matched up.
 We can do this with abstract variables as follows:
-\[ \ctx{a:A,b:B,c:C} \cb M(a,b,a) \types N(b,c,c) \]
-Note that every variable appears exactly twice to the right of the vertical bar, once covariantly and once contravariantly (where occurrences to the left of the turnstile $\vdash$ are counted with opposite variance).
+% \[ \ctx{a:\A,b:\B,c:\C} \cb M(a,b,a) \types N(b,c,c) \]
+\[ M(a,b,a) \mtoo{a:\A,b:\B,c:\C} N(b,c,c) \]
+Note that every variable appears exactly twice in the domain and codomain combined, once covariantly and once contravariantly, where occurrences in the domain are counted with opposite variance.
 
 This notation is especially valuable when the same cat appears multiple times.
 For instance, if $M\in\modk(A,A\o,A)$ and $N\in\modk(A)$, then there are two kinds of extraordinary morphisms from $M$ to $N$, which are represented in this notation as
 \begin{mathpar}
-  \ctx{x:A,y:A} \cb M(x,x,y)\types N(y)\\
-  \ctx{x:A,y:A} \cb M(x,y,y)\types N(x)
+  % \ctx{x:\A,y:\A} \cb M(x,x,y)\types N(y)\\
+  % \ctx{x:\A,y:\A} \cb M(x,y,y)\types N(x)
+  M(x,x,y)\mtoo{x:\A,y:\A} N(y)\and
+  M(x,y,y)\mtoo{x:\A,y:\A} N(x)
 \end{mathpar}
 It is also especially useful when talking about multivariable extraordinary morphisms.
 For instance, we could have
-\[ \ctx{a:A,b:B,c:C,d:D} \cb M_1(a,b), M_2(b,c) \types N(a,d,c,d) \]
-but here there is no way to act on $M_1$ and $M_2$ by symmetric groups separately to put the $B,B\o$ in front.
+% \[ \ctx{a:\A,b:\B,c:\C,d:\D} \cb M_1(a,b), M_2(b,c) \types N(a,d,c,d) \]
+\[ M_1(a,b), M_2(b,c) \mtoo{a:\A,b:\B,c:\C,d:\D} N(a,d,c,d) \]
+but here there is no way to act on $M_1$ and $M_2$ by symmetric groups separately to put the $\B,\B\o$ in front.
 Formally, this means that when describing multivariable extraordinary morphisms we have to incorporate a permutation in the definition; but with abstract variable notation we don't need to think about that.
 
-Finally, if the cats that the variables correspond to are obvious from context, we can omit their declarations, obtaining a more concise notation $M(a,b,a) \mto N(b,c,c)$ for a set of extraordinary module morphisms.
-Thus, if we want to give a name to a particular such morphism we can write
-\[ \phi \in \mhom{M(a,b,a)}{N(b,c,c)} \]
-As noted in \cref{rmk:turnstile}, the symbol $\types$ is still present here to indicate the use of abstract variables, even though the correspondence of variables to cats is not explicitly ``declared''.
+We will also sometimes abbreviate this notation, such as by leaving out the cats labeling the variables if they are obvious from context:
+\[ M_1(a,b), M_2(b,c) \mtoo{a,b,c,d} N(a,d,c,d) \]
+These notations are particularly convenient when we want to name a particular such morphism, so that we can write
+\[ \phi : M(a,b,a) \mtoo{a,b,c} N(b,c,c) \]
+% As noted in \cref{rmk:turnstile}, the symbol $\types$ is still present here to indicate the use of abstract variables, even though the correspondence of variables to cats is not explicitly ``declared''.
+We will also write
+\[\mhomv{a,b,c}{M(a,b,a)}{N(b,c,c)}\]
+for the set of extraordinary module morphisms of a given ``type''.
+Note the semicolon, which is used as in the theory of multicategories since the domain may be a list, for instance $\mhomv{a,b}{M(a),N(b)}{P(a,b)}$.
 
 It is worth emphasizing one difference between the use of abstract variables for restriction and for extraordinary morphisms.
-In the case of restriction, we write $\ctx{a:A,b:B}\types M(f(a),g(b))$ to denote the \emph{actual module} $(f,g)^*M$ obtained by restricting $M$ along $f$ and $g$.
-However, in the case of extraordinary morphisms, it is probably better not to think of the notation $\ctx{a:A} \types M(a,a)$ as actually denoting any module distinct from $M$;\footnote{In the formal definition to be presented in \cref{part:def}, it is possible to think of $\ctx{a:A} \types M(a,a)$ as an object of ``$S\E$'', but this is arguably just a technical device.} in particular it is not obtained by restriction of $M$ along any sort of ``diagonal'' (which need not exist in an arbitrary kit).
-We will also combine these notations, writing for instance $M(f(a),g(a),h(b))\mto N(k(b))$; in this case it is better to think of the restrictions as happening first (obtaining modules such as $\ctx{a_1:A,a_2:A,b:B}\types M(f(a_1),g(a_2),h(b))$), followed by the pairing of variables to determine a type of extraordinary morphism.
+In the case of restriction, we write $M(F(a),G(b))\in \modkv{a:\A,b:\B}$ to denote the \emph{actual module} $(F,G)^*M$ obtained by restricting $M$ along $F$ and $G$.
+However, in the case of extraordinary morphisms, it doesn't really make sense to think of the notation $M(a,a)$ as actually denoting any module distinct from $M$.
+%;\footnote{In the formal definition to be presented in \cref{part:def}, it is possible to think of $\ctx{a:A} \types M(a,a)$ as an object of ``$S\E$'', but this is arguably just a technical device.} in particular it is not obtained by restriction of $M$ along any sort of ``diagonal'' (which need not exist in an arbitrary kit).
+We will also combine these notations, writing for instance $M(F(a),G(a),H(b))\mtoo{a,b} N(K(b))$; in this case it is better to think of the restrictions as happening first (obtaining modules such as $M(F(a_1),G(a_2),H(b))\in \modkv{a_1:\A,a_2:\A,b:\B}$), followed by the pairing of variables to determine a type of extraordinary morphism.
 
 So far we have described our ``abstract variable notation'' somewhat informally.
 When doing formal category theory, this informal understanding is generally sufficient.
@@ -351,9 +391,9 @@ Formally, we can say that each set of extraordinary morphisms admits an action o
 More interesting sorts of composition involve two extraordinary transformations, as explained in~\cite{ek:gen-funct-calc}.
 The most basic composite of this sort involves two morphisms
 \begin{mathpar}
-  \phi\in \mhom{M(x)}{N(x,y,y)} \and \psi\in\mhom{N(z,z,w)}{P(w)}.
+  \phi :{M(x)} \mtoo{x:\A,y:\A} {N(x,y,y)} \and \psi : {N(z,z,w)}\mtoo{z:\A,w:\A}{P(w)}.
 \end{mathpar}
-with $x,y,z,w$ all associated to the same cat $A$.
+% with $x,y,z,w$ all associated to the same cat $A$.
 In examples, we can compose these by composing their components
 \[ M(x) \xto{\phi_{x,x}} N(x,x,x) \xto{\psi_{x,x}} P(x) \]
 and check that the result is an ordinary natural transformation $M\to P$.
@@ -363,11 +403,11 @@ This then determines how the naturality of the composite matches up the variable
 This process of identifying variables can be represented by drawing a graph:
 \begin{center}
   \begin{tikzpicture}[xscale=2,yscale=.8]
-    \node (A1) at (0,0) {$A$};
-    \node (A2a) at (1,1) {$A$};
-    \node (A2b) at (1,0) {$A$};
-    \node (A2c) at (1,-1) {$A$};
-    \node (A3) at (2,0) {$A$};
+    \node (A1) at (0,0) {$\A$};
+    \node (A2a) at (1,1) {$\A$};
+    \node (A2b) at (1,0) {$\A$};
+    \node (A2c) at (1,-1) {$\A$};
+    \node (A3) at (2,0) {$\A$};
     \draw (A1) to[out=0,in=180] node[auto,swap] {$x$} (A2c);
     \draw (A2a) to[out=0,in=180] node[auto] {$w$} (A3);
     \draw (A2a) to[out=180,in=180] node[auto,swap] {$y$} (A2b);
@@ -382,7 +422,7 @@ or by solving a system of equations that ``unifies'' each arguments of the codom
 There are cases where this doesn't work; that is, pairs of extraordinary morphisms from $M$ to $N$ and from $N$ to $P$ that are ``non-composable'' despite having the same module $N$ in the middle.
 For example, we might instead have
 \begin{mathpar}
-  \phi\in \mhom{M(x)}{N(x,y,y)} \and \xi\in\mhom{N(w,z,z)}{P(w)}.
+  \phi: {M(x)}\mtoo{x:\A,y:\B}{N(x,y,y)} \and \xi : {N(w,z,z)}\mtoo {w:\A,z:\B}{P(w)}.
 \end{mathpar}
 The problem here is that when ``composing components'' there is no way to decide what $y$ and $z$ should be: we can write down the composite
 \[ M(x) \xto{\phi_{x,y,y}} N(x,y,y) \xto{\xi_{x,y,y}} P(x) \]
@@ -390,11 +430,11 @@ for any value of $y$, and there is no canonical choice (note that $x$ and $w$ mi
 Graphically, this problem is visible as the presence of a ``loop'':
 \begin{center}
   \begin{tikzpicture}[xscale=2,yscale=.8]
-    \node (A1) at (0,0) {$A$};
-    \node (A2a) at (1,1) {$B$};
-    \node (A2b) at (1,0) {$B$};
-    \node (A2c) at (1,-1) {$A$};
-    \node (A3) at (2,0) {$A$};
+    \node (A1) at (0,0) {$\A$};
+    \node (A2a) at (1,1) {$\B$};
+    \node (A2b) at (1,0) {$\B$};
+    \node (A2c) at (1,-1) {$\A$};
+    \node (A3) at (2,0) {$\A$};
     \draw (A1) to[out=0,in=180] node[auto,swap] {$x$} (A2c);
     \draw (A2c) to[out=0,in=180] node[auto,swap] {$w$} (A3);
     \draw (A2a) to[out=180,in=180] node[auto,swap] {$y$} (A2b);
@@ -417,48 +457,48 @@ Specifically, universal properties of cats generally have to be extended to say 
 \label{sec:tens-opp}
 
 We begin with the simplest universal properties for cats: those that directly internalize the operations represented ``virtually'' by the multicategorical nature of functors.
-For instance, a tensor product of cats $A,B$ should be a cat $A\otimes B$ with a functor $\chi:(A,B)\to A\otimes B$ through which any functor $(A,B)\to C$ factors uniquely.
+For instance, a tensor product of cats $\A,\B$ should be a cat $\A\otimes \B$ with a functor $\chi:(\A,\B)\to \A\otimes \B$ through which any functor $(\A,\B)\to \C$ factors uniquely.
 
-However, this plain universal property, though it suffices to determine $A\otimes B$ uniquely up to isomorphism, is insufficient in several ways.
-Firstly, as in the case of ordinary multicategories, it needs to apply to more general functors containing $(A,B)$ as only part of their domain.
-Secondly, it needs to apply even in the contravariant case: functors $(A\o,B\o)\to C$ should factor through $(A\otimes B)\o$.
-Thirdly, it needs to apply to modules as well: we should have $\modk(A\otimes B)\cong \modk(A,B)$, and similarly when other cats are also present.
+However, this plain universal property, though it suffices to determine $\A\otimes \B$ uniquely up to isomorphism, is insufficient in several ways.
+Firstly, as in the case of ordinary multicategories, it needs to apply to more general functors containing $(\A,\B)$ as only part of their domain.
+Secondly, it needs to apply even in the contravariant case: functors $(\A\o,\B\o)\to \C$ should factor through $(\A\otimes \B)\o$.
+Thirdly, it needs to apply to modules as well: we should have $\modk(\A\otimes \B)\cong \modk(\A,\B)$, and similarly when other cats are also present.
 And finally, it also needs to apply to module morphisms of all sorts, even extraordinary ones.
 
 In order to state all of these universal properties precisely, we need some more notation.
 \begin{itemize}
-\item We will write $A\e$ to indicate either $A$ or $A\o$, and in this case we write $A\epbar$ for the other one ($A\o$ or $A$, respectively).
+\item We will write $\A\e$ to indicate either $\A$ or $\A\o$, and in this case we write $\A\epbar$ for the other one ($\A\o$ or $\A$, respectively).
 \item We will use the letter $\Gamma$ for a finite list of modules with abstract variables, such as $M(a,b),N(b,c,d),P(e)$ or $M_1(f(x),g(y,z)),M_2(h(y,x))$.
-  Similarly, we will use the letter $\Omega$ for a single module with abstract variables; thus a general extraordinary module morphism can be written $\phi\in\mhom{\Gamma}{\Omega}$.
+  Similarly, we will use the letter $\Omega$ for a single module with abstract variables; thus a general extraordinary module morphism can be written $\phi\in\mhomv{\Psi}{\Gamma}{\Omega}$, where $\Psi$ denotes the list of abstract variables occurring in $\Gamma$ and $\Omega$ (once with each variance, as usual).
 \item We will write $\subst\Gamma x \theta$ for the result of substituting the expression $\theta$ for all occurrences of the abstract variable $x$ in $\Gamma$, and similarly, for $\Omega$.
-  Thus, for instance, if $\Omega = M(a,b)$, then $\subst\Omega a{f(x,y)} = M(f(x,y),b)$.
+  Thus, for instance, if $\Omega = M(a,b)$, then $\subst\Omega a{F(x,y)} = M(F(x,y),b)$.
   Note that this might perform zero, one, or two substitutions, depending on how many times the variable occurs.
 \end{itemize}
 
 \begin{defn}\label{defn:tens-cat}
-  A \textbf{tensor product} of cats $A,B$ is a cat $A\otimes B$ with a functor $\chi:(A,B) \to A\otimes B$ such that
+  A \textbf{tensor product} of cats $\A,\B$ is a cat $\A\otimes \B$ with a functor $\chi:(\A,\B) \to \A\otimes \B$ such that
   \begin{enumerate}
   \item Precomposition with $\chi$ induces bijections of functor sets
-    \[ \K((\Psi,(A\otimes B)\e),C) \toiso \K((\Psi,A\e,B\e),C)\]
+    \[ \K((\Psi,(\A\otimes \B)\e),\C) \toiso \K((\Psi,\A\e,\B\e),\C)\]
     for any list $\Psi$ of cats with variance;\label{item:tenscat-1}
   \item Restriction along $\chi$ induces an isomorphism of categories
-    \[ \modk(\Psi,(A\otimes B)\e) \toiso \modk(\Psi,A\e,B\e) \]
+    \[ \modk(\Psi,(\A\otimes \B)\e) \toiso \modk(\Psi,\A\e,\B\e) \]
     for any $\Psi$; and finally
   \item Restriction along $\chi$ induces bijections of sets of extraordinary morphisms
-    \[ \mhomc{\Psi,z:(A\otimes B)\e}{\Gamma}{\Omega}\toiso \mhomc{\Psi,x:A\e,y:B\e}{\subst\Gamma z{\chi(x,y)}}{\subst \Omega z {\chi(x,y)}}\]
+    \[ \mhomv{\Psi,z:(\A\otimes \B)\e}{\Gamma}{\Omega}\toiso \mhomv{\Psi,x:\A\e,y:\B\e}{\subst\Gamma z{\chi(x,y)}}{\subst \Omega z {\chi(x,y)}}\]
     whenever this makes sense.\label{item:tenscat-3}
   \end{enumerate}
 \end{defn}
 
-Note that due to the symmetric group actions, it suffices to assert these universal properties when $A\otimes B$ is at the end of a list; corresponding properties then follow when it appears anywhere.
+Note that due to the symmetric group actions, it suffices to assert these universal properties when $\A\otimes \B$ is at the end of a list; corresponding properties then follow when it appears anywhere.
 
 We can similarly define $n$-ary tensor products of cats for all $n$, and using only~\ref{item:tenscat-1} we can show that these are associative and symmetric insofar as they exist.
-That is, if $A\otimes B$ and $(A\otimes B)\otimes C$ exist, then the latter is a ternary tensor product; hence if $B\otimes C$ exists then $A\otimes (B\otimes C)$ exists and is isomorphic to $(A\otimes B)\otimes C$.
-A 0-ary tensor product is a cat $I$ with a functor $\chi:()\to I$, precomposition with which induces isomorphisms
+That is, if $\A\otimes \B$ and $(\A\otimes \B)\otimes \C$ exist, then the latter is a ternary tensor product; hence if $\B\otimes \C$ exists then $\A\otimes (\B\otimes \C)$ exists and is isomorphic to $(\A\otimes \B)\otimes \C$.
+A 0-ary tensor product is a cat $\I$ with a functor $\chi:()\to \I$, precomposition with which induces isomorphisms
 \begin{align*}
-  \K((\Psi,I\e),C) &\toiso \K(\Psi,C)\\
-  \modk(\Psi,I\e) &\toiso \modk(\Psi)\\
-  \mhomc{\Psi,z:I\e}{\Gamma}{\Omega} &\toiso \mhomc{\Psi}{\subst\Gamma z\chi}{\subst\Omega z \chi}
+  \K((\Psi,\I\e),\C) &\toiso \K(\Psi,\C)\\
+  \modk(\Psi,\I\e) &\toiso \modk(\Psi)\\
+  \mhomv{\Psi,z:\I\e}{\Gamma}{\Omega} &\toiso \mhomv{\Psi}{\subst\Gamma z\chi}{\subst\Omega z \chi}
 \end{align*}
 In particular, if all tensor products of cats exist, then the category $\K_1$ of cats and unary functors is symmetric monoidal.
 
@@ -466,16 +506,16 @@ Similarly, we can internalize contravariance by defining an operation of ``oppos
 We will write this as $(-)\op$ to distinguish it from the formal marker of contravariance $(-)\o$.
 
 \begin{defn}\label{defn:opp-cat}
-  An \textbf{opposite} of a cat $A$ is a cat $A\op$ with a functor $\chi:(A\o) \to A\op$ precomposition with which induces isomorphisms
+  An \textbf{opposite} of a cat $\A$ is a cat $\A\op$ with a functor $\chi:(\A\o) \to \A\op$ precomposition with which induces isomorphisms
   \begin{align*}
-    \K((\Psi,(A\op)\e),C) &\toiso \K((\Psi,A\epbar),C)\\
-    \modk(\Psi,(A\op)\e) &\toiso \modk(\Psi,A\epbar) \\
-    \mhomc{\Psi,z:(A\op)\e}{\Gamma}{\Omega} &\toiso \mhomc{\Psi,x:A\epbar}{\subst\Gamma z {\chi(x)}}{\subst\Omega z{\chi(x)}}
+    \K((\Psi,(\A\op)\e),\C) &\toiso \K((\Psi,\A\epbar),\C)\\
+    \modk(\Psi,(\A\op)\e) &\toiso \modk(\Psi,\A\epbar) \\
+    \mhomv{\Psi,z:(\A\op)\e}{\Gamma}{\Omega} &\toiso \mhomv{\Psi,x:\A\epbar}{\subst\Gamma z {\chi(x)}}{\subst\Omega z{\chi(x)}}
   \end{align*}
 \end{defn}
 
 If all opposites exist, then $(-)\op$ defines an endofunctor of $\K_1$.
-By comparing universal properties, we can see that $(A\op)\op\cong A$ and $(A\otimes B)\op \cong A\op \otimes B\op$ and $I\op$, so that $(-)\op$ is a ``symmetric monoidal involution'' in a suitable sense.
+By comparing universal properties, we can see that $(\A\op)\op\cong \A$ and $(\A\otimes \B)\op \cong \A\op \otimes \B\op$ and $\I\op\cong \I$, so that $(-)\op$ is a ``symmetric monoidal involution'' in a suitable sense.
 
 
 \subsection{Tensor products of modules}
@@ -488,32 +528,34 @@ However, it is more complicated in that the universal property applies to all so
 To state this precisely, we need a bit more notation.
 \begin{itemize}
 \item If $M\in\modk(\Psi)$, we will write $M(\theta)$ for $M$ with a list of expressions $\theta$ for its abstract variables.
-  For instance, if $M\in\modk(A,B\o,C)$ and we have $g:X \to A$ and $h:(Y\o,Z)\to B$ and $k:()\to C$, then with $\theta=(g(x),h(y,z),k)$ we have $M(\theta) = M(g(x),h(y,z),k)$.
+  For instance, if $M\in\modk(\A,\B\o,\C)$ and we have $G:\X \to \A$ and $H:(\Y\o,\Z)\to \B$ and $K:()\to \C$, then with $\theta=(G(x),H(y,z),K)$ we have $M(\theta) = M(G(x),H(y,z),K)$.
   We will also use letters like $\gamma$ and $\omega$ for such lists $\theta$.
 \end{itemize}
 
 \begin{defn}
   A \textbf{tensor product} of modules $M_1\in\modk(\Psi_1)$ and $M_2\in\modk(\Psi_2)$ is a module $M_1\otimes M_2 \in \modk(\Psi_1,\Psi_2)$ along with an (ordinary) morphism $\chi:(M_1,M_2)\to M_1\otimes M_2$ such that precomposition with $\chi$ (or some restriction of it) induces bijections
-  \[ \mhom{\Gamma,(M_1\otimes M_2)(\theta_1,\theta_2)}{\Omega} \toiso \mhom{\Gamma,M_1(\theta_1),M_2(\theta_2)}{\Omega} \]
+  \[ \mhomv{\Psi}{\Gamma,(M_1\otimes M_2)(\theta_1,\theta_2)}{\Omega} \toiso \mhomv{\Psi}{\Gamma,M_1(\theta_1),M_2(\theta_2)}{\Omega} \]
+  whenever this makes sense.
 \end{defn}
 
 The presence of the $\theta$s means that this universal property includes extraordinary morphisms of all sorts, where paired variables may occur anywhere.
 Examples include:
 \begin{align*}
-  \mhom{(M_1 \otimes M_2)(a,b)}{N(a,b)} &\toiso \mhom{M_1(a), M_2(b)}{N(a,b)}\\
-  \mhom{(M_1 \otimes M_2)(a,a)}{N} &\toiso \mhom{M_1(a), M_2(a)}{N}\\
-  \mhom{P(a),(M_1 \otimes M_2)(a,b,c)}{N(b,c,d,d)} &\toiso \mhom{P(a),M_1(a,b), M_2(c)}{N(b,c,d,d)}\\
+  \mhomv{a,b}{(M_1 \otimes M_2)(a,b)}{N(a,b)} &\toiso \mhomv{a,b}{M_1(a), M_2(b)}{N(a,b)}\\
+  \mhomv{a}{(M_1 \otimes M_2)(a,a)}{N} &\toiso \mhomv{a}{M_1(a), M_2(a)}{N}\\
+  \mhomv{a,b,c,d}{P(a),(M_1 \otimes M_2)(a,b,c)}{N(b,c,d,d)} &\toiso \mhomv{a,b,c,d}{P(a),M_1(a,b), M_2(c)}{N(b,c,d,d)}\\
 \intertext{
 and so on.
 Similarly, $\theta$ can also include restrictions, so that we might have}
-  \mhom{(M_1\otimes M_2)(f(a),g(b))}{N(a,b)} &\toiso \mhom{M_1(f(a)),M_2(g(b))}{N(a,b)}
+  \mhomv{a,b}{(M_1\otimes M_2)(F(a),G(b))}{N(a,b)} &\toiso \mhomv{a,b}{M_1(F(a)),M_2(G(b))}{N(a,b)}
 \end{align*}
-In other words, the restricted morphism $(f,g)^*\chi : f^*M, g^*N \to (f,g)^*(M\otimes N)$ has the universal property that would be expected of $\chi: f^*M, g^*N \to f^*M \otimes g^*N$, and thus tensor products are stable under restriction: $ (f,g)^*(M\otimes N) \cong  f^*M \otimes g^*N$.
+In other words, the restricted morphism $(F,G)^*\chi : F^*M, G^*N \to (F,G)^*(M\otimes N)$ has the universal property that would be expected of $\chi: F^*M, G^*N \to F^*M \otimes G^*N$, and thus tensor products are stable under restriction: $ (F,G)^*(M\otimes N) \cong  F^*M \otimes G^*N$.
 
-In general this stability is only up to isomorphism, so we technically ought to resist the temptation to write things like $M_1(a,b)\otimes M_2(c)$ instead of $(M_1 \otimes M_2)(a,b,c)$.
-However, the former notation is so useful (it reminds us how the dependencies split) that we will often succumb to this temptation.
-It should be possible to prove a coherence theorem making tensor products (and all similar universal properties to be introduced below) strictly stable under restriction, and this is moreover how they appear in the type theory of~\cite{lnss:dirtt}.
-Remember also that the pairing of variables only indicates the type of extraordinary morphism under consideration; when we write $(M_1 \otimes M_2)(a,a)$ or $M_1(a)\otimes M_2(a)$ we are still talking about the same tensor product module $M_1\otimes M_2$, just different kinds of morphisms out of it.
+We will further abuse notation by ``distributing'' abstract variables over module operations such as $\otimes$.
+That is, instead of $(M_1 \otimes M_2)(a,b,c)$ we will write $M_1(a,b)\otimes M_2(c)$, which is more visually pleasing and moreover indicates exactly how the variable dependence arises from $M_1$ and $M_2$.
+In particular, this abuse of notation means we identify $(F,G)^*(M\otimes N)$ with its isomorph $F^*M \otimes G^*N$, since both will be denoted $M(F(x)) \otimes N(G(y))$.
+(This should be formally justifiable by a coherence theorem, necessary also for interpretation of the type theory of~\cite{lnss:dirtt}.)
+Remember also that the pairing of variables only indicates the type of extraordinary morphism under consideration; whether we write $(M_1 \otimes M_2)(a,a)$ or $M_1(a)\otimes M_2(a)$ we are still talking about the same tensor product module $M_1\otimes M_2$, just different kinds of morphisms out of it.
 
 As usual, we can define $n$-ary tensor products for all $n$, and the usual arguments show that these are associative and symmetric insofar as they exist.
 A nullary tensor product is a module $I\in \modk(())$ and a morphism $() \to I$, precomposition with which induces bijections $\mhom{\Gamma,I}{\Omega} \toiso \mhom\Gamma \Omega$.
@@ -529,54 +571,61 @@ First one more bit of notation:
 \begin{itemize}
 \item We will write $\xi$ for a $\theta$ that contains no functors or pairings, only a list of distinct abstract variables.
   In other words, $M(\xi)$ simply stands for a way to import $M$ into abstract variable notation, which is unique up to the choice of variable names.
-  Thus if $M\in \modk(A,B\o,C)$ then $M(\xi)$ might mean $M(a,b,c)$ but not $M(g(x),h(y,z),k)$.
+  Thus if $M\in \modk(\A,\B\o,\C)$, then $M(\xi)$ might mean $M(a,b,c)$ but not $M(g(x),h(y,z),k)$.
   Moreover, if different $\xi$s appear in an expression we assume them to be disjoint.
 \end{itemize}
 
-For instance, the universal morphism of a tensor product could be written in abstract variable notation as $\chi \in \mhom{M_1(\xi_1), M_2(\xi_2)}{(M_1\otimes M_2)(\xi_1,\xi_2)}$.
+For instance, the universal morphism of a tensor product could be written in abstract variable notation as $\chi \in \mhomv{\Psi}{M_1(\xi_1), M_2(\xi_2)}{(M_1\otimes M_2)(\xi_1,\xi_2)}$.
 We avoided this before by writing it without abstract variables, but that is no longer possible now that we want to consider extraordinary universal morphisms.
 
 \begin{defn}
-  A \textbf{coend} of a module $M\in \modk(A,A\o,\Psi)$ is a module $\coend^A M\in\modk(\Psi)$ together with a morphism $\chi\in\mhom{M(a,a,\xi)}{\big(\coend^A M\big)(\xi)}$, precomposition with which induces bijections
-  \[ \mhom{\Gamma,(\coend^A M)(\theta)}{\Omega} \toiso \mhom{\Gamma,M(a,a,\theta)}{\Omega} \]
+  A \textbf{coend} of a module $M\in \modk(\A,\A\o,\Psi)$ is a module $\coend^\A M\in\modk(\Psi)$ together with a morphism $\chi\in\mhom{M(a,a,\xi)}{\big(\coend^\A M\big)(\xi)}$, precomposition with which induces bijections
+  \[ \mhomv{\Psi'}{\Gamma,(\coend^\A M)(\theta)}{\Omega} \toiso \mhomv{\Psi',a}{\Gamma,M(a,a,\theta)}{\Omega} \]
   whenever this makes sense.
 \end{defn}
 
-If other variables belonging to $A$ occur elsewhere, then we may indicate which one is being ``coended'' by writing $\coend^{a:A} M(a,a)$.
+When using abstract variables, we \dots
+
+(TODO: Emphasize that we \emph{write} the variable $a$ inside the coend.)
+
+If other variables belonging to $\A$ occur elsewhere, then we may indicate which one is being ``coended'' by writing $\coend^{a:\A} M(a,a)$.
 In this notation the variable $a$ is ``bound'' and no longer indicates any ordinary or extraordinary dependence of the morphism under consideration.
 
 The simplest case of the universal property of a coend is that
-\[ \mhom{\coend^A M}{N} \cong \mhom{M(a,a)}{N} \]
-for $M\in\modk(A,A\o)$ and $N\in\modk(())$.
-In other words, $\coend^A M$ is the module universally equipped with a morphism from $M$ that is extraordinary in $A$.
-As with tensor products, the full universal property also applies to multivariable morphisms that may have other variables, both ordinary and extraordinary, and also implies a stability under restriction: $f^*(\coend^A M) \cong \coend^A f^*M$.
+\[ \mhomv{}{\coend^\A M}{N} \cong \mhomv{a}{M(a,a)}{N} \]
+for $M\in\modk(\A,\A\o)$ and $N\in\modk(())$.
+In other words, $\coend^\A M$ is the module universally equipped with a morphism from $M$ that is extraordinary in $\A$.
+As with tensor products, the full universal property also applies to multivariable morphisms that may have other variables, both ordinary and extraordinary, and also implies a stability under restriction: $F^*(\coend^\A M) \cong \coend^\A F^*M$.
+As with tensor products, this stability justifies abusing notation by distributing abstract variables inside the coend, so that we write $\coend^\A M(F(b))$ instead of the more correct $(\coend^\A M)(F(b))$.
 
-This stability is, of course, only true for restriction along functors between \emph{other} cats that $M$ may depend on: a functor $f:B\to A$ does not induce an isomorphism $\coend^{B} (f,f)^* M \cong \coend^A M$.
-We do, however, have a morphism $\coend^{B} (f,f)^* M \to \coend^A M$, induced by first restricting the universal morphism $M(a,a) \to \coend^A M$ along $f$ to obtain $M(f(b),f(b)) \to \coend^A M$, then applying the universal property of $\coend^B$.
+Note that this stability only applies to restriction along functors between \emph{other} cats that $M$ may depend on: a functor $F:\B\to \A$ does not induce an isomorphism $\coend^{\B} (F,F)^* M \cong \coend^\A M$.
+We do, however, have a morphism
+\[\coend^{b:\B} M(F(b),F(b)) \mtoo{} \coend^{a:\A} M(a,a),\]
+induced by first restricting the universal morphism $M(a,a) \mtoo{a} \coend^\A M$ along $F$ to obtain $M(F(b),F(b)) \mtoo{b} \coend^A M$, then applying the universal property of $\coend^\B M$.
 
 By comparing universal properties, we can deduce the ``Fubini theorem''
 \[ \coend^A \coend^B M \cong \coend^B \coend^A M. \]
 Moreover, if $A\otimes B$ exists, then both iterated coends are also isomorphic to $\coend^{A\otimes B} M'$, where $M'$ corresponds to $M$ under the universal property of $A\otimes B$ (applied twice, once covariantly and once contravariantly).
-Similarly, we have $\coend^I M'\cong M$ if $I$ is the unit cat and $M'$ corresponds to $M$ under its universal property.
+Similarly, we have $\coend^\I M'\cong M$ if $\I$ is the unit cat and $M'$ corresponds to $M$ under its universal property.
 
 Combining the coend with the (external) tensor product of modules, we obtain the \emph{binding} or \emph{canceling} tensor product of modules:
-\[ M\otimes_A N = \coend^A (M\otimes N) \]
-where $M\in\modk(\Psi_1,A)$ and $N\in\modk(\Psi_2,A\o)$ (or vice versa).
+\[ M\otimes_\A N = \coend^\A (M\otimes N) \]
+where $M\in\modk(\Psi_1,\A)$ and $N\in\modk(\Psi_2,\A\o)$ (or vice versa).
 Comparing universal properties, we see that this is also associative:
-\[ (M\otimes_A N) \otimes_B P \cong M\otimes_A (N\otimes_B P) \]
+\[ (M\otimes_\A N) \otimes_\B P \cong M\otimes_\A (N\otimes_\B P) \]
 and we can verify the pentagon axiom.
-This wants to be the composition operation in a bicategory of cats and modules, where the hom-category from $A$ to $B$ is $\modk(B\o,A)$; but we do not yet have the identity 1-cells for such a bicategory.
+This wants to be the composition operation in a bicategory of cats and modules, where the hom-category from $\A$ to $\B$ is $\modk(\B\o,\A)$; but we do not yet have the identity 1-cells for such a bicategory.
 
-Note that it is possible to express directly the universal property of the binding tensor product: it comes with a morphism $M(\xi_1,a), N(a,\xi_2) \mto (M\otimes_A N)(\xi_1,\xi_2)$, inducing bijections
-\[ \mhom{\Gamma,(M\otimes_A N) (\theta_1,\theta_2)}{\Omega} \toiso \mhom{\Gamma,M(\theta_1,a),N(a,\theta_2)}{\Omega} \]
+Note that it is possible to express directly the universal property of the binding tensor product: it comes with a morphism $M(\xi_1,a), N(a,\xi_2) \mtoo{a,\Psi} (M\otimes_A N)(\xi_1,\xi_2)$, inducing bijections
+\[ \mhomv{\Psi'}{\Gamma,(M\otimes_\A N) (\theta_1,\theta_2)}{\Omega} \toiso \mhomv{a,\Psi'}{\Gamma,M(\theta_1,a),N(a,\theta_2)}{\Omega} \]
 This is useful because in some kits the binding tensor product may exist even if the external tensor product and coend do not separately exist.
 
 Finally, ends are dual to coends.
 These are our first module with a ``mapping in'' universal property.
 
 \begin{defn}
-  An \textbf{end} of a module $M\in \modk(A,A\o,\Psi)$ is a module $\tend_A M\in\modk(\Psi)$ together with a morphism $\chi\in\mhom{\big(\tend_A M\big)(\xi)}{M(a,a,\xi)}$, postcomposition with which induces bijections
-  \[ \mhom{\Gamma}{(\tend_A M)(\theta)} \toiso \mhom{\Gamma}{M(a,a,\theta)} \]
+  An \textbf{end} of a module $M\in \modk(\A,\A\o,\Psi)$ is a module $\tend_\A M\in\modk(\Psi)$ together with a morphism $\chi: {\big(\tend_\A M\big)(\xi)} \mtoo{a,\Psi} {M(a,a,\xi)}$, postcomposition with which induces bijections
+  \[ \mhomv{\Psi'}{\Gamma}{(\tend_A M)(\theta)} \toiso \mhomv{\Psi',a}{\Gamma}{M(a,a,\theta)} \]
   whenever this makes sense.
 \end{defn}
 
@@ -698,7 +747,119 @@ Since universal properties are stable under restriction, it follows that for any
 As a special case, we can define (pointwise) Kan extensions.
 If $f:D\to C$ and $g:D\to E$ are functors, then the right Kan extension of $f$ along $g$ (if it exists) is the limit of $f$ weighted by $\mor{E}(1,g)$.
 
-\part{The definition of a kit}
+\newpage
+\part{A simpler definition of a kit}
+\label{part:def2}
+
+Let $V$ be the monad on $\bCat$ whose algebras are symmetric strict monoidal categories equipped with a strict symmetric monoidal strict involution, i.e.\ a strict symmetric monoidal functor $(-)\o : \C\to\C$ such that $(a\o)\o =a$ functorially.
+Concretely, the objects of $V\C$ are finite lists of objects of $\C$, some of which are marked with a formal $(\blank)\o$, such as $(a,b\o,b,c\o,a)$.
+It will also sometimes be convenient to write such a list as $(a\p,b\m,b\p,c\m,a\p)$, where $a\p=a$ and $a\m=a\o$; we can then write $a\e$ to mean either $a\p$ or $a\m$ depending on whether $\varepsilon=+$ or $\varepsilon=-$.
+We write $\varepsilon^*$ for the reversed variance, i.e.\ $+^*=-$ and $-^*=+$.
+
+Since $V\C$ is monoidal with an involution, its objects can be concatenated and oppositized (by distributing the opposite over the list), so for instance
+\[(a,b\o)(c\o,d,a) = (a,b\o,c\o,d,a) \quad\text{and}\quad (b\o,a,a)\o = (b,a\o,a\o).\]
+Its unit object is $\one = ()$.
+The morphisms of $V\C$ are given by finite lists of morphisms of $\C$ labeled by permutations which respect the opposites, e.g.\ a morphism $(a,b\o,b,c\o,a) \to (d,e,d\o,f,e\o)$ might be:
+\begin{tikzc}
+  \node (A1) at (0,3) {$a$};
+  \node (Bo2) at (1,3) {$b\o$};
+  \node (B3) at (2,3) {$b$};
+  \node (Co4) at (3,3) {$c\o$};
+  \node (A5) at (4,3) {$a$};
+  \node (D1') at (0,0) {$d$};
+  \node (B2') at (1,0) {$e$};
+  \node (Do3') at (2,0) {$d\o$};
+  \node (C4') at (3,0) {$f$};
+  \node (Ao5') at (4,0) {$e\o$};
+  \draw[->] (A1) to[out=-90,in=90] node[ed,swap,pos=.2] {$f$} (B2');
+  \draw[->] (Bo2) to[out=-90,in=90] node[ed,swap,pos=.1] {$g\o$} (Ao5');
+  \draw[->] (B3) to[out=-90,in=90] node[ed,swap,pos=.9] {$h$} (D1');
+  \draw[->] (Co4) to[out=-90,in=90] node[ed,swap,pos=.8] {$k\o$} (Do3');
+  \draw[->] (A5) to[out=-90,in=90] node[ed,pos=.2] {$\ell$} (C4');
+\end{tikzc}
+Here $f:a\to e$, $g:b\to e$, $h:b\to d$, $k:c\to d$, and $\ell:a\to f$ are morphisms in $\C$.
+Note that there can only be a morphism between two lists if they have the same length \emph{and} the same number of opposites.
+Formally, if $A=(a_1\e[1],\dots,a_n\e[n])$ and $B=(b_1\ph[1],\dots,b_n\ph[n])$, then a morphism $A\to B$ is a pair $(\sigma,f)$ where $\sigma\in \Sigma_n$ is a permutation such that $\varphi_{\sigma(k)} = \varepsilon_{k}$, and $f=(f_1,\dots,f_n)$ is a list of morphisms with $f_n : a_n \to b_{\sigma(n)}$.
+
+The monad $V$ extends naturally to the double category $\cProf$, so we have a notion of \textbf{$V$-multicategory}.
+A $V$-multicategory $\cK$ has a set $\cK_0$ of objects and sets $\cK(a_1\e[1],\dots,a_n\e[n];b)$ of morphisms (such as $\cK(a,b\o,c;d)$), with appropriate symmetric group actions, and multicategorical composition that respects permutations and opposites.
+Composition respecting opposites means, for instance, that if $f\in \cK(a,b\o;c)$ and $g\in \cK(d;a)$ and $h\in \cK(u,v\o;b)$, then $f\circ (g,h) \in \cK(d,u\o,v;c)$, i.e.\ if we have to oppositize the codomain in order to compose, the domain also gets oppositizes.
+
+As with any notion of generalized multicategory, a $V$-multicategory $\cK$ generates a free $V$-algebra $\Khat$.
+Its objects are those of $V\cK_0$ as described above, while its morphisms generalize those of $V$ above by allowing multiple domain objects for each morphism, with any desired permutation of the resulting domain.
+Formally, we can say that a morphism in $\Khat((a_1\e[1],\dots,a_n\e[n]),(b_1\ph[1],\dots,b_m\ph[m]))$ is uniquely determined by:
+\begin{itemize}
+\item For each $1\le j\le m$ a morphism $f_j\in \cK(c_{j1}\ps[j1],\dots,c_{j k_j}\ps[j k_j];b_j)$; and
+\item A shuffle $\sigma_f$ of the double-indices $(j,\ell)$ for $1\le \ell\le k_j$ into the single indices $i$ for $1\le i\le n$, i.e.\ a bijection that preserves the order on each set $\setof{ (j,\ell) | 1\le \ell\le k_j}$ separately; such that
+\item If $\sigma(j,\ell)=i$, then $(c_{ji}\ps[ji])\ph[j]=a_i\e[i]$.
+\end{itemize}
+The reason we use a shuffle instead of an arbitrary permutation is that the hom-sets $\cK(c_{j1}\ps[j1],\dots,c_{j k_j}\ps[j k_j];b_j)$ already have a permutation action.
+The more direct way to define $\Khat$ would incorporate an arbitrary permutation but then quotient by the action of these permutations; using a shuffle instead avoids the need to quotient.
+
+Now, given any category $\A$, let $G\A$ be the free strict compact closed category on $\A$.
+(By a \emph{strict compact closed category} we mean a symmetric strict monoidal category equipped with a strict involution $\A\op\to\A$ sending each object to a dual of itself.)
+This is like the free compact closed category on $\A$ described by~\cite{kelly-laplaza}, but its objects are the strings $(a_1\e[1],\dots,a_n\e[n])$ (which, as we have seen, are also the objects of $V\A$), which~\cite{kelly-laplaza} call \emph{signed sets}, rather than arbitrary parenthesizations thereof.
+
+Let $\cK$ be a $V$-multicategory, with object-set $\cK_0$; we define a double category $\Kbar$ as follows.
+Its vertical category is $\Khat$; its horizontal category is $G\K_0$.
+(We have already noted that these two categories have the same objects.)
+
+To define its square cells, let $\cK_\to$ denote the action groupoid of the permutation actions on the disjoint union $\sum \cK(a_1\e[1],\dots,a_n\e[n];b)$ of all hom-sets of $\cK$.
+That is, an object of $\cK_\to$ is a morphism in $\cK$ (with any domain and codomain), while a morphism $f\to g$ is a permutation that permutes the domain of $f$ into the domain of $g$, along with the assertion that $f$ and $g$ have the same codomain.
+Assigning codomains is a functor $\cK_\to\to\cK_0$, hence by functoriality induces a compact closed functor $G\ncod : G\cK_\to\to G\cK_0$.
+And assigning domains is a functor $\cK_\to \to G\cK_0$ (not to $\cK_0$), hence by freeness induces a compact closed functor $G\ndom : G\cK_\to \to G\cK_0$.
+
+Now we define a square cell in $\Kbar$:
+\[\xymatrix{
+  A \ar[r]^h \ar[d]_f \drtwocell\omit & B \ar[d]^g \\ C \ar[r]_k & D
+}\]
+as follows.
+Recall that $\Khat((a_1\e[1],\dots,a_n\e[n]),(b_1\ph[1],\dots,b_m\ph[m]))$ is determined by morphisms $f_j$ and a shuffle $\sigma_f$, and similarly $g$ is determined by morphisms $g_j$ and a shuffle $\sigma_g$.
+Let $\fbar$ denote the list $(f_1\ph[1],\dots,f_m\ph[m])$, which we can regard as an \emph{object} of $G\cK_\to$, and similarly $\gbar$.
+We define a 2-cell as above to consist of a morphism $\al:\fbar\to\gbar$ in $G\cK_\to$ such that $G\ncod(\al) = k$ and $\sigma_g\circ G\ndom(\al) = h\circ \sigma_f$ in $G\cK_0$.
+(We can regard a permutation as a morphism in $G\cK_0$, since $G\cK_0$ is symmetric monoidal.)
+
+It is straightforward to define double-categorical composition of squares in $\Kbar$: vertical composition is essentially as in $\Khat$, while horizontal composition is essentially as in $G\cK_\to$.
+Moreover, $\Kbar$ is a symmetric strict monoidal double category in an obvious way.
+Its symmetry constraints are actually companion pairs of vertical and horizontal morphisms, but we will only need the horizontal ones.
+Thus, $\Kbar$ can be viewed as an internal category in the category of symmetric strict monoidal categories and strict symmetric monoidal functors: its symmetric strict monoidal category of objects is its horizontal category $G\cK_0$.
+
+Now, the ``underlying symmetric multicategory'' functor $R$ from symmetric strict monoidal categories to symmetric multicategories is a right adjoint, and hence preserves limits.
+Therefore, it takes internal categories to internal categories, so that $R\Kbar$ is an internal category in symmetric multicategories, or as we might say (following~\cite{cheng-gurski-riehl}), a \emph{symmetric double multicategory}.
+Such a thing has objects, vertical unary arrows, horizontal multi-arrows, and horizontally-multi squares.
+
+Finally, let $B\cK$ denote the subobject of $R\Kbar$ containing all the objects, all the vertical arrows, but only the horizontal arrows and squares whose graphs contain no loops/traces.
+This is no longer a symmetric double multicategory, since tho composite of two loop-free morphisms can contain a loop; it is a \emph{partial symmetric double multicategory}, with horizontal composition only a partially defined function.
+
+\begin{defn}
+  A \textbf{kit} $\K$ consists of
+  \begin{itemize}
+  \item A $V$-multicategory $\cK$, and
+  \item A partial symmetric double multicategory $\modk$ and a functor $\modk \to B\cK$ that is:
+    \begin{enumerate}
+    \item horizontally an \emph{inner fibration}, i.e.\ reflects the existence of composites;
+    \item a discrete fibration on the categories of objects and vertical arrows; and
+    \item a discrete fibration on the categories of horizontal arrows and squares.
+    \end{enumerate}
+  \end{itemize}
+\end{defn}
+
+The objects of $\cK$ are called \textbf{cats}, and its morphisms \textbf{functors}.
+The objects of $\modk$ are called \textbf{modules}; the projection functor assigns to each module a signed list of cats as its domain.
+The discrete fibration of objects says that we can restrict/substitute modules along functors.
+The horizontal arrows of $\modk$ are called \textbf{transformations}; the projection functor assigns to each transformation a ``naturality signature'' consisting of a loop-free graph relating its domain and codomain.
+The discrete fibration on horizontal arrows says that we can restrict transformations along functors too.
+The inner fibration condition says that we can compose two transformations if (and only if) we can compose their naturality signatures without producing any loops.
+
+The universal properties of tensor product modules, function modules, ends, coends, and hom-modules are expressed as fibration or opfibration conditions with respect to horizontal arrows in $B\cK$, subject to a stability condition under vertical restriction.
+Universal properties such as tensor product cats and opposite cats are ordinary multicategorical universal properties in $\cK$ combined with an appropriate behavior on modules.
+
+In this definition of kit, restriction along functors is strictly functorial.
+We could weaken that by allowing $\modk \to B\cK$ to be a not-necessarily-discrete fibration, but then we would need some additional condition to remove the redundancy of having both nontrivial vertical and horizontal arrows in its fibers.
+
+
+\newpage
+\part{The old definition of a kit}
 \label{part:def}
 
 \section{Generalized polycategories}
